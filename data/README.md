@@ -18,10 +18,11 @@
 | `raw/compliance_lexicon.txt` | 绝对化/功效/医疗/价格词表 | 45 |
 | `raw/lexicon_variants.tsv` | 谐音、拼音、繁体、英文等变体 | 20 |
 | `raw/history_reason_stats.csv` | 同类理由历史表现（pattern 级） | 30 |
+| `exposure_click_history.csv` | 按推荐理由拆分的日粒度曝光点击历史（模拟） | 4,200 |
 | `raw/city_climate.json` | 城市/气候区/梅雨季映射 | 12 城市 |
 | `mock.db` | 上述数据的 SQLite 版本，供 MCP 工具直接查询 | — |
 
-**尚未生成**（依赖 Agent 产出）：`reason_candidates.jsonl`、`exposure_log.jsonl`、`labels.csv`、`latent.csv`。
+候选与曝光评测产物按批次生成：`reason_candidates.jsonl`、`exposure_log.jsonl`、`labels.csv`、`latent.csv`。`exposure_click_history.csv` 是基于全量 300 条候选与 14 天观察窗生成的参考数据，不替代原始曝光汇总。
 
 ---
 
@@ -159,6 +160,7 @@ term|canonical|risk_type|severity|law_ref|note
 ```bash
 python3 scripts/gen_data.py      # 重新生成全部 CSV/JSON/SQLite
 python3 scripts/validate_data.py # 7 类硬校验 + 分布告警
+python3 generate_exposure_click_history.py # 生成日粒度曝光点击参考数据
 ```
 
 校验覆盖：数量/唯一性/外键/类目/资质/价格/库存/评分/促销规则/用户字段/敏感比例/优惠覆盖/DB 行数。

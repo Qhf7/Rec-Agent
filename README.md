@@ -94,6 +94,8 @@ Rec-Agent 不输出 Jev 判决字段，避免生成模型替代下游合规判�
 - `compliance_lexicon.txt`：审核词表；
 - `history_reason_stats.csv`：历史理由统计特征。
 
+参考分析数据位于 [`data/exposure_click_history.csv`](data/exposure_click_history.csv)，由全量候选的 14 天观察窗拆分得到，包含用户、商品、日期、曝光、点击、加购、下单和设备/位置等字段；这是可复现的模拟数据，不替代原始曝光汇总。
+
 完整字段说明见 [`data/README.md`](data/README.md) 和 [`用户与商品数据说明.md`](用户与商品数据说明.md)。
 
 ## 本地运行
@@ -105,6 +107,7 @@ source .venv/bin/activate
 pip install -r requirements-mcp.txt
 pytest -q
 python3 scripts/validate_data.py
+python3 generate_exposure_click_history.py
 ```
 
 启动只读 MCP 服务：
