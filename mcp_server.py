@@ -1,7 +1,8 @@
 """Read-only MCP data tools for the Rec-Agent Harness preset.
 
-The server reads the canonical mock data under ``data/raw``. It never writes
-workspace files and never calls the Jev API; Jev remains a downstream judge.
+The server reads the canonical mock data under ``data/raw`` plus the
+post-Jev recommendation feedback history. It never writes workspace files and
+never calls the Jev API; Jev remains a downstream judge.
 Run with ``python3 mcp_server.py`` for the default stdio transport.
 """
 
@@ -10,7 +11,7 @@ from __future__ import annotations
 import csv
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -21,14 +22,16 @@ from mcp.server.fastmcp import FastMCP
 
 ROOT = Path(__file__).resolve().parent
 RAW = ROOT / "data" / "raw"
+FEEDBACK_HISTORY = ROOT / "data" / "recommendation_feedback_history.csv"
 SCENARIO_DATE = "2026-06-15"
 TIMEZONE = "Asia/Shanghai"
 
 mcp = FastMCP(
     "Rec-Agent Data Tools",
     instructions=(
-        "Read-only user, behavior, item, promotion and session-context tools "
-        "for the Rec-Agent recommendation preset. Do not mutate data or judge Jev exposure."
+        "Read-only user, behavior, item, promotion, session-context and post-Jev "
+        "recommendation feedback tools for the Rec-Agent recommendation preset. "
+        "Do not mutate data or judge Jev exposure."
     ),
 )
 
@@ -114,6 +117,23 @@ def _climate() -> dict[str, Any]:
     return json.loads((RAW / "city_climate.json").read_text(encoding="utf-8"))
 
 
+@lru_cache(maxsize=1)
+def _feedback_history() -> list[dict[str, Any]]:
+    if not FEEDBACK_HISTORY.exists():
+        return []
+    with FEEDBACK_HISTORY.open(encoding="utf-8-sig", newline="") as handle:
+        rows: list[dict[str, Any]] = []
+        for row in csv.DictReader(handle):
+            for key in ("jev_approved", "shown", "clicked"):
+                row[key] = row.get(key, "").lower() == "true"
+            if not row.get("click_time"):
+                row["click_time"] = None
+            row["position"] = _int(row.get("position"))
+            row["ctr_prior"] = _float(row.get("ctr_prior"))
+            rows.append(row)
+        return rows
+
+
 def _not_found(key: str, value: str) -> dict[str, Any]:
     return {"found": False, key: value}
 
@@ -149,6 +169,84 @@ def get_user_behavior(user_id: str) -> dict[str, Any]:
         "aov_90d",
     )
     return {"found": True, **{key: user.get(key) for key in keys}}
+
+
+@mcp.tool()
+def get_user_recommendation_history(
+    user_id: str,
+    days: int = 30,
+    limit: int = 20,
+    as_of: str = SCENARIO_DATE,
+) -> dict[str, Any]:
+    """Return post-Jev recommendation feedback for one user.
+
+    Only rows marked ``jev_approved=true`` and ``shown=true`` are returned.
+    An empty result is a normal cold-start state, not an error.
+    """
+
+    days = max(1, min(int(days), 365))
+    limit = max(0, min(int(limit), 100))
+    try:
+        as_of_date = datetime.fromisoformat(as_of).date()
+    except ValueError as exc:
+        raise ValueError("as_of must be an ISO date") from exc
+    cutoff = (as_of_date - timedelta(days=days - 1)).isoformat()
+    user_exists = user_id in _users()
+    events = [
+        row for row in _feedback_history()
+        if row.get("user_id") == user_id
+        and row.get("jev_approved") is True
+        and row.get("shown") is True
+        and cutoff <= str(row.get("event_date", "")) <= as_of_date.isoformat()
+    ]
+    events.sort(key=lambda row: (str(row.get("event_time", "")), str(row.get("event_id", ""))), reverse=True)
+    category_counts: dict[str, dict[str, int]] = {}
+    clicked_count = 0
+    recent_clicked_item_ids: list[str] = []
+    recent_shown_item_ids: list[str] = []
+    recent_ignored_item_ids: list[str] = []
+    for event in events:
+        item_id = str(event.get("item_id", ""))
+        if item_id and item_id not in recent_shown_item_ids:
+            recent_shown_item_ids.append(item_id)
+        if event.get("clicked") is True:
+            clicked_count += 1
+            if item_id and item_id not in recent_clicked_item_ids:
+                recent_clicked_item_ids.append(item_id)
+        elif item_id and item_id not in recent_ignored_item_ids:
+            recent_ignored_item_ids.append(item_id)
+        item = _items().get(str(event.get("item_id", "")), {})
+        category = str(item.get("category_l1", "unknown"))
+        stats = category_counts.setdefault(category, {"impressions": 0, "clicks": 0})
+        stats["impressions"] += 1
+        stats["clicks"] += int(bool(event.get("clicked")))
+    category_stats = [
+        {
+            "category_l1": category,
+            **stats,
+            "ctr": round(stats["clicks"] / stats["impressions"], 6) if stats["impressions"] else 0.0,
+            "smoothed_ctr": round((stats["clicks"] + 1) / (stats["impressions"] + 20), 6),
+        }
+        for category, stats in sorted(category_counts.items())
+    ]
+    smoothed_ctr = round((clicked_count + 1) / (len(events) + 20), 6)
+    return {
+        "found": user_exists,
+        "user_id": user_id,
+        "history_available": bool(events),
+        "history_status": "warm" if events else "cold_start",
+        "as_of": as_of_date.isoformat(),
+        "window_days": days,
+        "event_count": len(events),
+        "clicked_count": clicked_count,
+        "ctr": round(clicked_count / len(events), 6) if events else 0.0,
+        "smoothed_ctr": smoothed_ctr,
+        "recent_clicked_item_ids": recent_clicked_item_ids,
+        "recent_shown_item_ids": recent_shown_item_ids,
+        "recent_ignored_item_ids": recent_ignored_item_ids,
+        "category_stats": category_stats,
+        "events": events[:limit],
+    }
 
 
 @mcp.tool()

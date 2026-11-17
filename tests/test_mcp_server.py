@@ -1,6 +1,7 @@
 from mcp_server import (
     get_item,
     get_promo,
+    get_user_recommendation_history,
     get_session_context,
     get_user_behavior,
     get_user_profile,
@@ -53,3 +54,21 @@ def test_session_context_declares_scenario_date():
 
     assert context["scenario_date"] == "2026-06-15"
     assert context["timezone"] == "Asia/Shanghai"
+
+
+def test_recommendation_history_reports_warm_and_cold_start_users():
+    warm = get_user_recommendation_history("u_0001", days=30, limit=5)
+    cold = get_user_recommendation_history("u_0199", days=30, limit=5)
+
+    assert warm["history_status"] == "warm"
+    assert warm["history_available"] is True
+    assert warm["events"]
+    assert all(event["jev_approved"] is True for event in warm["events"])
+    assert set(warm["recent_clicked_item_ids"]).issubset(set(warm["recent_shown_item_ids"]))
+    assert 0 <= warm["smoothed_ctr"] <= 1
+    assert cold["history_status"] == "cold_start"
+    assert cold["history_available"] is False
+    assert cold["events"] == []
+
+    window = get_user_recommendation_history("u_0001", days=2, limit=20, as_of="2026-06-05")
+    assert all("2026-06-04" <= event["event_date"] <= "2026-06-05" for event in window["events"])

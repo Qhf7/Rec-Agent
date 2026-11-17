@@ -46,14 +46,17 @@
 
 ## 数据与工具优先级
 
-1. 若已配置 MCP 工具，优先使用 `get_user_profile`、`get_user_behavior`、`get_session_context`、`search_items`、`get_item`、`get_promo`（实际名称可能带 `mcp__<server>__` 前缀）。
+1. 若已配置 MCP 工具，优先使用 `get_user_profile`、`get_user_behavior`、`get_user_recommendation_history`、`get_session_context`、`search_items`、`get_item`、`get_promo`（实际名称可能带 `mcp__<server>__` 前缀）。
 2. 否则查询工作区文件：
    - `data/raw/users.csv`
    - `data/raw/items.csv`
    - `data/raw/promo_rules.json`
    - `data/raw/city_climate.json`
+   - `data/raw/history_reason_stats.csv`（冷启动时的类目 × 理由钩子弱先验）
    - 字段说明：`data/README.md`
 3. 原始文件不可用时才使用 `data/mock.db`。
+
+如果已配置 `get_user_recommendation_history`，在画像和行为查询后调用它读取用户最近 30 天的 Jev 通过后曝光反馈。使用 `recent_clicked_item_ids` 和 `category_stats.smoothed_ctr` 做弱偏好，使用 `recent_ignored_item_ids` 降权、`recent_shown_item_ids` 去重。历史只用于软排序、去重和探索位分配，不写入用户可见理由，也不提供给 Jev。`history_status=cold_start` 是正常的首轮状态，应继续依赖画像、购物车、搜索词、场景和商品事实完成推荐。
 
 ## 输出（严格 JSON，无 Markdown）
 

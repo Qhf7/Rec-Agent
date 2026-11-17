@@ -1,0 +1,338 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-labelledby="title desc">
+  <title id="title">Rec-Agent × Jev 曝光审核系统 · 双阶段解耦与闭环治理架构 (1920x1080)</title>
+  <desc id="desc">三平面泳道与防泄漏闭环架构图：左侧为数据基座与隔离墙，中左为 Rec-Agent 生成平面与 Fact Bundle 事实冻结层，中右为 Jev SystemOne 曝光前判决门禁，右侧为四档处置路由与 14 天曝光后校准闭环。</desc>
+  <defs>
+    <linearGradient id="canvasBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f1f5f9"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+    <linearGradient id="recLogo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1d4ed8"/>
+      <stop offset="55%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="jevPanelBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff5fa"/>
+      <stop offset="100%" stop-color="#fdf2f8"/>
+    </linearGradient>
+    <filter id="shadowSm" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#0f172a" flood-opacity="0.07"/>
+    </filter>
+    <filter id="shadowLogo" x="-15%" y="-15%" width="130%" height="135%">
+      <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#0f172a" flood-opacity="0.2"/>
+    </filter>
+    <marker id="arrBlue" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto">
+      <path d="M0 1 L9 5 L0 9 Z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrSlate" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto">
+      <path d="M0 1 L9 5 L0 9 Z" fill="#475569"/>
+    </marker>
+    <marker id="arrPink" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto">
+      <path d="M0 1 L9 5 L0 9 Z" fill="#db2777"/>
+    </marker>
+    <marker id="arrGreen" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto">
+      <path d="M0 1 L9 5 L0 9 Z" fill="#059669"/>
+    </marker>
+    <marker id="arrAmber" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto">
+      <path d="M0 1 L9 5 L0 9 Z" fill="#d97706"/>
+    </marker>
+    <marker id="arrOrange" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto">
+      <path d="M0 1 L9 5 L0 9 Z" fill="#ea580c"/>
+    </marker>
+    <marker id="arrRed" markerWidth="10" markerHeight="10" refX="8.5" refY="5" orient="auto">
+      <path d="M0 1 L9 5 L0 9 Z" fill="#e11d48"/>
+    </marker>
+    <style>
+      .title { font: 800 32px "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; fill: #0f172a; }
+      .subtitle { font: 400 15px "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; fill: #475569; }
+      .laneTag { font: 700 12px "SF Mono", Menlo, Consolas, monospace; fill: #64748b; letter-spacing: 1.2px; }
+      .h2 { font: 700 20px "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; fill: #0f172a; }
+      .h3 { font: 700 16px "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; fill: #1e293b; }
+      .mono { font: 600 13px "SF Mono", Menlo, Consolas, monospace; fill: #1e293b; }
+      .monoSm { font: 500 12px "SF Mono", Menlo, Consolas, monospace; fill: #475569; }
+      .body { font: 400 13.5px "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; fill: #334155; }
+      .muted { font: 400 12.5px "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; fill: #64748b; }
+      .badgeText { font: 600 12.5px "SF Mono", Menlo, Consolas, monospace; fill: #1e293b; }
+      .pill { font: 700 12px "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1920" height="1080" fill="url(#canvasBg)"/>
+  <rect x="20" y="18" width="1880" height="1044" rx="22" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+
+  <!-- ==================== TOP HEADER BAR ==================== -->
+  <g transform="translate(48, 36)">
+    <!-- Mini Rec-Agent Logo -->
+    <rect x="0" y="0" width="54" height="54" rx="14" fill="url(#recLogo)" filter="url(#shadowLogo)"/>
+    <rect x="10" y="13" width="34" height="27" rx="5" fill="#ffffff" fill-opacity="0.95"/>
+    <rect x="14" y="17" width="11" height="8" rx="2" fill="#2563eb"/>
+    <path d="M37 7 L39 14 L46 16 L39 18 L37 25 L35 18 L28 16 L35 14 Z" fill="#38bdf8" stroke="#ffffff" stroke-width="1.2"/>
+    <circle cx="27" cy="29" r="3.2" fill="#1d4ed8"/>
+    <circle cx="18" cy="38" r="3.2" fill="#2563eb" stroke="#ffffff" stroke-width="1"/>
+    <circle cx="36" cy="38" r="3.2" fill="#06b6d4" stroke="#ffffff" stroke-width="1"/>
+
+    <text x="72" y="24" class="title">Rec-Agent × Jev · 生成式推荐与曝光前合规审核全链路架构</text>
+    <text x="72" y="50" class="subtitle">「推荐生成」与「合规判决」双阶段解耦 · 严格数据防泄漏隔离 · 14 天曝光后校准闭环 (Qhf7/Rec-Agent · 1920×1080)</text>
+  </g>
+
+  <!-- Header Version Pills -->
+  <rect x="1420" y="42" width="214" height="34" rx="17" fill="#eff6ff" stroke="#93c5fd"/>
+  <circle cx="1440" cy="59" r="5" fill="#2563eb"/>
+  <text x="1454" y="64" class="badgeText">Agent: rec-agent-v2</text>
+
+  <rect x="1650" y="42" width="222" height="34" rx="17" fill="#fdf2f8" stroke="#f472b6"/>
+  <circle cx="1670" cy="59" r="5" fill="#e849b7"/>
+  <text x="1684" y="64" class="badgeText">Judge: jev-1.14.0</text>
+
+  <line x1="48" y1="106" x2="1872" y2="106" stroke="#e2e8f0" stroke-width="1.5"/>
+
+  <!-- ==================== COLUMN 1: DATA BASELINE & ISOLATION WALL ==================== -->
+  <rect x="48" y="124" width="356" height="836" rx="16" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" filter="url(#shadowSm)"/>
+  <text x="70" y="152" class="laneTag">DATA &amp; ISOLATION PLANE</text>
+  <text x="70" y="180" class="h2">数据基座与防泄漏隔离墙</text>
+
+  <!-- Box 1A: Canonical Data -->
+  <rect x="70" y="200" width="312" height="260" rx="12" fill="#ffffff" stroke="#93c5fd" stroke-width="1.5"/>
+  <text x="88" y="226" class="h3" fill="#1d4ed8">基础业务数据 (data/raw/)</text>
+  <text x="88" y="252" class="mono">• users.csv (200 条)</text>
+  <text x="102" y="272" class="muted">地域/气候/人生阶段/活跃时段/购物车/搜索词</text>
+  <text x="88" y="298" class="mono">• items.csv (200 条)</text>
+  <text x="102" y="318" class="muted">类目/功能/材质/场景/库存/功效清单/资质</text>
+  <text x="88" y="344" class="mono">• promo_rules.json (30 条)</text>
+  <text x="102" y="364" class="muted">满减/折扣/赠品门槛与有效期核验</text>
+  <text x="88" y="390" class="mono">• city_climate.json &amp; history_stats</text>
+  <text x="102" y="410" class="muted">基准日期 2026-06-15 · 梅雨季月份判定</text>
+  <rect x="88" y="424" width="276" height="24" rx="6" fill="#eff6ff"/>
+  <text x="226" y="440" text-anchor="middle" class="pill" fill="#1d4ed8">MCP 只读授权 · Agent 与 Jev 共享事实源</text>
+
+  <!-- Box 1B: Compliance Assets (Isolated from Agent) -->
+  <rect x="70" y="482" width="312" height="194" rx="12" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
+  <text x="88" y="508" class="h3" fill="#92400e">合规资产与金标 (下游专享)</text>
+  <text x="88" y="534" class="mono">• compliance_lexicon.txt (72 条)</text>
+  <text x="102" y="554" class="muted">绝对化用语 / 功效医疗 / 价格误导词表</text>
+  <text x="88" y="580" class="mono">• dev_labels_full.csv (300 条)</text>
+  <text x="102" y="600" class="muted">四档处置与六类风险金标/银标评测集</text>
+  <rect x="88" y="636" width="276" height="26" rx="6" fill="#fef2f2" stroke="#fca5a5" stroke-dasharray="4 3"/>
+  <text x="226" y="653" text-anchor="middle" class="pill" fill="#b91c1c">隔离墙：严禁 Rec-Agent 读取词表或标签</text>
+
+  <!-- Box 1C: Post-Exposure Logs (Isolated from Jev) -->
+  <rect x="70" y="698" width="312" height="242" rx="12" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.5"/>
+  <text x="88" y="724" class="h3" fill="#065f46">曝光后真实反馈日志 (data/)</text>
+  <text x="88" y="750" class="mono">• recommendation_feedback_history.csv</text>
+  <text x="102" y="770" class="muted">仅含 jev_approved=true 且已展示的点击事件</text>
+  <text x="88" y="796" class="mono">• exposure_log_full.jsonl (14 天窗)</text>
+  <text x="102" y="816" class="muted">click / add_cart / order / refund / complaint</text>
+  <text x="88" y="842" class="mono">• latent_full.csv (仅评测脚本使用)</text>
+  <text x="102" y="862" class="muted">隐变量 rel / appeal / claim_gap / quality</text>
+  <rect x="88" y="898" width="276" height="26" rx="6" fill="#fef2f2" stroke="#fca5a5" stroke-dasharray="4 3"/>
+  <text x="226" y="915" text-anchor="middle" class="pill" fill="#b91c1c">隔离墙：严禁泄漏至 Jev 曝光前判决输入</text>
+
+  <!-- ==================== COLUMN 2 TOP: GENERATION PLANE (REC-AGENT) ==================== -->
+  <rect x="448" y="124" width="490" height="430" rx="16" fill="#ffffff" stroke="#60a5fa" stroke-width="2" filter="url(#shadowSm)"/>
+  <text x="472" y="152" class="laneTag" fill="#1d4ed8">UPSTREAM · GENERATION PLANE (REC-AGENT)</text>
+
+  <!-- Rec-Agent Logo + Title -->
+  <g transform="translate(472, 168)" filter="url(#shadowLogo)">
+    <rect x="0" y="0" width="76" height="76" rx="19" fill="url(#recLogo)"/>
+    <rect x="13" y="18" width="50" height="39" rx="8" fill="#ffffff" fill-opacity="0.96"/>
+    <rect x="19" y="24" width="16" height="12" rx="3" fill="#2563eb"/>
+    <rect x="19" y="39" width="16" height="4" rx="2" fill="#0ea5e9"/>
+    <path d="M53 10 L56 20 L66 23 L56 26 L53 36 L50 26 L40 23 L50 20 Z" fill="#38bdf8" stroke="#ffffff" stroke-width="1.8"/>
+    <line x1="25" y1="54" x2="38" y2="41" stroke="#1d4ed8" stroke-width="3.2" stroke-linecap="round"/>
+    <line x1="51" y1="54" x2="38" y2="41" stroke="#1d4ed8" stroke-width="3.2" stroke-linecap="round"/>
+    <circle cx="38" cy="41" r="4.8" fill="#1d4ed8"/>
+    <circle cx="25" cy="54" r="4.8" fill="#2563eb" stroke="#ffffff" stroke-width="1.5"/>
+    <circle cx="51" cy="54" r="4.8" fill="#06b6d4" stroke="#ffffff" stroke-width="1.5"/>
+  </g>
+  <text x="564" y="196" class="h2">Rec-Agent 选品与文案生成</text>
+  <text x="564" y="220" class="monoSm">rec-agent-preset/cordis.patch.yml · modelgo_agent.py</text>
+  <text x="564" y="242" class="muted">输入: user_id 或 user_context (字段覆盖 CSV 快照)</text>
+
+  <!-- Step 1: MCP Tools -->
+  <rect x="472" y="262" width="442" height="114" rx="10" fill="#eff6ff" stroke="#bfdbfe"/>
+  <text x="490" y="286" class="mono" fill="#1d4ed8">① 只读 MCP 查询层 (mcp_server.py · 7 Tools)</text>
+  <text x="490" y="310" class="body">• 画像与行为：get_user_profile / get_user_behavior / get_session_context</text>
+  <text x="490" y="332" class="body">• 历史反馈：get_user_recommendation_history (smoothed_ctr 软排序/去重)</text>
+  <text x="490" y="354" class="body">• 商品与活动：search_items / get_item / get_promo (核验满减与折扣有效期)</text>
+
+  <!-- Step 2: Generation Contract -->
+  <rect x="472" y="390" width="442" height="146" rx="10" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="490" y="414" class="mono">② 选品过滤与严格 JSON 输出契约</text>
+  <text x="490" y="438" class="body">• 选品过滤：stock &gt; 0，季节/适用人群/价格带匹配，输出 1–3 张商品卡</text>
+  <text x="490" y="460" class="body">• exposure_reason：≤24 汉字（场景钩子 + 商品事实 + 心理收益）</text>
+  <text x="490" y="482" class="body">• 硬约束：禁写优惠价格/内部路径/Jev 判决字段；保留 2–6 个 evidence_fields</text>
+  <text x="490" y="504" class="monoSm">输出：reason_candidates_full.jsonl (300 条) · 查看器：rec-agent-viewer.html</text>
+  <text x="490" y="524" class="monoSm">批量引擎：DeepSeek V4 Flash (generate_agent_candidates.py)</text>
+
+  <!-- ==================== COLUMN 2 BOTTOM: FACT & RULE PLANE ==================== -->
+  <rect x="448" y="580" width="490" height="380" rx="16" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8" filter="url(#shadowSm)"/>
+  <text x="472" y="608" class="laneTag">MIDSTREAM · FACT BUNDLE &amp; RULE ENGINE</text>
+  <text x="472" y="636" class="h2">事实冻结包与确定性规则特征层</text>
+
+  <rect x="472" y="654" width="442" height="144" rx="10" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="490" y="678" class="mono">③ 事实包封装 (fact_bundle.py · fact-bundle-v1)</text>
+  <text x="490" y="702" class="body">• 快照冻结：user_context + item_attrs_returned + promo_computed_in_code</text>
+  <text x="490" y="724" class="body">• tool_trace 审计：区分「模型未查到事实」与「查到关键字段却忽略」</text>
+  <text x="490" y="746" class="body">• coverage &amp; provenance：检查 4 项核心属性完整性，全字段追溯至 CSV 行</text>
+  <text x="490" y="768" class="monoSm">• verification_state：verified | unverifiable (缺失属性或轨迹直接标记)</text>
+
+  <rect x="472" y="812" width="442" height="130" rx="10" fill="#fefce8" stroke="#fde047"/>
+  <text x="490" y="836" class="mono" fill="#854d0e">④ 确定性规则特征与基线 (run_rule_baseline.py)</text>
+  <text x="490" y="860" class="body">• compliance_lexicon.txt (72 条)：提取 lexicon_hits 词表命中</text>
+  <text x="490" y="882" class="body">• 事实核验特征：unsupported_efficacy_terms / absolute_claim_terms</text>
+  <text x="490" y="904" class="body">• 业务规则核验：price_mismatch (促销门槛计算) &amp; topic_mismatch</text>
+  <text x="490" y="926" class="monoSm">输出：fact_bundle_full.jsonl (300 条) · 同步产出纯规则基线 B1 对照指标</text>
+
+  <!-- ==================== COLUMN 3: JEV EXPOSURE GATE ==================== -->
+  <rect x="982" y="124" width="490" height="836" rx="16" fill="url(#jevPanelBg)" stroke="#e849b7" stroke-width="2.2" filter="url(#shadowSm)"/>
+  <text x="1008" y="152" class="laneTag" fill="#9d174d">DOWNSTREAM · JEV SYSTEMONE EXPOSURE GATE</text>
+
+  <!-- Official TypeSafe AI Jev Logo + Title -->
+  <g transform="translate(1008, 170)" filter="url(#shadowLogo)">
+    <rect x="0" y="0" width="84" height="84" rx="18" fill="#e849b7" stroke="#ffffff" stroke-width="2.5"/>
+    <g transform="translate(42, 42)" fill="none" stroke="#141414" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round">
+      <polygon points="0,-26 18,-15 18,6 0,-5 -9,1 -18,-5 -18,-15" fill="#e849b7"/>
+      <polyline points="-18,-15 0,-5 18,-15"/>
+      <line x1="0" y1="-26" x2="0" y2="-5"/>
+      <polygon points="0,26 -18,15 -18,-6 0,5 9,-1 18,5 18,15" fill="#e849b7"/>
+      <polyline points="-18,15 0,5 18,15"/>
+      <line x1="0" y1="5" x2="0" y2="26"/>
+      <polyline points="-9,-10 -9,10 9,20"/>
+      <polyline points="9,10 9,-10 -9,-20"/>
+    </g>
+  </g>
+  <text x="1108" y="198" class="h2" fill="#831843">Jev 曝光前合规判决门禁</text>
+  <text x="1108" y="222" class="mono" fill="#be185d">TypeSafe AI · SystemOne (jev-1.14.0)</text>
+  <text x="1108" y="244" class="monoSm">jev_adapter.py · run_jev_batch.py</text>
+
+  <!-- SystemOne Protocol Box -->
+  <rect x="1008" y="272" width="438" height="218" rx="12" fill="#ffffff" stroke="#f9a8d4" stroke-width="1.5"/>
+  <text x="1026" y="298" class="mono" fill="#be185d">① SystemOne 结构化判决协议 (POST /v1/systemone)</text>
+  <text x="1026" y="322" class="body">• state：序列化 Fact Bundle (不生成自由文本，杜绝格式幻觉)</text>
+  <text x="1026" y="346" class="body">• questions 并行提问（单次请求返回全部结构化概率）：</text>
+  <text x="1042" y="370" class="mono">1) decision (choice)：expose / rewrite / human_review / block</text>
+  <text x="1042" y="394" class="mono">2) risk_type (choice)：6 类风险分型（合规/绝对化/功效/价格/披露/偏题）</text>
+  <text x="1042" y="418" class="mono">3) judge_score (score)：0/1/2 量表归一化至 P(unsafe) ∈ [0, 1]</text>
+  <text x="1026" y="444" class="body">• 置信度提取：取三项回答的 min(confidence) 用于低置信升级判定</text>
+  <text x="1026" y="470" class="monoSm">支持 --dry-run 安全预览与 --send 真实批量调用（含错误隔离）</text>
+
+  <!-- Policy Safety Gate Box -->
+  <rect x="1008" y="508" width="438" height="248" rx="12" fill="#ffffff" stroke="#f9a8d4" stroke-width="1.5"/>
+  <text x="1026" y="534" class="mono" fill="#be185d">② 确定性策略安全门禁与代码级证据渲染</text>
+  <text x="1026" y="560" class="body">• 未验证拦截：verification_state != verified 或 confidence &lt; 0.7</text>
+  <text x="1042" y="580" class="monoSm">→ 强制路由至 human_review，设置 escalated = true（禁止静默放行）</text>
+  <text x="1026" y="606" class="body">• 硬风险兜底：unsupported_efficacy_terms 非空 → 强制 block</text>
+  <text x="1026" y="630" class="body">• 可修复改写：missing_ai_disclosure / absolute_claim / off_topic → rewrite</text>
+  <text x="1026" y="654" class="body">• 代码渲染证据 (build_evidence_from_fact_bundle)：</text>
+  <text x="1042" y="674" class="monoSm">仅从输入白名单路径渲染 evidence[]（如 item.functions / lexicon），</text>
+  <text x="1042" y="694" class="monoSm">并经 validate_decision() 强校验，实现证据有效率 100%</text>
+  <text x="1026" y="722" class="mono">输出：result_jev_full.jsonl (score_name: jev-compliance-v1)</text>
+  <text x="1026" y="742" class="monoSm">兼容对比：baseline_comparison_full_report.md (三档基线同口径对齐)</text>
+
+  <!-- Evaluation KPIs Box -->
+  <rect x="1008" y="774" width="438" height="166" rx="12" fill="#fdf2f8" stroke="#f472b6" stroke-width="1.5"/>
+  <text x="1026" y="800" class="mono" fill="#9d174d">③ 300 条全量样本实测门禁指标 (jev_batch_full_report.json)</text>
+  <rect x="1026" y="818" width="128" height="54" rx="8" fill="#ffffff" stroke="#fbcfe8"/>
+  <text x="1090" y="842" text-anchor="middle" class="h2" fill="#059669">0.0000</text>
+  <text x="1090" y="862" text-anchor="middle" class="muted">违规漏放率(红线0)</text>
+
+  <rect x="1166" y="818" width="128" height="54" rx="8" fill="#ffffff" stroke="#fbcfe8"/>
+  <text x="1230" y="842" text-anchor="middle" class="h2" fill="#be185d">1.0000</text>
+  <text x="1230" y="862" text-anchor="middle" class="muted">四档处置宏 F1</text>
+
+  <rect x="1306" y="818" width="122" height="54" rx="8" fill="#ffffff" stroke="#fbcfe8"/>
+  <text x="1367" y="842" text-anchor="middle" class="h2" fill="#1d4ed8">100%</text>
+  <text x="1367" y="862" text-anchor="middle" class="muted">证据有效率</text>
+
+  <text x="1026" y="900" class="monoSm">风险分型准确率：1.0000 · 人工复核率：5.33% · 升级率：66.33%</text>
+  <text x="1026" y="922" class="monoSm">端到端延迟：平均 666.8 ms · p95 1005.6 ms · Error 0/300</text>
+
+  <!-- ==================== COLUMN 4: 4-WAY DISPOSITION & CALIBRATION LOOP ==================== -->
+  <text x="1520" y="144" class="laneTag">DISPOSITION &amp; CALIBRATION LOOP</text>
+
+  <!-- 4 Disposition Cards -->
+  <rect x="1520" y="160" width="352" height="106" rx="14" fill="#ecfdf5" stroke="#34d399" stroke-width="2" filter="url(#shadowSm)"/>
+  <circle cx="1548" cy="192" r="12" fill="#059669"/>
+  <path d="M1542 192 l4 4 l8 -8" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="1570" y="198" class="h3" fill="#065f46">expose · 直接曝光 (200/300)</text>
+  <text x="1540" y="224" class="body">事实完整、属性支撑充分、AI 披露齐全</text>
+  <text x="1540" y="246" class="monoSm" fill="#047857">→ 放行至首页「猜你喜欢」展示并记录点击</text>
+
+  <rect x="1520" y="282" width="352" height="106" rx="14" fill="#fffbeb" stroke="#fbbf24" stroke-width="2" filter="url(#shadowSm)"/>
+  <circle cx="1548" cy="314" r="12" fill="#d97706"/>
+  <path d="M1543 318 l10 -10 M1550 308 l3 3" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+  <text x="1570" y="320" class="h3" fill="#92400e">rewrite · 改写后曝光 (50/300)</text>
+  <text x="1540" y="346" class="body">删绝对化词 / 补 AI 披露 / 纠偏主题</text>
+  <text x="1540" y="368" class="monoSm" fill="#b45309">→ 规则机械修复并二次核验后进入曝光</text>
+
+  <rect x="1520" y="404" width="352" height="106" rx="14" fill="#fff7ed" stroke="#fb923c" stroke-width="2" filter="url(#shadowSm)"/>
+  <circle cx="1548" cy="436" r="12" fill="#ea580c"/>
+  <circle cx="1548" cy="432" r="3.5" fill="#ffffff"/>
+  <path d="M1541 442 c2 -4 12 -4 14 0" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+  <text x="1570" y="442" class="h3" fill="#9a3412">human_review · 人工复核 (16/300)</text>
+  <text x="1540" y="468" class="body">关键字段缺失 / 工具冲突 / 低置信度</text>
+  <text x="1540" y="490" class="monoSm" fill="#c2410c">→ escalated=true 转入人工合规工单队列</text>
+
+  <rect x="1520" y="526" width="352" height="106" rx="14" fill="#fff1f2" stroke="#fb7185" stroke-width="2" filter="url(#shadowSm)"/>
+  <circle cx="1548" cy="558" r="12" fill="#e11d48"/>
+  <line x1="1542" y1="558" x2="1554" y2="558" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round"/>
+  <text x="1570" y="564" class="h3" fill="#9f1239">block · 严禁曝光拦截 (34/300)</text>
+  <text x="1540" y="590" class="body">无依据功效/医疗宣称、严重价格误导</text>
+  <text x="1540" y="612" class="monoSm" fill="#be123c">→ 阻断曝光（漏放率=0），不进入线上信息流</text>
+
+  <!-- Post-Exposure Calibration Card -->
+  <rect x="1520" y="666" width="352" height="294" rx="16" fill="#f8fafc" stroke="#059669" stroke-width="2" filter="url(#shadowSm)"/>
+  <text x="1542" y="694" class="laneTag" fill="#065f46">POST-EXPOSURE CALIBRATION</text>
+  <text x="1542" y="722" class="h2" fill="#065f46">曝光后校准与反馈闭环</text>
+  <text x="1542" y="744" class="monoSm">evaluate_exposure.py · 14天观察窗</text>
+
+  <text x="1542" y="774" class="body">1. 仅 expose / rewrite 产生真实曝光日志</text>
+  <text x="1556" y="794" class="muted">记录 click、add_cart、order、refund、complaint</text>
+  <text x="1542" y="820" class="body">2. judge_score 10 分桶单调性校准</text>
+  <text x="1556" y="840" class="muted">检验分桶与退款率/投诉率/成交率相关性</text>
+  <text x="1542" y="866" class="body">3. 合规点击回写历史反馈表</text>
+  <text x="1556" y="886" class="muted">generate_exposure_click_history.py 生成</text>
+  <rect x="1542" y="904" width="308" height="38" rx="8" fill="#ecfdf5" stroke="#6ee7b7"/>
+  <text x="1696" y="927" text-anchor="middle" class="pill" fill="#065f46">仅回流至 Rec-Agent MCP 软排序 (不进 Jev)</text>
+
+  <!-- ==================== CONNECTING ARROWS ==================== -->
+  <!-- Data -> Rec-Agent (MCP Read-Only) -->
+  <path d="M382 320 H448" fill="none" stroke="#2563eb" stroke-width="2.8" marker-end="url(#arrBlue)"/>
+  <!-- Data -> Fact Bundle (Raw + Lexicon) -->
+  <path d="M382 578 H415 V725 H448" fill="none" stroke="#475569" stroke-width="2.5" marker-end="url(#arrSlate)"/>
+  <!-- Rec-Agent -> Fact Bundle -->
+  <path d="M693 554 V580" fill="none" stroke="#2563eb" stroke-width="2.8" marker-end="url(#arrBlue)"/>
+  <!-- Fact Bundle -> Jev -->
+  <path d="M938 770 H960 V380 H982" fill="none" stroke="#db2777" stroke-width="3" marker-end="url(#arrPink)"/>
+  <!-- Jev -> 4 Dispositions -->
+  <path d="M1472 213 H1520" fill="none" stroke="#059669" stroke-width="2.5" marker-end="url(#arrGreen)"/>
+  <path d="M1472 335 H1520" fill="none" stroke="#d97706" stroke-width="2.5" marker-end="url(#arrAmber)"/>
+  <path d="M1472 457 H1520" fill="none" stroke="#ea580c" stroke-width="2.5" marker-end="url(#arrOrange)"/>
+  <path d="M1472 579 H1520" fill="none" stroke="#e11d48" stroke-width="2.5" marker-end="url(#arrRed)"/>
+
+  <!-- Expose & Rewrite -> Calibration Loop (right margin bus) -->
+  <path d="M1872 213 H1888 V740 H1872" fill="none" stroke="#059669" stroke-width="2.5" marker-end="url(#arrGreen)"/>
+  <path d="M1872 335 H1888" fill="none" stroke="#d97706" stroke-width="2.5"/>
+
+  <!-- Calibration Loop -> Post-Exposure Log (bottom feedback return) -->
+  <path d="M1696 960 V986 H226 V940" fill="none" stroke="#059669" stroke-width="2.5" stroke-dasharray="7 5" marker-end="url(#arrGreen)"/>
+  <rect x="830" y="972" width="380" height="26" rx="13" fill="#ecfdf5" stroke="#34d399"/>
+  <text x="1020" y="989" text-anchor="middle" class="pill" fill="#065f46">14天曝光反馈闭环：仅写回历史点击表供 Rec-Agent 软排序</text>
+
+  <!-- ==================== FOOTER LEGEND ==================== -->
+  <rect x="48" y="1014" width="1824" height="34" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
+  <line x1="76" y1="1031" x2="112" y2="1031" stroke="#2563eb" stroke-width="3"/>
+  <text x="122" y="1036" class="muted">MCP 只读检索与推荐生成流</text>
+
+  <line x1="340" y1="1031" x2="376" y2="1031" stroke="#db2777" stroke-width="3"/>
+  <text x="386" y="1036" class="muted">Fact Bundle 事实包与 Jev SystemOne 判决流</text>
+
+  <line x1="690" y1="1031" x2="726" y2="1031" stroke="#059669" stroke-width="3" stroke-dasharray="6 4"/>
+  <text x="736" y="1036" class="muted">曝光后 14 天校准与安全反馈闭环</text>
+
+  <line x1="1020" y1="1031" x2="1056" y2="1031" stroke="#e11d48" stroke-width="2.5" stroke-dasharray="4 3"/>
+  <text x="1066" y="1036" class="muted">数据隔离防火墙（禁止词表/标签进 Agent，禁止曝光日志进 Jev）</text>
+
+  <text x="1848" y="1036" text-anchor="end" class="monoSm">1920×1080 · 1080p HD</text>
+</svg>

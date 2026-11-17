@@ -1,0 +1,267 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-labelledby="title desc">
+  <title id="title">Figure 1: Decoupled Architecture of Rec-Agent and Jev Exposure Gate (1920x1080)</title>
+  <desc id="desc">Academic conference-style system architecture diagram (KDD/WWW/ACL style) showing Data Plane, Rec-Agent Generation, Fact Bundle &amp; Deterministic Rules, Jev SystemOne Gate, and 14-Day Calibration Loop.</desc>
+  <defs>
+    <marker id="arrDark" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0 1 L7.5 4 L0 7 Z" fill="#1e293b"/>
+    </marker>
+    <marker id="arrBlue" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0 1 L7.5 4 L0 7 Z" fill="#1d4ed8"/>
+    </marker>
+    <marker id="arrPink" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0 1 L7.5 4 L0 7 Z" fill="#be185d"/>
+    </marker>
+    <marker id="arrGreen" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0 1 L7.5 4 L0 7 Z" fill="#047857"/>
+    </marker>
+    <marker id="arrRed" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0 1 L7.5 4 L0 7 Z" fill="#b91c1c"/>
+    </marker>
+  </defs>
+
+  <!-- Pure White Publication Canvas -->
+  <rect width="1920" height="1080" fill="#ffffff"/>
+
+  <!-- Top Academic Header -->
+  <text x="56" y="54" font-family="Helvetica Neue, Arial, PingFang SC, sans-serif" font-size="26" font-weight="700" fill="#0f172a">Figure 1: Two-Stage Decoupled Framework for Generative Recommendation &amp; Pre-Exposure Compliance Auditing</text>
+  <text x="56" y="82" font-family="Helvetica Neue, Arial, PingFang SC, sans-serif" font-size="15" font-weight="400" fill="#475569">Qhf7/Rec-Agent · Strict Information Isolation Between Reason Generation (Rec-Agent v2) and Probabilistic Gatekeeping (Jev-1.14.0 SystemOne)</text>
+  <line x1="56" y1="98" x2="1864" y2="98" stroke="#0f172a" stroke-width="1.5"/>
+
+  <!-- ==================== (a) DATA & ANTI-LEAKAGE PLANE ==================== -->
+  <rect x="56" y="118" width="350" height="826" rx="8" fill="#f8fafc" stroke="#475569" stroke-width="1.5"/>
+  <text x="74" y="146" font-family="Helvetica Neue, Arial, sans-serif" font-size="15" font-weight="700" fill="#0f172a">(a) Data &amp; Isolation Plane</text>
+  <line x1="74" y1="158" x2="388" y2="158" stroke="#cbd5e1" stroke-width="1"/>
+
+  <!-- Canonical Store -->
+  <rect x="74" y="176" width="314" height="244" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="1.2"/>
+  <text x="90" y="200" font-family="Helvetica Neue, Arial, sans-serif" font-size="14" font-weight="700" fill="#1e3a8a">Canonical Mock Store (data/raw/)</text>
+  <text x="90" y="226" font-family="Menlo, Consolas, monospace" font-size="12.5" fill="#1e293b">• users.csv (|U| = 200)</text>
+  <text x="102" y="245" font-family="Helvetica Neue, Arial, sans-serif" font-size="12" fill="#475569">profile, tags, cart, search_terms</text>
+  <text x="90" y="272" font-family="Menlo, Consolas, monospace" font-size="12.5" fill="#1e293b">• items.csv (|I| = 200)</text>
+  <text x="102" y="291" font-family="Helvetica Neue, Arial, sans-serif" font-size="12" fill="#475569">attrs, functions, stock, qualifications</text>
+  <text x="90" y="318" font-family="Menlo, Consolas, monospace" font-size="12.5" fill="#1e293b">• promo_rules.json (30 rules)</text>
+  <text x="90" y="342" font-family="Menlo, Consolas, monospace" font-size="12.5" fill="#1e293b">• city_climate.json (t₀ = 2026-06-15)</text>
+  <rect x="90" y="366" width="282" height="36" rx="4" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/>
+  <text x="231" y="389" text-anchor="middle" font-family="Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="600" fill="#1e40af">Shared Read-Only Ground Truth</text>
+
+  <!-- Lexicon & Gold Labels (Isolated from Agent) -->
+  <rect x="74" y="444" width="314" height="210" rx="6" fill="#fffbeb" stroke="#d97706" stroke-width="1.2"/>
+  <text x="90" y="468" font-family="Helvetica Neue, Arial, sans-serif" font-size="14" font-weight="700" fill="#92400e">Compliance &amp; Gold Assets</text>
+  <text x="90" y="494" font-family="Menlo, Consolas, monospace" font-size="12.5" fill="#1e293b">• compliance_lexicon.txt (72 terms)</text>
+  <text x="102" y="513" font-family="Helvetica Neue, Arial, sans-serif" font-size="12" fill="#475569">absolute / efficacy / price risk terms</text>
+  <text x="90" y="540" font-family="Menlo, Consolas, monospace" font-size="12.5" fill="#1e293b">• dev_labels_full.csv (300 labels)</text>
+  <text x="102" y="559" font-family="Helvetica Neue, Arial, sans-serif" font-size="12" fill="#475569">4-class decision &amp; 6-class risk_type</text>
+  <rect x="90" y="592" width="282" height="44" rx="4" fill="#fef2f2" stroke="#dc2626" stroke-width="1.4" stroke-dasharray="5 3"/>
+  <text x="231" y="611" text-anchor="middle" font-family="Helvetica Neue, Arial, sans-serif" font-size="11.5" font-weight="700" fill="#b91c1c">ANTI-LEAKAGE BARRIER I</text>
+  <text x="231" y="627" text-anchor="middle" font-family="Helvetica Neue, Arial, sans-serif" font-size="11" fill="#991b1b">Blocked from Rec-Agent Input</text>
+
+  <!-- Post-Exposure Logs (Isolated from Jev) -->
+  <rect x="74" y="678" width="314" height="246" rx="6" fill="#ecfdf5" stroke="#059669" stroke-width="1.2"/>
+  <text x="90" y="702" font-family="Helvetica Neue, Arial, sans-serif" font-size="14" font-weight="700" fill="#065f46">Post-Exposure Telemetry</text>
+  <text x="90" y="728" font-family="Menlo, Consolas, monospace" font-size="12.5" fill="#1e293b">• recommendation_feedback_history.csv</text>
+  <text x="102" y="747" font-family="Helvetica Neue, Arial, sans-serif" font-size="12" fill="#475569">only jev_approved=true &amp; shown=true</text>
+  <text x="90" y="774" font-family="Menlo, Consolas, monospace" font-size="12.5" fill="#1e293b">• exposure_log_full.jsonl (14d)</text>
+  <text x="102" y="793" font-family="Helvetica Neue, Arial, sans-serif" font-size="12" fill="#475569">click, cart, order, refund, complaint</text>
+  <text x="90" y="820" font-family="Menlo, Consolas, monospace" font-size="12.5" fill="#1e293b">• latent_full.csv (Eval-only DGP)</text>
+  <rect x="90" y="860" width="282" height="44" rx="4" fill="#fef2f2" stroke="#dc2626" stroke-width="1.4" stroke-dasharray="5 3"/>
+  <text x="231" y="879" text-anchor="middle" font-family="Helvetica Neue, Arial, sans-serif" font-size="11.5" font-weight="700" fill="#b91c1c">ANTI-LEAKAGE BARRIER II</text>
+  <text x="231" y="895" text-anchor="middle" font-family="Helvetica Neue, Arial, sans-serif" font-size="11" fill="#991b1b">Blocked from Jev Pre-Exposure Input</text>
+
+  <!-- ==================== (b) UPSTREAM GENERATION: REC-AGENT ==================== -->
+  <rect x="448" y="118" width="470" height="410" rx="8" fill="#f0f9ff" stroke="#1d4ed8" stroke-width="1.6"/>
+  <text x="468" y="146" font-family="Helvetica Neue, Arial, sans-serif" font-size="15" font-weight="700" fill="#1e3a8a">(b) Upstream Generation · Rec-Agent (rec-agent-v2)</text>
+  <line x1="468" y1="158" x2="898" y2="158" stroke="#bfdbfe" stroke-width="1"/>
+
+  <!-- Flat Rec-Agent Vector Logo -->
+  <g transform="translate(468, 174)">
+    <rect x="0" y="0" width="60" height="60" rx="14" fill="#2563eb"/>
+    <rect x="10" y="14" width="40" height="31" rx="6" fill="#ffffff"/>
+    <rect x="15" y="19" width="13" height="9" rx="2" fill="#2563eb"/>
+    <path d="M42 8 L44 16 L52 18 L44 20 L42 28 L40 20 L32 18 L40 16 Z" fill="#06b6d4"/>
+    <circle cx="30" cy="33" r="4" fill="#1e40af"/>
+    <circle cx="20" cy="43" r="4" fill="#2563eb"/>
+    <circle cx="40" cy="43" r="4" fill="#06b6d4"/>
+    <line x1="20" y1="43" x2="30" y2="33" stroke="#1e40af" stroke-width="2.5"/>
+    <line x1="40" y1="43" x2="30" y2="33" stroke="#1e40af" stroke-width="2.5"/>
+  </g>
+  <text x="542" y="196" font-family="Helvetica Neue, Arial, sans-serif" font-size="14" font-weight="700" fill="#0f172a">Harness Preset &amp; ModelGo Client</text>
+  <text x="542" y="216" font-family="Menlo, Consolas, monospace" font-size="12" fill="#475569">cordis.patch.yml · modelgo_agent.py</text>
+  <text x="542" y="234" font-family="Helvetica Neue, Arial, sans-serif" font-size="12" fill="#475569">Backbone: DeepSeek-V4-Flash</text>
+
+  <!-- MCP Box -->
+  <rect x="468" y="252" width="430" height="114" rx="6" fill="#ffffff" stroke="#93c5fd" stroke-width="1.2"/>
+  <text x="484" y="274" font-family="Menlo, Consolas, monospace" font-size="12.5" font-weight="700" fill="#1d4ed8">FastMCP Read-Only Interface (mcp_server.py)</text>
+  <text x="484" y="296" font-family="Menlo, Consolas, monospace" font-size="12" fill="#334155">1. get_user_profile / get_user_behavior / get_session_context</text>
+  <text x="484" y="318" font-family="Menlo, Consolas, monospace" font-size="12" fill="#334155">2. get_user_recommendation_history (smoothed_ctr ranking)</text>
+  <text x="484" y="340" font-family="Menlo, Consolas, monospace" font-size="12" fill="#334155">3. search_items / get_item / get_promo (stock &gt; 0 &amp; active)</text>
+
+  <!-- Schema Box -->
+  <rect x="468" y="380" width="430" height="130" rx="6" fill="#ffffff" stroke="#93c5fd" stroke-width="1.2"/>
+  <text x="484" y="402" font-family="Helvetica Neue, Arial, sans-serif" font-size="13" font-weight="700" fill="#0f172a">Strict JSON Output Contract (1–3 Cards / User)</text>
+  <text x="484" y="424" font-family="Helvetica Neue, Arial, sans-serif" font-size="12.5" fill="#334155">• exposure_reason (≤24 CJK chars): Scene Hook + Fact + Benefit</text>
+  <text x="484" y="446" font-family="Helvetica Neue, Arial, sans-serif" font-size="12.5" fill="#334155">• Constraints: No prices/discounts, no internal paths or Jev fields</text>
+  <text x="484" y="468" font-family="Menlo, Consolas, monospace" font-size="12" fill="#334155">• evidence_fields (2–6 paths) + context_summary (≤60 chars)</text>
+  <text x="484" y="492" font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#64748b">Output: reason_candidates_full.jsonl (200 natural + 100 stress)</text>
+
+  <!-- ==================== (c) MIDSTREAM: FACT BUNDLE & RULE VERIFICATION ==================== -->
+  <rect x="448" y="556" width="470" height="388" rx="8" fill="#fefce8" stroke="#ca8a04" stroke-width="1.6"/>
+  <text x="468" y="584" font-family="Helvetica Neue, Arial, sans-serif" font-size="15" font-weight="700" fill="#854d0e">(c) Midstream · Fact Freezing &amp; Rule Layer</text>
+  <line x1="468" y1="596" x2="898" y2="596" stroke="#fde047" stroke-width="1"/>
+
+  <rect x="468" y="612" width="430" height="148" rx="6" fill="#ffffff" stroke="#eab308" stroke-width="1.2"/>
+  <text x="484" y="634" font-family="Menlo, Consolas, monospace" font-size="12.5" font-weight="700" fill="#854d0e">fact_bundle.py (Schema: fact-bundle-v1)</text>
+  <text x="484" y="658" font-family="Helvetica Neue, Arial, sans-serif" font-size="12.5" fill="#334155">• Snapshot Freeze: user_context + item_attrs + promo_computed</text>
+  <text x="484" y="680" font-family="Helvetica Neue, Arial, sans-serif" font-size="12.5" fill="#334155">• Auditability: tool_trace (separates unqueried vs. ignored facts)</text>
+  <text x="484" y="702" font-family="Helvetica Neue, Arial, sans-serif" font-size="12.5" fill="#334155">• Coverage Gate: {category, functions, scenes, price} completeness</text>
+  <text x="484" y="724" font-family="Menlo, Consolas, monospace" font-size="12" fill="#334155">• State: verification_state ∈ {verified, unverifiable}</text>
+  <text x="484" y="746" font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#64748b">• Provenance: row-level pointer to canonical CSV/JSON</text>
+
+  <rect x="468" y="776" width="430" height="148" rx="6" fill="#ffffff" stroke="#eab308" stroke-width="1.2"/>
+  <text x="484" y="798" font-family="Menlo, Consolas, monospace" font-size="12.5" font-weight="700" fill="#854d0e">Deterministic Rule Features (run_rule_baseline.py)</text>
+  <text x="484" y="822" font-family="Helvetica Neue, Arial, sans-serif" font-size="12.5" fill="#334155">• Lexicon Matching: lexicon_hits against 72 compliance terms</text>
+  <text x="484" y="844" font-family="Menlo, Consolas, monospace" font-size="12" fill="#334155">• Efficacy Support: supported vs. unsupported_efficacy_terms</text>
+  <text x="484" y="866" font-family="Menlo, Consolas, monospace" font-size="12" fill="#334155">• Consistency: absolute_claim, price_mismatch, topic_mismatch</text>
+  <text x="484" y="890" font-family="Helvetica Neue, Arial, sans-serif" font-size="12" fill="#64748b">• Baseline B1: Pure rule baseline evaluated on identical split</text>
+  <text x="484" y="910" font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#64748b">Output: fact_bundle_full.jsonl (N = 300)</text>
+
+  <!-- ==================== (d) DOWNSTREAM: JEV EXPOSURE GATE ==================== -->
+  <rect x="964" y="118" width="490" height="826" rx="8" fill="#fdf2f8" stroke="#be185d" stroke-width="1.8"/>
+  <text x="984" y="146" font-family="Helvetica Neue, Arial, sans-serif" font-size="15" font-weight="700" fill="#831843">(d) Downstream · Jev SystemOne Gate (jev-1.14.0)</text>
+  <line x1="984" y1="158" x2="1434" y2="158" stroke="#fbcfe8" stroke-width="1"/>
+
+  <!-- Official TypeSafe AI Jev Logo -->
+  <g transform="translate(984, 174)">
+    <rect x="0" y="0" width="64" height="64" rx="13" fill="#e849b7" stroke="#be185d" stroke-width="1.2"/>
+    <g transform="translate(32, 32)" fill="none" stroke="#141414" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round">
+      <polygon points="0,-20 14,-11.5 14,4.5 0,-4 -7,0.5 -14,-4 -14,-11.5" fill="#e849b7"/>
+      <polyline points="-14,-11.5 0,-4 14,-11.5"/>
+      <line x1="0" y1="-20" x2="0" y2="-4"/>
+      <polygon points="0,20 -14,11.5 -14,-4.5 0,4 7,-0.5 14,4 14,11.5" fill="#e849b7"/>
+      <polyline points="-14,11.5 0,4 14,11.5"/>
+      <line x1="0" y1="4" x2="0" y2="20"/>
+      <polyline points="-7,-8 -7,8 7,15.5"/>
+      <polyline points="7,8 7,-8 -7,-15.5"/>
+    </g>
+  </g>
+  <text x="1062" y="196" font-family="Helvetica Neue, Arial, sans-serif" font-size="14" font-weight="700" fill="#831843">TypeSafe AI Jev SystemOne Adapter</text>
+  <text x="1062" y="216" font-family="Menlo, Consolas, monospace" font-size="12" fill="#9d174d">jev_adapter.py · run_jev_batch.py</text>
+  <text x="1062" y="234" font-family="Menlo, Consolas, monospace" font-size="12" fill="#475569">Endpoint: POST /v1/systemone</text>
+
+  <!-- Typed Questions Box -->
+  <rect x="984" y="256" width="450" height="206" rx="6" fill="#ffffff" stroke="#f472b6" stroke-width="1.2"/>
+  <text x="1000" y="278" font-family="Helvetica Neue, Arial, sans-serif" font-size="13" font-weight="700" fill="#9d174d">1. Parallel Typed Decision Protocol (No Free-Form Text)</text>
+  <text x="1000" y="302" font-family="Menlo, Consolas, monospace" font-size="12" fill="#1e293b">Input state = JSON.dumps(fact_bundle)</text>
+  <text x="1000" y="328" font-family="Menlo, Consolas, monospace" font-size="12" fill="#334155">• Q1 decision (choice): {expose, rewrite, human_review, block}</text>
+  <text x="1000" y="352" font-family="Menlo, Consolas, monospace" font-size="12" fill="#334155">• Q2 risk_type (choice): 6-class taxonomy</text>
+  <text x="1016" y="372" font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#64748b">{compliant, absolute_claim, efficacy_or_medical,</text>
+  <text x="1016" y="390" font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#64748b"> price_misleading, missing_ai_disclosure, off_topic}</text>
+  <text x="1000" y="416" font-family="Menlo, Consolas, monospace" font-size="12" fill="#334155">• Q3 judge_score (score): normalized P(unsafe) ∈ [0, 1]</text>
+  <text x="1000" y="440" font-family="Helvetica Neue, Arial, sans-serif" font-size="12" fill="#475569">• Confidence check: c_min = min(c_Q1, c_Q2, c_Q3)</text>
+
+  <!-- Policy Gate & Evidence Box -->
+  <rect x="984" y="480" width="450" height="244" rx="6" fill="#ffffff" stroke="#f472b6" stroke-width="1.2"/>
+  <text x="1000" y="502" font-family="Helvetica Neue, Arial, sans-serif" font-size="13" font-weight="700" fill="#9d174d">2. Deterministic Safety Gate &amp; Whitelisted Evidence</text>
+  <text x="1000" y="528" font-family="Helvetica Neue, Arial, sans-serif" font-size="12.5" fill="#334155">• Unverifiable / Conflict / c_min &lt; 0.7:</text>
+  <text x="1016" y="548" font-family="Menlo, Consolas, monospace" font-size="12" fill="#b45309">⇒ Force human_review (escalated = true)</text>
+  <text x="1000" y="574" font-family="Helvetica Neue, Arial, sans-serif" font-size="12.5" fill="#334155">• Unsupported Efficacy Claims:</text>
+  <text x="1016" y="594" font-family="Menlo, Consolas, monospace" font-size="12" fill="#be123c">⇒ Force block (Zero-Tolerance Policy)</text>
+  <text x="1000" y="620" font-family="Helvetica Neue, Arial, sans-serif" font-size="12.5" fill="#334155">• Missing AI Disclosure / Mechanical Fixes:</text>
+  <text x="1016" y="640" font-family="Menlo, Consolas, monospace" font-size="12" fill="#d97706">⇒ Route to rewrite</text>
+  <text x="1000" y="668" font-family="Helvetica Neue, Arial, sans-serif" font-size="12.5" fill="#334155">• Code-Rendered Evidence (build_evidence_from_fact_bundle):</text>
+  <text x="1016" y="688" font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#475569">Extracts exact paths (item.functions, lexicon) + schema check</text>
+  <text x="1016" y="708" font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#64748b">Output: result_jev_full.jsonl (score_name: jev-compliance-v1)</text>
+
+  <!-- Benchmark Metrics Table -->
+  <rect x="984" y="742" width="450" height="182" rx="6" fill="#ffffff" stroke="#be185d" stroke-width="1.2"/>
+  <text x="1000" y="766" font-family="Helvetica Neue, Arial, sans-serif" font-size="13" font-weight="700" fill="#831843">3. Full Benchmark Evaluation (N = 300, Pilot Synthetic)</text>
+  <line x1="1000" y1="778" x2="1418" y2="778" stroke="#f1f5f9" stroke-width="1"/>
+  <text x="1010" y="802" font-family="Helvetica Neue, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#334155">Metric</text>
+  <text x="1220" y="802" font-family="Helvetica Neue, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#334155">Value</text>
+  <text x="1320" y="802" font-family="Helvetica Neue, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#334155">Target</text>
+  <line x1="1000" y1="810" x2="1418" y2="810" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="1010" y="832" font-family="Helvetica Neue, Arial, sans-serif" font-size="12.5" fill="#1e293b">Violation Leak Rate (block→expose)</text>
+  <text x="1220" y="832" font-family="Menlo, Consolas, monospace" font-size="12.5" font-weight="700" fill="#059669">0.0000</text>
+  <text x="1320" y="832" font-family="Menlo, Consolas, monospace" font-size="12" fill="#475569">= 0.0 (Hard)</text>
+  <text x="1010" y="856" font-family="Helvetica Neue, Arial, sans-serif" font-size="12.5" fill="#1e293b">4-Class Decision Macro-F1 / Risk Acc.</text>
+  <text x="1220" y="856" font-family="Menlo, Consolas, monospace" font-size="12.5" font-weight="700" fill="#be185d">1.0000</text>
+  <text x="1320" y="856" font-family="Menlo, Consolas, monospace" font-size="12" fill="#475569">Max</text>
+  <text x="1010" y="880" font-family="Helvetica Neue, Arial, sans-serif" font-size="12.5" fill="#1e293b">Evidence Validity / Human Review Rate</text>
+  <text x="1220" y="880" font-family="Menlo, Consolas, monospace" font-size="12.5" fill="#1e293b">100% / 5.3%</text>
+  <text x="1320" y="880" font-family="Menlo, Consolas, monospace" font-size="12" fill="#475569">100% / Min</text>
+  <text x="1010" y="904" font-family="Helvetica Neue, Arial, sans-serif" font-size="12.5" fill="#1e293b">Latency (Mean / p95)</text>
+  <text x="1220" y="904" font-family="Menlo, Consolas, monospace" font-size="12" fill="#1e293b">667 / 1006 ms</text>
+  <text x="1320" y="904" font-family="Menlo, Consolas, monospace" font-size="12" fill="#475569">Err: 0/300</text>
+
+  <!-- ==================== (e) DISPOSITION & CALIBRATION LOOP ==================== -->
+  <text x="1500" y="138" font-family="Helvetica Neue, Arial, sans-serif" font-size="15" font-weight="700" fill="#0f172a">(e) Disposition &amp; 14-Day Calibration</text>
+
+  <!-- 4 Disposition Boxes -->
+  <rect x="1500" y="156" width="364" height="96" rx="6" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+  <text x="1518" y="182" font-family="Menlo, Consolas, monospace" font-size="14" font-weight="700" fill="#065f46">expose (200 / 300, 66.7%)</text>
+  <text x="1518" y="206" font-family="Helvetica Neue, Arial, sans-serif" font-size="12.5" fill="#1e293b">Verified &amp; compliant ⇒ Live feed exposure</text>
+  <text x="1518" y="228" font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#047857">Logged to 14-day observation window</text>
+
+  <rect x="1500" y="272" width="364" height="96" rx="6" fill="#fffbeb" stroke="#d97706" stroke-width="1.5"/>
+  <text x="1518" y="298" font-family="Menlo, Consolas, monospace" font-size="14" font-weight="700" fill="#92400e">rewrite (50 / 300, 16.7%)</text>
+  <text x="1518" y="322" font-family="Helvetica Neue, Arial, sans-serif" font-size="12.5" fill="#1e293b">Repairable claim / missing AI disclosure</text>
+  <text x="1518" y="344" font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#b45309">Deterministic rewrite ⇒ Re-verify &amp; expose</text>
+
+  <rect x="1500" y="388" width="364" height="96" rx="6" fill="#fff7ed" stroke="#ea580c" stroke-width="1.5"/>
+  <text x="1518" y="414" font-family="Menlo, Consolas, monospace" font-size="14" font-weight="700" fill="#9a3412">human_review (16 / 300, 5.3%)</text>
+  <text x="1518" y="438" font-family="Helvetica Neue, Arial, sans-serif" font-size="12.5" fill="#1e293b">Unverifiable attrs or low confidence (&lt;0.7)</text>
+  <text x="1518" y="460" font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#c2410c">escalated = true ⇒ Compliance audit queue</text>
+
+  <rect x="1500" y="504" width="364" height="96" rx="6" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="1518" y="530" font-family="Menlo, Consolas, monospace" font-size="14" font-weight="700" fill="#991b1b">block (34 / 300, 11.3%)</text>
+  <text x="1518" y="554" font-family="Helvetica Neue, Arial, sans-serif" font-size="12.5" fill="#1e293b">Unsupported efficacy / price misleading</text>
+  <text x="1518" y="576" font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#b91c1c">Hard intercept (Zero violation leakage)</text>
+
+  <!-- Calibration Box -->
+  <rect x="1500" y="636" width="364" height="308" rx="8" fill="#f8fafc" stroke="#047857" stroke-width="1.5"/>
+  <text x="1520" y="664" font-family="Helvetica Neue, Arial, sans-serif" font-size="14.5" font-weight="700" fill="#065f46">Post-Exposure Calibration Loop</text>
+  <text x="1520" y="686" font-family="Menlo, Consolas, monospace" font-size="12" fill="#475569">evaluate_exposure.py (14-Day Window)</text>
+  <line x1="1520" y1="698" x2="1844" y2="698" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="1520" y="724" font-family="Helvetica Neue, Arial, sans-serif" font-size="12.5" fill="#1e293b">1. Simulate / observe exposed cards:</text>
+  <text x="1534" y="744" font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#475569">exposure_log_full.jsonl (click, order, refund)</text>
+  <text x="1520" y="772" font-family="Helvetica Neue, Arial, sans-serif" font-size="12.5" fill="#1e293b">2. 10-Bucket Score Monotonicity:</text>
+  <text x="1534" y="792" font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#475569">Verify P(refund), P(complaint) vs. judge_score</text>
+  <text x="1520" y="820" font-family="Helvetica Neue, Arial, sans-serif" font-size="12.5" fill="#1e293b">3. Safe Feedback Write-Back:</text>
+  <text x="1534" y="840" font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#475569">generate_exposure_click_history.py</text>
+  <rect x="1520" y="864" width="324" height="58" rx="4" fill="#ecfdf5" stroke="#059669" stroke-width="1"/>
+  <text x="1682" y="888" text-anchor="middle" font-family="Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#065f46">Only Approved Clicks Return to MCP</text>
+  <text x="1682" y="908" text-anchor="middle" font-family="Helvetica Neue, Arial, sans-serif" font-size="11.5" fill="#047857">Soft ranking prior for Rec-Agent (Never Jev)</text>
+
+  <!-- ==================== ORTHOGONAL CONNECTORS ==================== -->
+  <!-- Data -> Rec-Agent -->
+  <path d="M406 298 H448" fill="none" stroke="#1d4ed8" stroke-width="2" marker-end="url(#arrBlue)"/>
+  <!-- Data -> Fact Bundle -->
+  <path d="M406 549 H426 V710 H448" fill="none" stroke="#1e293b" stroke-width="1.8" marker-end="url(#arrDark)"/>
+  <!-- Rec-Agent -> Fact Bundle -->
+  <path d="M683 528 V556" fill="none" stroke="#1d4ed8" stroke-width="2" marker-end="url(#arrBlue)"/>
+  <!-- Fact Bundle -> Jev -->
+  <path d="M918 750 H942 V360 H964" fill="none" stroke="#be185d" stroke-width="2.2" marker-end="url(#arrPink)"/>
+  <!-- Jev -> 4 Dispositions -->
+  <path d="M1454 204 H1500" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#arrGreen)"/>
+  <path d="M1454 320 H1500" fill="none" stroke="#d97706" stroke-width="2" marker-end="url(#arrDark)"/>
+  <path d="M1454 436 H1500" fill="none" stroke="#ea580c" stroke-width="2" marker-end="url(#arrDark)"/>
+  <path d="M1454 552 H1500" fill="none" stroke="#dc2626" stroke-width="2" marker-end="url(#arrRed)"/>
+  <!-- Expose/Rewrite -> Calibration -->
+  <path d="M1864 204 H1886 V740 H1864" fill="none" stroke="#047857" stroke-width="1.8" marker-end="url(#arrGreen)"/>
+  <path d="M1864 320 H1886" fill="none" stroke="#d97706" stroke-width="1.8"/>
+  <!-- Calibration -> Post-Exposure Telemetry -->
+  <path d="M1682 944 V978 H231 V924" fill="none" stroke="#047857" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrGreen)"/>
+  <rect x="760" y="964" width="440" height="26" rx="4" fill="#ecfdf5" stroke="#059669" stroke-width="1"/>
+  <text x="980" y="982" text-anchor="middle" font-family="Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="600" fill="#065f46">Closed-Loop Feedback: Approved Clicks → MCP History (Isolated from Jev)</text>
+
+  <!-- Bottom Academic Caption / Legend -->
+  <line x1="56" y1="1012" x2="1864" y2="1012" stroke="#cbd5e1" stroke-width="1"/>
+  <line x1="68" y1="1040" x2="104" y2="1040" stroke="#1d4ed8" stroke-width="2.2"/>
+  <text x="114" y="1045" font-family="Helvetica Neue, Arial, sans-serif" font-size="13" fill="#334155">Upstream Generation Flow</text>
+  <line x1="330" y1="1040" x2="366" y2="1040" stroke="#be185d" stroke-width="2.2"/>
+  <text x="376" y="1045" font-family="Helvetica Neue, Arial, sans-serif" font-size="13" fill="#334155">Fact Bundle &amp; Jev Gate Flow</text>
+  <line x1="620" y1="1040" x2="656" y2="1040" stroke="#047857" stroke-width="2.2" stroke-dasharray="6 4"/>
+  <text x="666" y="1045" font-family="Helvetica Neue, Arial, sans-serif" font-size="13" fill="#334155">14-Day Calibration &amp; Feedback</text>
+  <line x1="920" y1="1040" x2="956" y2="1040" stroke="#dc2626" stroke-width="2" stroke-dasharray="5 3"/>
+  <text x="966" y="1045" font-family="Helvetica Neue, Arial, sans-serif" font-size="13" fill="#334155">Anti-Leakage Firewall (No Lexicon/Labels to Agent; No Exposure Logs to Jev)</text>
+  <text x="1864" y="1045" text-anchor="end" font-family="Menlo, Consolas, monospace" font-size="12" fill="#64748b">1920×1080 · CS Conference Style</text>
+</svg>

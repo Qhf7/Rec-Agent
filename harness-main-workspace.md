@@ -24,17 +24,21 @@ python3 mcp_server.py
 
 - `get_user_profile`
 - `get_user_behavior`
+- `get_user_recommendation_history`
 - `get_session_context`
 - `search_items`
 - `get_item`
 - `get_promo`
 
 Harness 中对应的工具名为：`mcp__rec-agent-data__get_user_profile`、
-`mcp__rec-agent-data__get_user_behavior`、`mcp__rec-agent-data__get_session_context`、
+`mcp__rec-agent-data__get_user_behavior`、`mcp__rec-agent-data__get_user_recommendation_history`、
+`mcp__rec-agent-data__get_session_context`、
 `mcp__rec-agent-data__search_items`、`mcp__rec-agent-data__get_item`、
 `mcp__rec-agent-data__get_promo`。
 
-这些工具只读 `data/raw/`，不修改数据，也不调用 Jev。
+这些工具只读 `data/raw/` 和 `data/recommendation_feedback_history.csv`，不修改数据，也不调用 Jev。推荐历史只提供给 Rec-Agent 做候选排序参考，不会进入 Jev 审核输入。
+
+事件级参考数据位于 `data/recommendation_feedback_history.csv`：每行是一条已通过 Jev 并实际展示的推荐事件，包含 `event_time`、`exposure_reason`、`clicked`、`click_time`、`position`、`traffic_source`、`device_type` 和 `session_id`。它是合成冷启动演示数据，接入真实链路后应由展示服务按同一字段追加真实反馈。
 
 ## 测试输入
 

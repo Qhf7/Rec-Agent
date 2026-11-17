@@ -19,10 +19,11 @@
 | `raw/lexicon_variants.tsv` | 谐音、拼音、繁体、英文等变体 | 20 |
 | `raw/history_reason_stats.csv` | 同类理由历史表现（pattern 级） | 30 |
 | `exposure_click_history.csv` | 按推荐理由拆分的日粒度曝光点击历史（模拟） | 4,200 |
+| `recommendation_feedback_history.csv` | Jev 通过后的一次推荐曝光/点击事件（模拟） | 1,600 |
 | `raw/city_climate.json` | 城市/气候区/梅雨季映射 | 12 城市 |
 | `mock.db` | 上述数据的 SQLite 版本，供 MCP 工具直接查询 | — |
 
-候选与曝光评测产物按批次生成：`reason_candidates.jsonl`、`exposure_log.jsonl`、`labels.csv`、`latent.csv`。`exposure_click_history.csv` 是基于全量 300 条候选与 14 天观察窗生成的参考数据，不替代原始曝光汇总。
+候选与曝光评测产物按批次生成：`reason_candidates.jsonl`、`exposure_log.jsonl`、`labels.csv`、`latent.csv`。`exposure_click_history.csv` 是基于全量 300 条候选与 14 天观察窗生成的统计回放数据，不替代原始曝光汇总；`recommendation_feedback_history.csv` 是给 Rec-Agent 读取的事件级模拟反馈，一行代表一次已通过 Jev 且已展示的推荐，含 `event_time`、`clicked`、`click_time`、位置、流量来源、设备和会话字段。
 
 ---
 
@@ -153,6 +154,8 @@ term|canonical|risk_type|severity|law_ref|note
 
 用途：给判决层提供「同类理由先验」，辅助校准；**不直接作为违规证据**，且不能与当前候选的标签混用（防泄漏）。
 
+`recommendation_feedback_history.csv` 只供 Rec-Agent 做用户历史参考。它不进入 Jev 输入；真实链路应在最终 Jev 通过并完成展示后写入，点击与未点击都要记录。MCP 返回的 `smoothed_ctr` 使用弱先验抑制小样本波动。没有个人事件时，Agent 进入 `cold_start`，回退到画像、购物车、搜索词、时段和类目先验。
+
 ---
 
 ## 8. 重建与校验
@@ -161,6 +164,7 @@ term|canonical|risk_type|severity|law_ref|note
 python3 scripts/gen_data.py      # 重新生成全部 CSV/JSON/SQLite
 python3 scripts/validate_data.py # 7 类硬校验 + 分布告警
 python3 generate_exposure_click_history.py # 生成日粒度曝光点击参考数据
+python3 scripts/generate_recommendation_feedback_history.py # 生成 Agent 可读的事件级反馈参考数据
 ```
 
 校验覆盖：数量/唯一性/外键/类目/资质/价格/库存/评分/促销规则/用户字段/敏感比例/优惠覆盖/DB 行数。
@@ -214,4 +218,4 @@ WHERE term IN ('防潮', '最', '治疗');
 4. **价格为模拟**：划线价按 1.25–1.8 倍生成，不代表真实价格行为。
 5. **行为快照**：购物车/订单是静态 ID 列表，没有时间序列；深夜/时段只做静态标记。
 6. **天气是规则生成**：`city_climate.json` 只提供季节/梅雨标记，不接真实天气 API。
-7. **没有真实标签**：候选理由、曝光日志、人工标签都要在后续步骤生成；当前数据只到「商品 + 用户 + 规则 + 词表」。
+7. **没有真实标签**：候选理由、曝光日志、人工标签和推荐反馈均为合成参考数据，不能替代线上埋点或人工金标。
