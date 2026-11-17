@@ -1,0 +1,34 @@
+.env
+__pycache__/
+*.pyc
+.DS_Store
+.pytest_cache/
+
+# Generated evaluation outputs and local run artifacts
+*.jsonl
+!tests/fixtures/*.jsonl
+agent_generation_report.json
+agent_quality_report.json
+baseline_comparison*.json
+baseline_comparison*.md
+calibration*.json
+dev_labels*.csv
+error_analysis_report.md
+exposure_log*.jsonl
+fact_bundle*.jsonl
+jev_batch_report*.json
+jev_batch_full_report.json
+jev_errors*.jsonl
+jev_live_smoke_result.json
+jev_request_preview.json
+latent*.csv
+reason_candidates*.jsonl
+result*.jsonl
+rule_baseline_report*.json
+rule_baseline_full_report.json
+
+# Root-level legacy/generated copies; canonical fixtures live under data/raw/
+/users.csv
+/items.csv
+/promo_rules.json
+/compliance_lexicon.txt

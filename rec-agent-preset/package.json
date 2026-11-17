@@ -1,0 +1,12 @@
+{
+  "name": "@local/dsh-rec-agent-preset",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Rec-Agent preset: workspace-grounded product recommendations with concise, evidence-based reasons for the Jev exposure-review chain.",
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}

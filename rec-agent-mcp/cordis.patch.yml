@@ -1,0 +1,13 @@
+# Local MCP registration for the canonical main workspace data layer.
+- insert:
+    - id: mcp-rec-agent-data
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: rec-agent-data
+        transport: stdio
+        command: python3
+        args:
+          - /Users/qiaohongfei/Desktop/实习/Jev曝光审核/mcp_server.py
+        cwd: /Users/qiaohongfei/Desktop/实习/Jev曝光审核
+        toolCallTimeoutMs: 60000
+        failOnStartupError: false

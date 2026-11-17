@@ -1,0 +1,570 @@
+[
+  {
+    "rule_id": "P001",
+    "type": "full_reduction",
+    "title": "家居日用满199减30",
+    "threshold_cents": 19900,
+    "discount_cents": 3000,
+    "discount_percent": 0,
+    "gift": "",
+    "scope": {
+      "category_l1": [
+        "家居日用"
+      ]
+    },
+    "start": "2026-06-01",
+    "end": "2026-06-30",
+    "stackable": false,
+    "fine_print": "不与会员折扣、其他优惠叠加"
+  },
+  {
+    "rule_id": "P002",
+    "type": "full_reduction",
+    "title": "美妆个护满299减50",
+    "threshold_cents": 29900,
+    "discount_cents": 5000,
+    "discount_percent": 0,
+    "gift": "",
+    "scope": {
+      "category_l1": [
+        "美妆个护"
+      ]
+    },
+    "start": "2026-06-01",
+    "end": "2026-06-30",
+    "stackable": false,
+    "fine_print": "不与会员折扣、其他优惠叠加"
+  },
+  {
+    "rule_id": "P003",
+    "type": "full_reduction",
+    "title": "食品生鲜满99减10",
+    "threshold_cents": 9900,
+    "discount_cents": 1000,
+    "discount_percent": 0,
+    "gift": "",
+    "scope": {
+      "category_l1": [
+        "食品生鲜"
+      ]
+    },
+    "start": "2026-06-01",
+    "end": "2026-06-30",
+    "stackable": false,
+    "fine_print": "不与会员折扣、其他优惠叠加"
+  },
+  {
+    "rule_id": "P004",
+    "type": "full_reduction",
+    "title": "母婴亲子满199减20",
+    "threshold_cents": 19900,
+    "discount_cents": 2000,
+    "discount_percent": 0,
+    "gift": "",
+    "scope": {
+      "category_l1": [
+        "母婴亲子"
+      ]
+    },
+    "start": "2026-06-01",
+    "end": "2026-06-30",
+    "stackable": false,
+    "fine_print": "不与会员折扣、其他优惠叠加"
+  },
+  {
+    "rule_id": "P005",
+    "type": "full_reduction",
+    "title": "3C数码满499减50",
+    "threshold_cents": 49900,
+    "discount_cents": 5000,
+    "discount_percent": 0,
+    "gift": "",
+    "scope": {
+      "category_l1": [
+        "3C数码"
+      ]
+    },
+    "start": "2026-06-01",
+    "end": "2026-06-30",
+    "stackable": false,
+    "fine_print": "不与会员折扣、其他优惠叠加"
+  },
+  {
+    "rule_id": "P006",
+    "type": "full_reduction",
+    "title": "服饰鞋包满299减30",
+    "threshold_cents": 29900,
+    "discount_cents": 3000,
+    "discount_percent": 0,
+    "gift": "",
+    "scope": {
+      "category_l1": [
+        "服饰鞋包"
+      ]
+    },
+    "start": "2026-06-01",
+    "end": "2026-06-30",
+    "stackable": false,
+    "fine_print": "不与会员折扣、其他优惠叠加"
+  },
+  {
+    "rule_id": "P007",
+    "type": "full_reduction",
+    "title": "运动户外满199减20",
+    "threshold_cents": 19900,
+    "discount_cents": 2000,
+    "discount_percent": 0,
+    "gift": "",
+    "scope": {
+      "category_l1": [
+        "运动户外"
+      ]
+    },
+    "start": "2026-06-01",
+    "end": "2026-06-30",
+    "stackable": false,
+    "fine_print": "不与会员折扣、其他优惠叠加"
+  },
+  {
+    "rule_id": "P008",
+    "type": "full_reduction",
+    "title": "保健医疗满299减50",
+    "threshold_cents": 29900,
+    "discount_cents": 5000,
+    "discount_percent": 0,
+    "gift": "",
+    "scope": {
+      "category_l1": [
+        "保健医疗"
+      ]
+    },
+    "start": "2026-06-01",
+    "end": "2026-06-30",
+    "stackable": false,
+    "fine_print": "不与会员折扣、其他优惠叠加"
+  },
+  {
+    "rule_id": "P009",
+    "type": "full_reduction",
+    "title": "全品类满499减80",
+    "threshold_cents": 49900,
+    "discount_cents": 8000,
+    "discount_percent": 0,
+    "gift": "",
+    "scope": {
+      "category_l1": [
+        "家居日用",
+        "美妆个护",
+        "食品生鲜",
+        "服饰鞋包",
+        "3C数码",
+        "母婴亲子",
+        "运动户外",
+        "保健医疗"
+      ]
+    },
+    "start": "2026-06-01",
+    "end": "2026-06-30",
+    "stackable": false,
+    "fine_print": "不与会员折扣、其他优惠叠加"
+  },
+  {
+    "rule_id": "P010",
+    "type": "discount",
+    "title": "家居日用85折",
+    "threshold_cents": 0,
+    "discount_cents": 0,
+    "discount_percent": 85,
+    "gift": "",
+    "scope": {
+      "category_l1": [
+        "家居日用"
+      ]
+    },
+    "start": "2026-06-01",
+    "end": "2026-06-30",
+    "stackable": false,
+    "fine_print": "不与会员折扣、其他优惠叠加"
+  },
+  {
+    "rule_id": "P011",
+    "type": "discount",
+    "title": "美妆个护8折",
+    "threshold_cents": 0,
+    "discount_cents": 0,
+    "discount_percent": 80,
+    "gift": "",
+    "scope": {
+      "category_l1": [
+        "美妆个护"
+      ]
+    },
+    "start": "2026-06-01",
+    "end": "2026-06-30",
+    "stackable": false,
+    "fine_print": "不与会员折扣、其他优惠叠加"
+  },
+  {
+    "rule_id": "P012",
+    "type": "discount",
+    "title": "食品生鲜9折",
+    "threshold_cents": 0,
+    "discount_cents": 0,
+    "discount_percent": 90,
+    "gift": "",
+    "scope": {
+      "category_l1": [
+        "食品生鲜"
+      ]
+    },
+    "start": "2026-06-01",
+    "end": "2026-06-30",
+    "stackable": false,
+    "fine_print": "不与会员折扣、其他优惠叠加"
+  },
+  {
+    "rule_id": "P013",
+    "type": "discount",
+    "title": "3C数码95折",
+    "threshold_cents": 0,
+    "discount_cents": 0,
+    "discount_percent": 95,
+    "gift": "",
+    "scope": {
+      "category_l1": [
+        "3C数码"
+      ]
+    },
+    "start": "2026-06-01",
+    "end": "2026-06-30",
+    "stackable": false,
+    "fine_print": "不与会员折扣、其他优惠叠加"
+  },
+  {
+    "rule_id": "P014",
+    "type": "discount",
+    "title": "服饰鞋包75折",
+    "threshold_cents": 0,
+    "discount_cents": 0,
+    "discount_percent": 75,
+    "gift": "",
+    "scope": {
+      "category_l1": [
+        "服饰鞋包"
+      ]
+    },
+    "start": "2026-06-01",
+    "end": "2026-06-30",
+    "stackable": false,
+    "fine_print": "不与会员折扣、其他优惠叠加"
+  },
+  {
+    "rule_id": "P015",
+    "type": "coupon",
+    "title": "全品类满99减10券",
+    "threshold_cents": 9900,
+    "discount_cents": 1000,
+    "discount_percent": 0,
+    "gift": "",
+    "scope": {
+      "category_l1": [
+        "家居日用",
+        "美妆个护",
+        "食品生鲜",
+        "服饰鞋包",
+        "3C数码",
+        "母婴亲子",
+        "运动户外",
+        "保健医疗"
+      ]
+    },
+    "start": "2026-06-01",
+    "end": "2026-06-30",
+    "stackable": false,
+    "fine_print": "不与会员折扣、其他优惠叠加"
+  },
+  {
+    "rule_id": "P016",
+    "type": "coupon",
+    "title": "母婴亲子满199减30券",
+    "threshold_cents": 19900,
+    "discount_cents": 3000,
+    "discount_percent": 0,
+    "gift": "",
+    "scope": {
+      "category_l1": [
+        "母婴亲子"
+      ]
+    },
+    "start": "2026-06-01",
+    "end": "2026-06-30",
+    "stackable": false,
+    "fine_print": "不与会员折扣、其他优惠叠加"
+  },
+  {
+    "rule_id": "P017",
+    "type": "gift",
+    "title": "美妆个护满199赠小样",
+    "threshold_cents": 19900,
+    "discount_cents": 0,
+    "discount_percent": 0,
+    "gift": "随机小样2件",
+    "scope": {
+      "category_l1": [
+        "美妆个护"
+      ]
+    },
+    "start": "2026-06-01",
+    "end": "2026-06-30",
+    "stackable": false,
+    "fine_print": "赠品数量有限，赠完即止"
+  },
+  {
+    "rule_id": "P018",
+    "type": "gift",
+    "title": "食品生鲜满99赠试吃装",
+    "threshold_cents": 9900,
+    "discount_cents": 0,
+    "discount_percent": 0,
+    "gift": "试吃装1份",
+    "scope": {
+      "category_l1": [
+        "食品生鲜"
+      ]
+    },
+    "start": "2026-06-01",
+    "end": "2026-06-30",
+    "stackable": false,
+    "fine_print": "赠品数量有限，赠完即止"
+  },
+  {
+    "rule_id": "P019",
+    "type": "full_reduction",
+    "title": "收纳整理满99减15",
+    "threshold_cents": 9900,
+    "discount_cents": 1500,
+    "discount_percent": 0,
+    "gift": "",
+    "scope": {
+      "category_l2": [
+        "收纳整理"
+      ]
+    },
+    "start": "2026-06-01",
+    "end": "2026-06-30",
+    "stackable": false,
+    "fine_print": "不与会员折扣、其他优惠叠加"
+  },
+  {
+    "rule_id": "P020",
+    "type": "discount",
+    "title": "面部护肤88折",
+    "threshold_cents": 0,
+    "discount_cents": 0,
+    "discount_percent": 88,
+    "gift": "",
+    "scope": {
+      "category_l2": [
+        "面部护肤"
+      ]
+    },
+    "start": "2026-06-01",
+    "end": "2026-06-30",
+    "stackable": false,
+    "fine_print": "不与会员折扣、其他优惠叠加"
+  },
+  {
+    "rule_id": "P021",
+    "type": "gift",
+    "title": "母婴亲子满299赠湿巾",
+    "threshold_cents": 29900,
+    "discount_cents": 0,
+    "discount_percent": 0,
+    "gift": "婴儿湿巾1包",
+    "scope": {
+      "category_l1": [
+        "母婴亲子"
+      ]
+    },
+    "start": "2026-06-01",
+    "end": "2026-06-30",
+    "stackable": false,
+    "fine_print": "赠品数量有限，赠完即止"
+  },
+  {
+    "rule_id": "P022",
+    "type": "coupon",
+    "title": "家居日用满199减20券",
+    "threshold_cents": 19900,
+    "discount_cents": 2000,
+    "discount_percent": 0,
+    "gift": "",
+    "scope": {
+      "category_l1": [
+        "家居日用"
+      ]
+    },
+    "start": "2026-06-01",
+    "end": "2026-06-30",
+    "stackable": false,
+    "fine_print": "不与会员折扣、其他优惠叠加"
+  },
+  {
+    "rule_id": "P023",
+    "type": "full_reduction",
+    "title": "全品类满199减40（已结束）",
+    "threshold_cents": 19900,
+    "discount_cents": 4000,
+    "discount_percent": 0,
+    "gift": "",
+    "scope": {
+      "category_l1": [
+        "家居日用",
+        "美妆个护",
+        "食品生鲜",
+        "服饰鞋包",
+        "3C数码",
+        "母婴亲子",
+        "运动户外",
+        "保健医疗"
+      ]
+    },
+    "start": "2026-05-01",
+    "end": "2026-05-31",
+    "stackable": false,
+    "fine_print": "不与会员折扣、其他优惠叠加"
+  },
+  {
+    "rule_id": "P024",
+    "type": "discount",
+    "title": "服饰鞋包7折（已结束）",
+    "threshold_cents": 0,
+    "discount_cents": 0,
+    "discount_percent": 70,
+    "gift": "",
+    "scope": {
+      "category_l1": [
+        "服饰鞋包"
+      ]
+    },
+    "start": "2026-05-01",
+    "end": "2026-05-31",
+    "stackable": false,
+    "fine_print": "不与会员折扣、其他优惠叠加"
+  },
+  {
+    "rule_id": "P025",
+    "type": "coupon",
+    "title": "美妆个护满299减60（已结束）",
+    "threshold_cents": 29900,
+    "discount_cents": 6000,
+    "discount_percent": 0,
+    "gift": "",
+    "scope": {
+      "category_l1": [
+        "美妆个护"
+      ]
+    },
+    "start": "2026-05-01",
+    "end": "2026-05-31",
+    "stackable": false,
+    "fine_print": "不与会员折扣、其他优惠叠加"
+  },
+  {
+    "rule_id": "P026",
+    "type": "gift",
+    "title": "食品生鲜满199赠礼盒（已结束）",
+    "threshold_cents": 19900,
+    "discount_cents": 0,
+    "discount_percent": 0,
+    "gift": "礼盒1份",
+    "scope": {
+      "category_l1": [
+        "食品生鲜"
+      ]
+    },
+    "start": "2026-05-01",
+    "end": "2026-05-31",
+    "stackable": false,
+    "fine_print": "赠品数量有限，赠完即止"
+  },
+  {
+    "rule_id": "P027",
+    "type": "full_reduction",
+    "title": "全品类满299减60（未开始）",
+    "threshold_cents": 29900,
+    "discount_cents": 6000,
+    "discount_percent": 0,
+    "gift": "",
+    "scope": {
+      "category_l1": [
+        "家居日用",
+        "美妆个护",
+        "食品生鲜",
+        "服饰鞋包",
+        "3C数码",
+        "母婴亲子",
+        "运动户外",
+        "保健医疗"
+      ]
+    },
+    "start": "2026-07-01",
+    "end": "2026-07-31",
+    "stackable": false,
+    "fine_print": "不与会员折扣、其他优惠叠加"
+  },
+  {
+    "rule_id": "P028",
+    "type": "discount",
+    "title": "3C数码85折（未开始）",
+    "threshold_cents": 0,
+    "discount_cents": 0,
+    "discount_percent": 85,
+    "gift": "",
+    "scope": {
+      "category_l1": [
+        "3C数码"
+      ]
+    },
+    "start": "2026-07-01",
+    "end": "2026-07-31",
+    "stackable": false,
+    "fine_print": "不与会员折扣、其他优惠叠加"
+  },
+  {
+    "rule_id": "P029",
+    "type": "coupon",
+    "title": "运动户外满199减30（未开始）",
+    "threshold_cents": 19900,
+    "discount_cents": 3000,
+    "discount_percent": 0,
+    "gift": "",
+    "scope": {
+      "category_l1": [
+        "运动户外"
+      ]
+    },
+    "start": "2026-07-01",
+    "end": "2026-07-31",
+    "stackable": false,
+    "fine_print": "不与会员折扣、其他优惠叠加"
+  },
+  {
+    "rule_id": "P030",
+    "type": "gift",
+    "title": "保健医疗满399赠礼盒（未开始）",
+    "threshold_cents": 39900,
+    "discount_cents": 0,
+    "discount_percent": 0,
+    "gift": "礼盒1份",
+    "scope": {
+      "category_l1": [
+        "保健医疗"
+      ]
+    },
+    "start": "2026-07-01",
+    "end": "2026-07-31",
+    "stackable": false,
+    "fine_print": "赠品数量有限，赠完即止"
+  }
+]

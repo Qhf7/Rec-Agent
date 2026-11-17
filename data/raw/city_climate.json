@@ -1,0 +1,96 @@
+{
+  "杭州": {
+    "city_tier": "新一线",
+    "climate_zone": "江南",
+    "monsoon_months": [
+      6,
+      7
+    ],
+    "notes": "6 月为梅雨季"
+  },
+  "上海": {
+    "city_tier": "一线",
+    "climate_zone": "江南",
+    "monsoon_months": [
+      6,
+      7
+    ],
+    "notes": "6 月为梅雨季"
+  },
+  "北京": {
+    "city_tier": "一线",
+    "climate_zone": "华北",
+    "monsoon_months": [],
+    "notes": "按季节规则生成"
+  },
+  "广州": {
+    "city_tier": "一线",
+    "climate_zone": "华南",
+    "monsoon_months": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "notes": "按季节规则生成"
+  },
+  "深圳": {
+    "city_tier": "一线",
+    "climate_zone": "华南",
+    "monsoon_months": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "notes": "按季节规则生成"
+  },
+  "成都": {
+    "city_tier": "新一线",
+    "climate_zone": "西南",
+    "monsoon_months": [],
+    "notes": "按季节规则生成"
+  },
+  "武汉": {
+    "city_tier": "新一线",
+    "climate_zone": "华中",
+    "monsoon_months": [],
+    "notes": "按季节规则生成"
+  },
+  "西安": {
+    "city_tier": "新一线",
+    "climate_zone": "西北",
+    "monsoon_months": [],
+    "notes": "按季节规则生成"
+  },
+  "南京": {
+    "city_tier": "新一线",
+    "climate_zone": "江南",
+    "monsoon_months": [
+      6,
+      7
+    ],
+    "notes": "6 月为梅雨季"
+  },
+  "重庆": {
+    "city_tier": "新一线",
+    "climate_zone": "西南",
+    "monsoon_months": [],
+    "notes": "按季节规则生成"
+  },
+  "苏州": {
+    "city_tier": "新一线",
+    "climate_zone": "江南",
+    "monsoon_months": [
+      6,
+      7
+    ],
+    "notes": "6 月为梅雨季"
+  },
+  "长沙": {
+    "city_tier": "新一线",
+    "climate_zone": "华中",
+    "monsoon_months": [],
+    "notes": "按季节规则生成"
+  }
+}

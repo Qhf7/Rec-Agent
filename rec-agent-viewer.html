@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rec-Agent 结果查看器</title>
+  <style>
+    :root { color-scheme: light; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    body { margin: 0; background: #f5f7fb; color: #182230; }
+    header { padding: 24px 32px 12px; background: #132238; color: white; }
+    header h1 { margin: 0 0 6px; font-size: 24px; }
+    header p { margin: 0; color: #b8c7db; }
+    main { display: grid; grid-template-columns: minmax(320px, 0.9fr) minmax(420px, 1.1fr); gap: 20px; padding: 24px 32px 40px; }
+    section { min-width: 0; }
+    textarea { box-sizing: border-box; width: 100%; min-height: 360px; padding: 16px; border: 1px solid #cbd5e1; border-radius: 12px; background: white; font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; resize: vertical; }
+    button { margin: 12px 8px 12px 0; padding: 10px 16px; border: 0; border-radius: 8px; background: #2563eb; color: white; cursor: pointer; font-weight: 600; }
+    button.secondary { background: #64748b; }
+    .error { min-height: 24px; color: #b42318; }
+    .panel { margin-top: 12px; padding: 18px; border: 1px solid #dbe3ef; border-radius: 12px; background: white; box-shadow: 0 4px 14px rgba(15, 23, 42, .05); }
+    .panel-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+    .panel-heading h2 { margin: 0; }
+    .hint { margin: 6px 0 0; color: #64748b; font-size: 13px; line-height: 1.5; }
+    .result-panel { border-color: #93c5fd; box-shadow: 0 8px 24px rgba(37, 99, 235, .08); }
+    .result-panel pre { min-height: 180px; padding: 16px; border: 1px solid #dbe3ef; border-radius: 10px; background: #f8fbff; }
+    .copy-status { min-height: 20px; margin-top: 8px; color: #16794a; font-size: 13px; }
+    .profile { display: grid; grid-template-columns: 120px 1fr; gap: 8px 14px; font-size: 14px; }
+    .label { color: #64748b; }
+    .card { margin-top: 14px; padding: 16px; border: 1px solid #dbe3ef; border-radius: 10px; background: #fbfdff; }
+    .card h3 { margin: 0 0 8px; font-size: 16px; }
+    .reason { margin: 8px 0; color: #0f4c81; font-size: 17px; font-weight: 650; }
+    .meta { color: #526173; font-size: 13px; line-height: 1.6; }
+    pre { margin: 0; max-height: 760px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; tab-size: 2; font: 13px/1.65 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    @media (max-width: 900px) { main { grid-template-columns: 1fr; padding: 18px; } header { padding: 20px 18px 12px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Rec-Agent 结果查看器</h1>
+    <p>粘贴 Harness 的整段输出，自动提取 JSON 并生成可读的推荐卡片。</p>
+  </header>
+  <main>
+    <section>
+      <div class="panel">
+        <h2>粘贴 Harness 输出</h2>
+        <textarea id="input" placeholder="把 Harness 的整段消息粘贴到这里"></textarea>
+        <div>
+          <button id="format">格式化结果</button>
+          <button id="clear" class="secondary">清空</button>
+        </div>
+        <div id="error" class="error"></div>
+      </div>
+      <div id="summary" class="panel" hidden></div>
+    </section>
+    <section>
+      <div class="panel result-panel">
+        <div class="panel-heading">
+          <div>
+            <h2>独立格式化结果</h2>
+            <p class="hint">结果会重新生成 JSON，统一使用 2 个空格缩进和逐项换行。</p>
+          </div>
+          <button id="copy-formatted" class="secondary" type="button" disabled>复制格式化结果</button>
+        </div>
+        <pre id="formatted-result" aria-live="polite">等待输入……</pre>
+        <div id="copy-status" class="copy-status" aria-live="polite"></div>
+      </div>
+      <div id="cards" class="panel" hidden></div>
+    </section>
+  </main>
+  <script>
+    const input = document.getElementById('input');
+    const error = document.getElementById('error');
+    const formattedResult = document.getElementById('formatted-result');
+    const copyFormatted = document.getElementById('copy-formatted');
+    const copyStatus = document.getElementById('copy-status');
+    const summary = document.getElementById('summary');
+    const cards = document.getElementById('cards');
+
+    function stripCodeFence(text) {
+      return text.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+    }
+
+    function extract(text) {
+      const normalized = stripCodeFence(text);
+      const start = normalized.indexOf('{');
+      if (start < 0) throw new Error('未找到 JSON 对象');
+      const decoder = new JSONDecoderCompat(normalized.slice(start));
+      return decoder.parse();
+    }
+
+    // Find the first complete JSON object without relying on browser extensions.
+    class JSONDecoderCompat {
+      constructor(text) { this.text = text; }
+      parse() {
+        let quote = false, escape = false, depth = 0, start = -1;
+        for (let i = 0; i < this.text.length; i++) {
+          const ch = this.text[i];
+          if (quote) { if (escape) escape = false; else if (ch === '\\') escape = true; else if (ch === '"') quote = false; continue; }
+          if (ch === '"') { quote = true; continue; }
+          if (ch === '{') { if (start < 0) start = i; depth++; }
+          if (ch === '}') { depth--; if (start >= 0 && depth === 0) return JSON.parse(this.text.slice(start, i + 1)); }
+        }
+        throw new Error('JSON 不完整或格式错误');
+      }
+    }
+
+    function render(payload) {
+      const formatted = JSON.stringify(payload, null, 2);
+      formattedResult.textContent = formatted;
+      copyFormatted.disabled = false;
+      copyStatus.textContent = `共 ${formatted.split('\n').length} 行，可直接复制到文档或工单。`;
+      const profile = payload.user_profile || {};
+      summary.hidden = false;
+      summary.innerHTML = `<h2>用户画像</h2><div class="profile">
+        <div class="label">用户 ID</div><div>${payload.user_id || ''}</div>
+        <div class="label">城市</div><div>${profile.city || ''}（${profile.city_tier || ''}）</div>
+        <div class="label">人生阶段</div><div>${profile.life_stage || ''}</div>
+        <div class="label">偏好类目</div><div>${(profile.preferred_categories || []).join('、')}</div>
+        <div class="label">用户标签</div><div>${(profile.tags || []).join('、')}</div>
+      </div>`;
+      cards.hidden = false;
+      cards.innerHTML = '<h2>推荐卡片</h2>' + (payload.recommendations || []).map((rec, i) => `<article class="card">
+        <h3>${i + 1}. ${rec.title || ''} <span class="meta">(${rec.item_id || ''})</span></h3>
+        <div class="reason">${rec.exposure_reason || ''}</div>
+        <div class="meta"><strong>支撑字段：</strong>${(rec.evidence_fields || []).join('、')}</div>
+        <div class="meta"><strong>上下文：</strong>${rec.context_summary || ''}</div>
+      </article>`).join('');
+    }
+
+    document.getElementById('format').addEventListener('click', () => {
+      error.textContent = '';
+      formattedResult.textContent = '等待输入……';
+      copyFormatted.disabled = true;
+      copyStatus.textContent = '';
+      summary.hidden = true;
+      cards.hidden = true;
+      try { render(extract(input.value)); } catch (e) { error.textContent = e.message; }
+    });
+    copyFormatted.addEventListener('click', async () => {
+      const text = formattedResult.textContent;
+      if (!text || text === '等待输入……') return;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (e) {
+        const helper = document.createElement('textarea');
+        helper.value = text;
+        helper.style.position = 'fixed';
+        helper.style.opacity = '0';
+        document.body.appendChild(helper);
+        helper.select();
+        document.execCommand('copy');
+        helper.remove();
+      }
+      copyStatus.textContent = '已复制格式化结果。';
+    });
+    document.getElementById('clear').addEventListener('click', () => {
+      input.value = '';
+      error.textContent = '';
+      formattedResult.textContent = '等待输入……';
+      copyFormatted.disabled = true;
+      copyStatus.textContent = '';
+      summary.hidden = true;
+      cards.hidden = true;
+    });
+  </script>
+</body>
+</html>
