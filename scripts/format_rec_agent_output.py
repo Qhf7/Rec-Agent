@@ -8,7 +8,10 @@ import json
 import sys
 from pathlib import Path
 
-from scripts.strict_json_output import extract_last_json
+try:
+    from scripts.strict_json_output import extract_last_json
+except ModuleNotFoundError:  # Direct execution: python3 scripts/format_rec_agent_output.py
+    from strict_json_output import extract_last_json
 
 
 def extract_json(text: str) -> dict:
