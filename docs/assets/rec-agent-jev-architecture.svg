@@ -20,11 +20,11 @@
       .cardSub{font:500 16px "Avenir Next","Aptos Display","PingFang SC","Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#64748b;font-style:italic;letter-spacing:.25px}
       .body{font:400 16px "Avenir Next","Aptos Display","PingFang SC","Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#475569}
       .small{font:400 15px "Avenir Next","Aptos Display","PingFang SC","Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#64748b;font-style:italic;letter-spacing:.15px}
-      .mono{font:600 15px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#475569}
+      .mono{font:600 16px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#475569}
       .node{fill:url(#paper);stroke:#cbd5e1;stroke-width:1.5}
       .label{font:600 14px "Avenir Next","Aptos Display","PingFang SC","Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#2563eb;font-style:italic}
       .outTitle{font:700 20px "Avenir Next","Aptos Display","PingFang SC","Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#172033}
-      .outSub{font:400 16px "Avenir Next","Aptos Display","PingFang SC","Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#475569;font-style:italic;letter-spacing:.15px}
+      .outSub{font:400 18px "Avenir Next","Aptos Display","PingFang SC","Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#475569;font-style:italic;letter-spacing:.15px}
     </style>
   </defs>
 
@@ -110,7 +110,6 @@
 
   <text x="84" y="690" class="stage">05  EXPOSURE DECISION · 四档处置</text>
   <path d="M1512 610V658H900V710" fill="none" stroke="#7c3aed" stroke-width="3" marker-end="url(#arrowJev)"/>
-  <circle cx="900" cy="710" r="6" fill="#7c3aed"/>
   <rect x="1230" y="640" width="96" height="24" rx="12" fill="#faf5ff" stroke="#ddd6fe"/>
   <text x="1278" y="657" text-anchor="middle" style="font:600 14px 'Avenir Next','Aptos Display','PingFang SC','Noto Sans SC',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#7c3aed;font-style:italic">判决分流</text>
   <path d="M264 710H1512" fill="none" stroke="#94a3b8" stroke-width="2"/>
