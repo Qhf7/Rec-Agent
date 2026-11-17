@@ -4,7 +4,7 @@
 
 [![Agent](https://img.shields.io/badge/Agent-Rec--Agent-2563eb)](rec-agent-preset/)
 [![Review](https://img.shields.io/badge/Review-Jev%20Exposure%20Gate-7c3aed)](jev_adapter.py)
-[![Tests](https://img.shields.io/badge/tests-43%20passed-16a34a)](tests/)
+[![Tests](https://img.shields.io/badge/tests-48%20passed-16a34a)](tests/)
 [![Data](https://img.shields.io/badge/mock%20data-200%20users%20%2B%20200%20items-0891b2)](data/raw/)
 
 这个项目把「推荐什么」和「能否曝光」拆成两个职责清晰的阶段：Rec-Agent 根据用户画像、行为和场景数据选择商品并生成一句用户可见的推荐理由；Jev 再对推荐理由进行曝光前判定，输出 `expose / rewrite / human_review / block` 四档处置结论。
@@ -20,7 +20,7 @@
 | 模块 | 作用 | 入口 |
 | --- | --- | --- |
 | **Rec-Agent preset** | 编排选品、生成用户可见曝光理由、输出严格 JSON | [`rec-agent-preset/`](rec-agent-preset/) |
-| **MCP data layer** | 只读查询用户、行为、商品、促销和会话场景 | [`mcp_server.py`](mcp_server.py) |
+| **MCP data layer** | 只读查询用户、行为、推荐反馈、商品、促销和会话场景 | [`mcp_server.py`](mcp_server.py) |
 | **ModelGo Agent** | 为批量候选生成提供 dry-run / HTTP 客户端 | [`modelgo_agent.py`](modelgo_agent.py) |
 | **Fact Bundle** | 将候选结果转换为可审核、可追溯的事实包 | [`fact_bundle.py`](fact_bundle.py) |
 | **Jev Adapter** | 调用或模拟 `jev-1.14.0` 的审核判决 | [`jev_adapter.py`](jev_adapter.py) |
@@ -85,6 +85,8 @@ Rec-Agent 不输出 Jev 判决字段，避免生成模型替代下游合规判�
 
 参考分析数据位于 [`data/exposure_click_history.csv`](data/exposure_click_history.csv)，由全量候选的 14 天观察窗拆分得到，包含用户、商品、日期、曝光、点击、加购、下单和设备/位置等字段；这是可复现的模拟数据，不替代原始曝光汇总。
 
+给 Rec-Agent 使用的事件级反馈位于 [`data/recommendation_feedback_history.csv`](data/recommendation_feedback_history.csv)，每行是一条 Jev 通过并实际展示的推荐事件，包含推荐时间、理由、点击、点击时间、位置、设备、流量来源和会话信息；它不进入 Jev 输入。
+
 完整字段说明见 [`data/README.md`](data/README.md) 和 [`用户与商品数据说明.md`](用户与商品数据说明.md)。
 
 ## 本地运行
@@ -97,6 +99,7 @@ pip install -r requirements-mcp.txt
 pytest -q
 python3 scripts/validate_data.py
 python3 generate_exposure_click_history.py
+python3 scripts/generate_recommendation_feedback_history.py
 ```
 
 启动只读 MCP 服务：
@@ -149,7 +152,7 @@ pbpaste | python3 scripts/format_rec_agent_output.py
 ## 验证状态
 
 ```text
-pytest -q                 43 passed
+pytest -q                 48 passed
 scripts/validate_data.py  PASS: all hard checks passed
 ```
 

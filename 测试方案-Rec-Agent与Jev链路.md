@@ -158,10 +158,13 @@ python3 run_jev_batch.py --dry-run \
 5. 确认出现以下工具调用：
    - `mcp__rec-agent-data__get_user_profile`
    - `mcp__rec-agent-data__get_user_behavior`
+   - `mcp__rec-agent-data__get_user_recommendation_history`
    - `mcp__rec-agent-data__get_session_context`
    - `mcp__rec-agent-data__get_item`
    - `mcp__rec-agent-data__get_promo`
 6. 确认最终 JSON 中存在 `exposure_reason`，且它与 `generated_reason` 相同。
+7. 用 `u_0001` 验证历史路径：轨迹中 `get_user_recommendation_history` 返回 `history_status=warm`，并包含事件或类目统计。
+8. 用 `u_0199` 验证冷启动路径：返回 `history_status=cold_start`，但 Agent 仍应根据画像和场景生成推荐，不应直接返回空结果。
 
 ## 六、建议的测试顺序
 
