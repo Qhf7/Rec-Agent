@@ -11,20 +11,9 @@
 
 ## 一眼看懂项目链路
 
-```mermaid
-flowchart LR
-    U[用户 ID] --> A[Rec-Agent]
-    D[(data/raw\nusers.csv / items.csv)] --> M[MCP 数据层]
-    M --> A
-    A --> C[推荐候选 JSON\n商品 + 曝光理由 + 证据字段]
-    C --> F[Fact Bundle\n事实包与可追溯 provenance]
-    F --> J[Jev Adapter]
-    J --> G{曝光处置}
-    G -->|expose| E[直接曝光]
-    G -->|rewrite| R[改写后曝光]
-    G -->|human_review| H[人工合规队列]
-    G -->|block| B[禁止曝光]
-```
+![Rec-Agent 与 Jev 曝光审核架构图](docs/assets/rec-agent-jev-architecture.svg)
+
+图中使用了项目自定义的 Rec-Agent 图标和 Jev 审核模型图标，并把链路拆成「上下文输入 → 推荐生成 → 事实追溯 → Jev 判决 → 四档处置」五个视觉区块。
 
 ## 当前实现
 

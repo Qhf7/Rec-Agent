@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Rec-Agent 与 Jev 曝光审核链路</title>
+  <desc id="desc">用户和数据通过 MCP 进入 Rec-Agent，生成推荐候选和事实包，再交给 Jev 做曝光处置。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#08111f"/><stop offset="1" stop-color="#111b32"/></linearGradient>
+    <linearGradient id="rec" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#2563eb"/></linearGradient>
+    <linearGradient id="jev" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c084fc"/><stop offset="1" stop-color="#7c3aed"/></linearGradient>
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#059669"/></linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000" flood-opacity=".30"/></filter>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#9fb5d9" stroke-opacity=".07"/></pattern>
+    <marker id="arrowBlue" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0L12 6L0 12Z" fill="#67e8f9"/></marker>
+    <marker id="arrowPurple" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0L12 6L0 12Z" fill="#c084fc"/></marker>
+    <marker id="arrowGreen" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0L12 6L0 12Z" fill="#6ee7b7"/></marker>
+    <marker id="arrowAmber" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0L12 6L0 12Z" fill="#fbbf24"/></marker>
+    <style>
+      .title{font:700 30px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#f8fafc}
+      .subtitle{font:400 15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#a9b9d4}
+      .h{font:700 17px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#f8fafc}
+      .body{font:400 14px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#cbd5e1}
+      .small{font:500 12px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#9fb1ca}
+      .tag{font:700 11px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#dbeafe;letter-spacing:1px}
+      .mono{font:600 12px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#b7c9e8}
+      .card{fill:#101c31;stroke:#2b3c5d;stroke-width:1.5}
+    </style>
+  </defs>
+
+  <rect width="1600" height="900" rx="28" fill="url(#bg)"/>
+  <rect x="1" y="1" width="1598" height="898" rx="28" fill="url(#grid)"/>
+  <text x="72" y="72" class="title">Rec-Agent × Jev · 推荐生成与曝光审核</text>
+  <text x="72" y="103" class="subtitle">从用户上下文到商品卡片，再到曝光前四档处置</text>
+  <rect x="1240" y="52" width="286" height="38" rx="19" fill="#172846" stroke="#2f4770"/>
+  <circle cx="1266" cy="71" r="6" fill="#34d399"/><text x="1282" y="76" class="small">mock data · dry-run friendly</text>
+
+  <!-- Input zone -->
+  <rect x="64" y="168" width="260" height="510" rx="22" class="card" filter="url(#shadow)"/>
+  <text x="92" y="205" class="tag">01 · CONTEXT</text>
+  <text x="92" y="238" class="h">用户与数据输入</text>
+  <!-- user icon -->
+  <circle cx="194" cy="307" r="44" fill="#162d4b" stroke="#4b80b8" stroke-width="2"/>
+  <circle cx="194" cy="293" r="14" fill="#8bd8ff"/>
+  <path d="M166 335c7-22 49-22 56 0" fill="none" stroke="#8bd8ff" stroke-width="8" stroke-linecap="round"/>
+  <text x="194" y="386" text-anchor="middle" class="h">user_id</text>
+  <text x="194" y="411" text-anchor="middle" class="mono">u_0007</text>
+  <line x1="96" y1="452" x2="292" y2="452" stroke="#2b3c5d"/>
+  <text x="96" y="484" class="body">画像 / 行为 / 场景</text>
+  <text x="96" y="516" class="small">users.csv · items.csv</text>
+  <text x="96" y="542" class="small">购物车 · 搜索词 · 活跃时段</text>
+  <text x="96" y="568" class="small">城市气候 · 促销规则</text>
+  <rect x="91" y="604" width="205" height="42" rx="12" fill="#102b48" stroke="#275b84"/>
+  <text x="194" y="630" text-anchor="middle" class="mono">MCP · read-only</text>
+
+  <!-- Rec-Agent card -->
+  <rect x="390" y="168" width="318" height="510" rx="22" fill="#0d223e" stroke="#2677b9" stroke-width="2" filter="url(#shadow)"/>
+  <text x="420" y="205" class="tag">02 · GENERATE</text>
+  <text x="420" y="238" class="h">Rec-Agent</text>
+  <text x="420" y="264" class="small">rec-agent-v2 · personalized copy</text>
+  <!-- custom Rec-Agent icon -->
+  <rect x="485" y="298" width="130" height="130" rx="38" fill="url(#rec)" filter="url(#shadow)"/>
+  <path d="M523 335h54c12 0 21 9 21 21v30c0 12-9 21-21 21h-54c-12 0-21-9-21-21v-30c0-12 9-21 21-21Z" fill="#071629" opacity=".92"/>
+  <circle cx="541" cy="371" r="7" fill="#67e8f9"/><circle cx="559" cy="371" r="7" fill="#67e8f9"/><circle cx="577" cy="371" r="7" fill="#67e8f9"/>
+  <path d="M546 392c8 8 18 8 26 0" fill="none" stroke="#67e8f9" stroke-width="4" stroke-linecap="round"/>
+  <path d="M550 326v-12m20 12v-12" stroke="#d5faff" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="550" cy="311" r="4" fill="#d5faff"/><circle cx="570" cy="311" r="4" fill="#d5faff"/>
+  <text x="550" y="466" text-anchor="middle" class="h">选品 + 推荐理由</text>
+  <text x="420" y="510" class="body">输出 1–3 张推荐卡片</text>
+  <text x="420" y="540" class="small">exposure_reason · user_profile</text>
+  <text x="420" y="566" class="small">generated_reason · evidence_fields</text>
+  <text x="420" y="592" class="small">context_summary</text>
+  <rect x="420" y="624" width="246" height="34" rx="10" fill="#0e3c61"/>
+  <text x="543" y="646" text-anchor="middle" class="mono">用户可见文案 · JSON</text>
+
+  <!-- Candidate / fact bundle -->
+  <rect x="780" y="168" width="280" height="510" rx="22" class="card" filter="url(#shadow)"/>
+  <text x="810" y="205" class="tag">03 · TRACE</text>
+  <text x="810" y="238" class="h">候选与事实包</text>
+  <rect x="812" y="286" width="216" height="108" rx="14" fill="#172640" stroke="#3b5a83"/>
+  <text x="832" y="315" class="mono">recommendations[]</text>
+  <text x="832" y="344" class="small">商品 ID / 标题</text>
+  <text x="832" y="368" class="small">曝光理由 / 证据字段</text>
+  <rect x="812" y="424" width="216" height="126" rx="14" fill="#201d3f" stroke="#6653a4"/>
+  <text x="832" y="454" class="mono">fact_bundle-v1</text>
+  <text x="832" y="483" class="small">provenance · coverage</text>
+  <text x="832" y="507" class="small">词表命中 · disclosure</text>
+  <text x="832" y="531" class="small">可追溯、可复核</text>
+  <text x="920" y="618" text-anchor="middle" class="body">把“为什么这样写”</text>
+  <text x="920" y="643" text-anchor="middle" class="body">交给审核链路</text>
+
+  <!-- Jev card -->
+  <rect x="1130" y="168" width="300" height="510" rx="22" fill="#211a3d" stroke="#8054c9" stroke-width="2" filter="url(#shadow)"/>
+  <text x="1160" y="205" class="tag">04 · JUDGE</text>
+  <text x="1160" y="238" class="h">Jev 曝光审核</text>
+  <text x="1160" y="264" class="small">jev-1.14.0 · system-one gate</text>
+  <!-- custom Jev icon: shield + neural nodes -->
+  <path d="M1280 292l68 24v50c0 49-30 82-68 101-38-19-68-52-68-101v-50l68-24Z" fill="url(#jev)" filter="url(#shadow)"/>
+  <path d="M1280 323v75m-31-47 31 23 31-23m-47 52 16-12 16 12" fill="none" stroke="#f5eaff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="1249" cy="351" r="6" fill="#fff"/><circle cx="1311" cy="351" r="6" fill="#fff"/><circle cx="1280" cy="398" r="6" fill="#fff"/>
+  <text x="1280" y="465" text-anchor="middle" class="h">事实核验 · 风险判定</text>
+  <text x="1160" y="510" class="body">decision · risk_type</text>
+  <text x="1160" y="540" class="small">evidence · judge_score</text>
+  <text x="1160" y="566" class="small">escalated · model_version</text>
+  <rect x="1160" y="606" width="240" height="42" rx="12" fill="#382366" stroke="#7952bb"/>
+  <text x="1280" y="632" text-anchor="middle" class="mono">曝光前速审</text>
+
+  <!-- Flow connectors -->
+  <path d="M324 420H390" fill="none" stroke="#67e8f9" stroke-width="4" marker-end="url(#arrowBlue)"/>
+  <text x="357" y="403" text-anchor="middle" class="small">上下文</text>
+  <path d="M708 420H780" fill="none" stroke="#67e8f9" stroke-width="4" marker-end="url(#arrowBlue)"/>
+  <text x="744" y="403" text-anchor="middle" class="small">候选 JSON</text>
+  <path d="M1060 420H1130" fill="none" stroke="#c084fc" stroke-width="4" marker-end="url(#arrowPurple)"/>
+  <text x="1095" y="403" text-anchor="middle" class="small">事实包</text>
+
+  <!-- decision rail -->
+  <text x="800" y="738" class="tag">05 · EXPOSURE DECISION</text>
+  <path d="M1280 678V720" fill="none" stroke="#c084fc" stroke-width="4" marker-end="url(#arrowPurple)"/>
+  <path d="M1280 720H444" fill="none" stroke="#7387aa" stroke-width="2" stroke-dasharray="6 8"/>
+  <rect x="80" y="768" width="286" height="74" rx="16" fill="#0f382f" stroke="#2e9f7b"/>
+  <circle cx="110" cy="805" r="10" fill="#34d399"/><text x="134" y="811" class="h">expose</text><text x="134" y="830" class="small">直接曝光</text>
+  <rect x="408" y="768" width="286" height="74" rx="16" fill="#3b2b0d" stroke="#c58a26"/>
+  <circle cx="438" cy="805" r="10" fill="#fbbf24"/><text x="462" y="811" class="h">rewrite</text><text x="462" y="830" class="small">改写后曝光</text>
+  <rect x="736" y="768" width="286" height="74" rx="16" fill="#392613" stroke="#d97706"/>
+  <circle cx="766" cy="805" r="10" fill="#fb923c"/><text x="790" y="811" class="h">human_review</text><text x="790" y="830" class="small">人工合规队列</text>
+  <rect x="1064" y="768" width="286" height="74" rx="16" fill="#3b1723" stroke="#c04c6f"/>
+  <circle cx="1094" cy="805" r="10" fill="#fb7185"/><text x="1118" y="811" class="h">block</text><text x="1118" y="830" class="small">禁止曝光</text>
+  <path d="M1280 720V746M223 746V768M551 746V768M879 746V768M1207 746V768" fill="none" stroke="#7387aa" stroke-width="2" marker-end="url(#arrowGreen)"/>
+</svg>
