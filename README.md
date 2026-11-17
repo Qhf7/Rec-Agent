@@ -13,7 +13,7 @@
 
 ![Rec-Agent 与 Jev 曝光审核架构图](docs/assets/rec-agent-jev-architecture.svg)
 
-图中使用新的 Rec-Agent 图形标志与 [TypeSafe AI 官方 Jev 标志](https://typesafe.ai/)，并把链路拆成「上下文输入 → 推荐生成 → 事实追溯 → Jev 判决 → 四档处置」五个视觉区块。
+图中使用新的 Rec-Agent 图形标志与 [TypeSafe AI 官方公司 logo](https://typesafe.ai/)；官方 wordmark 资产保存在 [`docs/assets/typesafe-ai-official-logo.svg`](docs/assets/typesafe-ai-official-logo.svg)，并把链路拆成「上下文输入 → 推荐生成 → 事实追溯 → Jev 判决 → 四档处置」五个视觉区块。
 
 ## 当前实现
 
