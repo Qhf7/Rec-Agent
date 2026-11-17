@@ -66,3 +66,9 @@ pbpaste | python3 scripts/format_rec_agent_output.py
 ```bash
 pbpaste | python3 scripts/format_rec_agent_output.py --json-only
 ```
+
+如果要把 Harness 的整段消息直接转换成一个严格 JSON 文档（自动跳过工具预览、进度文字和前面的非 JSON 内容）：
+
+```bash
+pbpaste | python3 scripts/strict_json_output.py
+```

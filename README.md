@@ -132,6 +132,12 @@ Harness 的消息区域可能把 JSON 空白压缩成一行。打开 [`rec-agent
 pbpaste | python3 scripts/format_rec_agent_output.py
 ```
 
+要从 Harness 整段消息中直接提取最后一个严格 JSON 对象：
+
+```bash
+pbpaste | python3 scripts/strict_json_output.py
+```
+
 ## 目录结构
 
 ```text

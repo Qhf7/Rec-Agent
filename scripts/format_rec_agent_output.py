@@ -8,15 +8,11 @@ import json
 import sys
 from pathlib import Path
 
+from scripts.strict_json_output import extract_last_json
+
 
 def extract_json(text: str) -> dict:
-    text = text.strip()
-    start = text.find("{")
-    if start < 0:
-        raise ValueError("未找到 JSON 对象")
-
-    decoder = json.JSONDecoder()
-    payload, _ = decoder.raw_decode(text[start:])
+    payload = extract_last_json(text)
     if not isinstance(payload, dict):
         raise ValueError("结果必须是 JSON 对象")
     return payload
