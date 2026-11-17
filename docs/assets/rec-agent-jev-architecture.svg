@@ -13,18 +13,18 @@
     <marker id="arrowHuman" markerWidth="11" markerHeight="11" refX="10" refY="5.5" orient="auto"><path d="M0 0L11 5.5L0 11Z" fill="#ea580c"/></marker>
     <marker id="arrowBlock" markerWidth="11" markerHeight="11" refX="10" refY="5.5" orient="auto"><path d="M0 0L11 5.5L0 11Z" fill="#be123c"/></marker>
     <style>
-      .title{font:700 34px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#172033}
-      .subtitle{font:400 16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#64748b}
-      .stage{font:700 12px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:1.2px;fill:#64748b}
-      .cardTitle{font:700 21px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#172033}
-      .cardSub{font:500 13px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#64748b}
-      .body{font:400 14px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#475569}
-      .small{font:400 12px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#64748b}
+      .title{font:700 34px Inter,"Aptos","PingFang SC","Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#172033}
+      .subtitle{font:400 16px Inter,"Aptos","PingFang SC","Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#64748b}
+      .stage{font:700 12px Inter,"Aptos","PingFang SC","Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:1.2px;fill:#64748b}
+      .cardTitle{font:700 21px Inter,"Aptos","PingFang SC","Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#172033}
+      .cardSub{font:500 13px Inter,"Aptos","PingFang SC","Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#64748b}
+      .body{font:400 14px Inter,"Aptos","PingFang SC","Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#475569}
+      .small{font:400 12px Inter,"Aptos","PingFang SC","Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#64748b}
       .mono{font:600 12px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#475569}
       .node{fill:url(#paper);stroke:#cbd5e1;stroke-width:1.5}
-      .label{font:600 12px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#2563eb}
-      .outTitle{font:700 18px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#172033}
-      .outSub{font:400 13px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#475569}
+      .label{font:600 12px Inter,"Aptos","PingFang SC","Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#2563eb}
+      .outTitle{font:700 18px Inter,"Aptos","PingFang SC","Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#172033}
+      .outSub{font:400 13px Inter,"Aptos","PingFang SC","Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#475569}
     </style>
   </defs>
 
@@ -94,10 +94,13 @@
   <text x="888" y="379" text-anchor="middle" class="label">候选</text>
   <path d="M1276 400H1332" fill="none" stroke="#7c3aed" stroke-width="3" marker-end="url(#arrowJev)"/>
   <rect x="1274" y="363" width="60" height="22" rx="11" fill="#faf5ff"/>
-  <text x="1304" y="379" text-anchor="middle" style="font:600 12px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#7c3aed">事实包</text>
+  <text x="1304" y="379" text-anchor="middle" style="font:600 12px Inter,'Aptos','PingFang SC','Noto Sans SC',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#7c3aed">事实包</text>
 
   <text x="84" y="690" class="stage">05  EXPOSURE DECISION · 四档处置</text>
-  <path d="M1512 610V710" fill="none" stroke="#7c3aed" stroke-width="3" marker-end="url(#arrowJev)"/>
+  <path d="M1512 610V658H900V710" fill="none" stroke="#7c3aed" stroke-width="3" marker-end="url(#arrowJev)"/>
+  <circle cx="900" cy="710" r="6" fill="#7c3aed"/>
+  <rect x="1230" y="640" width="96" height="24" rx="12" fill="#faf5ff" stroke="#ddd6fe"/>
+  <text x="1278" y="657" text-anchor="middle" style="font:600 12px Inter,'Aptos','PingFang SC','Noto Sans SC',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#7c3aed">判决分流</text>
   <path d="M264 710H1512" fill="none" stroke="#94a3b8" stroke-width="2"/>
   <path d="M264 710V752" fill="none" stroke="#059669" stroke-width="3" marker-end="url(#arrowExpose)"/>
   <path d="M678 710V752" fill="none" stroke="#d97706" stroke-width="3" marker-end="url(#arrowRewrite)"/>
