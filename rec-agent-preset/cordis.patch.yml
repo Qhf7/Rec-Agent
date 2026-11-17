@@ -83,7 +83,8 @@
                 4. 逐项核对字段，先写 exposure_reason，再将同一句复制到 generated_reason，最后填写只支撑这句文案的 evidence_fields 与 context_summary。
                 5. 自检：JSON 可解析、字段齐全、user_profile 完整、item_id 存在、exposure_reason 不超过 24 个汉字、exposure_reason 与 generated_reason 完全相同、不含优惠信息、每条文案至少有场景钩子或心理收益、每个卖点有字段依据、evidence_fields 与文案逐词对应、无审核判决字段。
                 6. 只输出最终 JSON，不要 Markdown 代码块、不要前言、不要解释、不要额外字段。不得在 JSON 前后输出英文或中文过程说明，不得输出「I'll start」「The scenario date is」等规划句；工具调用过程由 Harness 自己展示，最终回答区域只保留 JSON。
-                7. 排版是硬约束：第一行必须只有 `{`，最后一行必须只有 `}`；顶层属性、每个推荐对象、数组元素和 evidence_fields 都必须各占独立行，统一使用 2 个空格缩进。禁止把完整 JSON 压缩成一行；如果自检发现输出没有换行，必须重新格式化后再返回。
+                7. 工具回显、工具轨迹、状态进度和中间解释不属于最终回答，不得复制或拼接进最终 JSON。最终回答只能有一个 JSON 根对象；禁止并列多个根对象、禁止输出 JSON5/JavaScript 对象写法、禁止输出未加引号的键、禁止输出省略号或截断数组。
+                8. 排版是硬约束：第一行必须只有 `{`，最后一行必须只有 `}`；顶层属性、每个推荐对象、数组元素和 evidence_fields 都必须各占独立行，统一使用 2 个空格缩进。禁止把完整 JSON 压缩成一行；如果自检发现输出没有换行，必须重新格式化后再返回。
 
                 ## 输出 Schema（严格 JSON）
                 {
@@ -120,7 +121,7 @@
                 - recommendations 默认 1–3 条，按推荐优先级排序。
                 - 空结果：当用户不存在、商品字段不足或找不到有事实支撑的推荐时，recommendations 返回 []，并在顶层增加 context_summary 说明原因（例如「users.csv 中无 u_9999，未生成推荐」）；这是唯一允许的额外字段，非空结果不得输出顶层 context_summary。
               suffix: |-
-                输出硬约束：只返回一个格式化 JSON 对象（UTF-8），第一行只有 `{`、最后一行只有 `}`；不要 Markdown 代码块、不要前后缀说明、不要注释。对象属性、数组元素和 evidence_fields 每项使用换行与 2 个空格缩进，禁止输出单行压缩 JSON；agent_version 固定为 "rec-agent-v2"；recommendations 为空时按上面的空结果例外处理。
+                输出硬约束：只返回一个格式化 JSON 对象（UTF-8），只能有一个 JSON 根对象，第一行只有 `{`、最后一行只有 `}`；不要 Markdown 代码块、不要前后缀说明、不要注释、不要工具回显或过程进度。禁止输出 JSON5/JavaScript 对象写法、未加引号的键、省略号、截断数组或并列多个根对象。对象属性、数组元素和 evidence_fields 每项使用换行与 2 个空格缩进，禁止输出单行压缩 JSON；agent_version 固定为 "rec-agent-v2"；recommendations 为空时按上面的空结果例外处理。
           - id: time-context
             name: '@deepseek-ai/dsh-time-context'
           - id: tool-fs

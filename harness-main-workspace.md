@@ -47,7 +47,7 @@ Harness 中对应的工具名为：`mcp__rec-agent-data__get_user_profile`、
 ```
 
 用户卡片只展示 `exposure_reason`；`evidence_fields` 和 `context_summary` 留给 Jev 审核与审计。
-最终回答使用格式化 JSON，前后不附加英文过程说明；如果界面仍显示旧的压缩 JSON 或 `rec-agent-v1`，请完全重启 Harness 并新建会话。
+最终回答必须是一个严格 JSON 根对象；工具回显和轨迹可以在 Harness 的工具面板中查看，但不要把它们与最终 JSON 拼接。前后不附加英文过程说明；如果界面仍显示旧的压缩 JSON 或 `rec-agent-v1`，请完全重启 Harness 并新建会话。
 
 每次修改 `rec-agent-preset/cordis.patch.yml` 后，需要完全退出并重新打开 DeepSeek Harness，再新建会话验证。旧会话会保留历史响应；如果输出中的 `agent_version` 仍是 `rec-agent-v1`，说明看到的是旧结果。本次文案策略版本为 `rec-agent-v2`。
 

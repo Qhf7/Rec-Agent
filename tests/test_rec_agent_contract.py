@@ -27,6 +27,10 @@ def test_rec_agent_preset_exposes_user_facing_reason_contract():
     assert "generated_reason 必须与 exposure_reason 完全相同" in patch_text
     assert "get_user_recommendation_history" in patch_text
     assert "cold_start" in patch_text
+    assert "只能有一个 JSON 根对象" in patch_text
+    assert "禁止输出未加引号的键" in patch_text
+    assert "禁止输出省略号" in patch_text
+    assert "工具回显" in patch_text
     assert "exposure_reason" in readme_text
 
 
