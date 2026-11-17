@@ -31,6 +31,8 @@ def test_rec_agent_preset_exposes_user_facing_reason_contract():
     assert "禁止输出未加引号的键" in patch_text
     assert "禁止输出省略号" in patch_text
     assert "工具回显" in patch_text
+    assert "调用工具前不要输出任何文本" in patch_text
+    assert "工具调用之间不要发送自然语言消息" in patch_text
     assert "exposure_reason" in readme_text
 
 
