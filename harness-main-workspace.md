@@ -72,3 +72,5 @@ pbpaste | python3 scripts/format_rec_agent_output.py --json-only
 ```bash
 pbpaste | python3 scripts/strict_json_output.py
 ```
+
+请从对话区最终回答旁的“复制”按钮复制内容；不要从“轨迹”面板的工具结果卡片复制，因为工具卡片是便于阅读的对象预览，可能包含未加引号的键或 `…`，不属于完整 JSON。

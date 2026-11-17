@@ -58,7 +58,10 @@ def extract_last_json(text: str) -> Any:
         if isinstance(value, (dict, list)):
             candidates.append((end, start, value))
     if not candidates:
-        raise ValueError("未找到完整的严格 JSON 对象或数组")
+        raise ValueError(
+            "未找到完整的严格 JSON 对象或数组。请复制 Harness 对话区最终回答的完整内容，"
+            "不要复制轨迹面板中的工具预览；工具预览常含 found:true、未加引号的键或省略号 …，无法还原为严格 JSON。"
+        )
     candidates.sort(key=lambda pair: (pair[0], pair[1]))
     return candidates[-1][2]
 
