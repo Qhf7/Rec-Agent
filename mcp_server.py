@@ -17,6 +17,12 @@ from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
+from canonical_data import (
+    CANONICAL_SCHEMA_VERSION,
+    load_canonical_items,
+    load_canonical_promos,
+    load_canonical_users,
+)
 from mcp.server.fastmcp import FastMCP
 
 
@@ -95,21 +101,16 @@ def _normalize_item(row: dict[str, str]) -> dict[str, Any]:
     return result
 
 
-@lru_cache(maxsize=1)
 def _users() -> dict[str, dict[str, Any]]:
-    with (RAW / "users.csv").open(encoding="utf-8-sig", newline="") as handle:
-        return {row["user_id"]: _normalize_user(row) for row in csv.DictReader(handle)}
+    return load_canonical_users()
 
 
-@lru_cache(maxsize=1)
 def _items() -> dict[str, dict[str, Any]]:
-    with (RAW / "items.csv").open(encoding="utf-8-sig", newline="") as handle:
-        return {row["item_id"]: _normalize_item(row) for row in csv.DictReader(handle)}
+    return load_canonical_items()
 
 
-@lru_cache(maxsize=1)
 def _promos() -> list[dict[str, Any]]:
-    return json.loads((RAW / "promo_rules.json").read_text(encoding="utf-8"))
+    return load_canonical_promos()
 
 
 @lru_cache(maxsize=1)
