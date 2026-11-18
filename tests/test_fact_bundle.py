@@ -1,6 +1,8 @@
 import json
 from pathlib import Path
 
+import pytest
+
 from canonical_data import load_canonical_items
 from fact_bundle import build_fact_bundle, load_candidates
 from run_rule_baseline import load_lexicon
@@ -80,3 +82,92 @@ def test_candidate_loader_reads_jsonl():
     path.parent.mkdir(exist_ok=True)
     path.write_text('{"reason_id":"r1"}\n', encoding="utf-8")
     assert load_candidates(path) == [{"reason_id": "r1"}]
+
+
+def complete_candidate():
+    return {
+        "schema_version": "rec-candidate-v2",
+        "data_version": "canonical-2026-06-15-v1",
+        "reason_id": "r_disclosure_separation",
+        "user_id": "u_0001",
+        "item_id": "i_0063",
+        "exposure_reason": "家庭主食，2.5kg五常大米",
+        "generated_reason": "家庭主食，2.5kg五常大米",
+        "item_attrs_returned": load_canonical_items()["i_0063"],
+        "attrs_returned_complete": True,
+        "tool_trace": [{"tool": "get_item", "returned_fields": ["functions", "spec"]}],
+        "snapshot_at": "2026-06-15T12:00:00+08:00",
+        "ai_disclosure_required": True,
+    }
+
+
+@pytest.mark.parametrize("flag,status,notes", [
+    (None, "unknown", ["ai_disclosure_unknown"]),
+    (True, "visible", []),
+    (False, "missing", ["ai_disclosure_missing"]),
+])
+def test_disclosure_does_not_change_fact_verification(flag, status, notes):
+    candidate = complete_candidate()
+    if flag is not None:
+        candidate["ai_disclosure_flag_from_code"] = flag
+    bundle = build_fact_bundle(candidate, [])
+
+    assert bundle["verification_state"] == "verified"
+    assert bundle["coverage"]["complete"] is True
+    assert bundle["coverage"]["missing"] == []
+    assert bundle["disclosure"] == {"flag": flag, "required": True, "status": status}
+    assert bundle["configuration_notes"] == notes
+
+
+def test_untrusted_status_cannot_claim_disclosure_is_visible():
+    candidate = complete_candidate()
+    candidate["disclosure_status"] = "visible"
+    bundle = build_fact_bundle(candidate, [])
+
+    assert bundle["disclosure"]["flag"] is None
+    assert bundle["disclosure"]["status"] == "unknown"
+    assert bundle["configuration_notes"] == ["ai_disclosure_unknown"]
+
+
+@pytest.mark.parametrize("flag", [None, True, False])
+def test_missing_facts_remain_unverifiable_regardless_of_disclosure(flag):
+    candidate = complete_candidate()
+    candidate["item_attrs_returned"].pop("functions")
+    if flag is not None:
+        candidate["ai_disclosure_flag_from_code"] = flag
+    bundle = build_fact_bundle(candidate, [])
+
+    assert bundle["verification_state"] == "unverifiable"
+    assert "functions" in bundle["coverage"]["missing"]
+
+
+def test_no_trace_remains_unverifiable_with_unknown_disclosure():
+    candidate = complete_candidate()
+    candidate["tool_trace"] = []
+    bundle = build_fact_bundle(candidate, [])
+    assert bundle["verification_state"] == "unverifiable"
+    assert bundle["configuration_notes"] == ["ai_disclosure_unknown"]
+
+
+@pytest.mark.parametrize("flag", [None, False])
+def test_optional_disclosure_keeps_status_without_configuration_action(flag):
+    candidate = complete_candidate()
+    candidate["ai_disclosure_required"] = False
+    if flag is not None:
+        candidate["ai_disclosure_flag_from_code"] = flag
+    bundle = build_fact_bundle(candidate, [])
+    assert bundle["verification_state"] == "verified"
+    assert bundle["disclosure"]["required"] is False
+    assert bundle["configuration_notes"] == []
+
+
+@pytest.mark.parametrize("field,value", [
+    ("ai_disclosure_flag_from_code", "visible"),
+    ("ai_disclosure_flag_from_code", {"visible": True}),
+    ("ai_disclosure_required", "false"),
+])
+def test_disclosure_configuration_rejects_nonboolean_values(field, value):
+    candidate = complete_candidate()
+    candidate[field] = value
+    with pytest.raises(ValueError, match=field):
+        build_fact_bundle(candidate, [])

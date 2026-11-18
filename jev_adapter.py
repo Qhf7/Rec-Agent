@@ -1,4 +1,4 @@
-"""Replaceable Jev SystemOne HTTP adapter with a safe dry-run mode."""
+"""Jev SystemOne HTTP adapter that preserves the model disposition."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ import re
 import ssl
 import urllib.error
 import urllib.request
-from typing import Any
+from typing import Any, Callable
 
 from jev_protocol import (
     JEV_QUESTION_SCHEMA_VERSION,
@@ -49,6 +49,21 @@ class JevConfigurationError(RuntimeError):
 
 class JevResponseError(RuntimeError):
     pass
+
+
+def _strict_json_loads(text: str) -> Any:
+    def unique_object(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise JevResponseError(f"duplicate JSON key: {key}")
+            result[key] = value
+        return result
+
+    def invalid_constant(value):
+        raise JevResponseError(f"invalid JSON constant: {value}")
+
+    return json.loads(text, object_pairs_hook=unique_object, parse_constant=invalid_constant)
 
 
 def build_ssl_context() -> ssl.SSLContext:
@@ -125,6 +140,8 @@ class JevAdapter:
         score_name: str = DEFAULT_SCORE_NAME,
         timeout: float = 30.0,
         dry_run: bool = True,
+        response_observer: Callable[[str, str], None] | None = None,
+        question_version: str | None = None,
     ) -> None:
         self.api_key = api_key if api_key is not None else os.getenv("MODELGO_API_KEY")
         self.endpoint = endpoint
@@ -132,14 +149,19 @@ class JevAdapter:
         self.score_name = score_name
         self.timeout = timeout
         self.dry_run = dry_run
+        # The observer sees only the candidate ID and response body, before
+        # parsing. Request headers and credentials stay private.
+        self.response_observer = response_observer
+        self.question_version = question_version or JEV_QUESTION_SCHEMA_VERSION
+        build_jev_questions(self.question_version)
 
     def build_payload(self, fact_bundle: dict) -> dict:
-        jev_input = build_jev_input(dict(fact_bundle, model_version=self.model))
+        jev_input = build_jev_input(dict(fact_bundle, model_version=self.model), question_version=self.question_version)
         state = json.dumps(jev_input, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
         return {
             "model": self.model,
             "state": state,
-            "questions": build_jev_questions(),
+            "questions": build_jev_questions(self.question_version),
         }
 
     def judge(self, fact_bundle: dict) -> dict:
@@ -169,34 +191,45 @@ class JevAdapter:
             raise JevResponseError(f"HTTP {exc.code}: {body[:1000]}") from exc
         except urllib.error.URLError as exc:
             raise JevResponseError(f"Jev request failed: {exc}") from exc
-        return self.parse_response(raw, fact_bundle, expected_protocol=JEV_QUESTION_SCHEMA_VERSION)
+        if self.response_observer is not None:
+            self.response_observer(fact_bundle["reason_id"], raw)
+        return self.parse_response(raw, fact_bundle, expected_protocol=self.question_version)
 
     def parse_response(self, raw: str | bytes | dict, fact_bundle: dict, *,
                        expected_protocol: str | None = None) -> dict:
         if isinstance(raw, bytes):
             raw = raw.decode("utf-8")
-        parsed: Any = raw if isinstance(raw, dict) else json.loads(raw)
+        parsed: Any = raw if isinstance(raw, dict) else _strict_json_loads(raw)
         if isinstance(parsed, dict) and isinstance(parsed.get("answers"), dict):
             return self._parse_systemone_response(parsed, fact_bundle, expected_protocol=expected_protocol)
         if expected_protocol is not None:
             raise JevResponseError("response format does not match requested scalar protocol")
 
-        result = _find_decision_object(parsed)
-        if result is None:
+        found = _find_decision_object(parsed)
+        if found is None:
             raise JevResponseError("response did not contain a valid decision object")
+        result = dict(found)
         result.setdefault("reason_id", fact_bundle.get("reason_id"))
         result.setdefault("model_version", self.model)
         result.setdefault("score_name", self.score_name)
         if result["reason_id"] != fact_bundle.get("reason_id"):
             raise JevResponseError("response reason_id mismatch")
         result.setdefault("confidence", 0.0)
-        self._apply_safety_gates(result, fact_bundle)
+        self._attach_result_metadata(result, fact_bundle, decision_question="decision")
         return validate_decision(result)
 
     def _parse_systemone_response(self, payload: dict, fact_bundle: dict, *,
                                   expected_protocol: str | None = None) -> dict:
         if payload.get("model", self.model) != self.model:
             raise JevResponseError("response model does not match requested model")
+        expected_metadata = {
+            "reason_id": fact_bundle.get("reason_id"),
+            "item_id": fact_bundle.get("item_id"),
+            "question_schema_version": expected_protocol or self.question_version,
+        }
+        for field, expected in expected_metadata.items():
+            if field in payload and payload[field] != expected:
+                raise JevResponseError(f"response {field} mismatch")
         try:
             parsed_answers = parse_jev_answers(payload, fact_bundle, expected_protocol=expected_protocol)
         except (KeyError, TypeError, ValueError) as exc:
@@ -210,61 +243,35 @@ class JevAdapter:
         }
         result["evidence"] = list(result.get("evidence") or []) or build_evidence_from_fact_bundle(fact_bundle)
         result["evidence_source"] = "model_field_selection" if parsed_answers.get("evidence") else "workflow_fact_snapshot"
-        self._apply_safety_gates(result, fact_bundle)
+        self._attach_result_metadata(
+            result, fact_bundle,
+            decision_question="decision" if parsed_answers.get("protocol_completeness") == "legacy_3_question" else "q7_final_decision",
+        )
         return validate_decision(result)
 
-    def _apply_safety_gates(self, result: dict, fact_bundle: dict) -> None:
+    def _attach_result_metadata(self, result: dict, fact_bundle: dict, *, decision_question: str) -> None:
+        """Validate response metadata and describe its source without changing its disposition."""
         confidence = result.get("confidence", 0.0)
         if isinstance(confidence, bool) or not isinstance(confidence, (int, float)) or not math.isfinite(confidence) or not 0 <= confidence <= 1:
             raise JevResponseError("confidence must be finite in [0, 1]")
         if result.get("reason_id") != fact_bundle.get("reason_id"):
             raise JevResponseError("response reason_id mismatch")
-        result.setdefault("evidence", [])
-        state = fact_bundle.get("verification_state", "unverifiable")
-        missing = (fact_bundle.get("coverage") or {}).get("missing")
-        human_gate = (
-            state != "verified" or bool(missing) or confidence < 0.7
-            or result.get("escalated") is True or result["decision"] == "human_review"
-            or result.get("identity_choice") in {"invalid", "unverifiable"}
-            or result.get("fact_support_choice") == "unverifiable"
-            or result.get("commercial_accuracy_choice") == "unverifiable"
-            or result.get("context_relevance_choice") == "unverifiable"
-            or result.get("safety_gate_choice") == "human_review"
-        )
-        if human_gate:
-            result.update(decision="human_review", escalated=True)
-            result["evidence"].append("workflow.safety_gate: 事实不足、冲突、人工门禁或置信度不足")
-            return
-        features = fact_bundle.get("rule_features") or {}
-        if (features.get("unsupported_efficacy_terms")
-                or features.get("price_mismatch")
-                or result.get("fact_support_choice") == "unsupported"
-                or result.get("expression_risk_choice") == "blocking"
-                or result.get("commercial_accuracy_choice") == "mismatch"
-                or result.get("safety_gate_choice") == "fail"):
-            result["decision"] = "block"
-            if features.get("unsupported_efficacy_terms"):
-                result["risk_type"] = "efficacy_or_medical_claim"
-            elif features.get("price_mismatch") or result.get("commercial_accuracy_choice") == "mismatch":
-                result["risk_type"] = "price_misleading"
-            result["evidence"].append("workflow.safety_gate: 明确的事实或合规硬风险")
-        elif result["decision"] != "block" and (
-                result.get("fact_support_choice") == "partial"
-                or result.get("expression_risk_choice") == "rewriteable"
-                or result.get("context_relevance_choice") == "off_topic"
-                or features.get("absolute_claim_terms") or features.get("topic_mismatch")):
-            result["decision"] = "rewrite"
-            if features.get("absolute_claim_terms"):
-                result["risk_type"] = "absolute_claim"
-            elif features.get("topic_mismatch") or result.get("context_relevance_choice") == "off_topic":
-                result["risk_type"] = "off_topic"
+        if result.get("model_version") != self.model:
+            raise JevResponseError("response model does not match requested model")
+        if "escalated" in result and not isinstance(result["escalated"], bool):
+            raise JevResponseError("escalated must be boolean")
+        # Compatibility field describes the returned label; it does not dispatch work.
+        result["escalated"] = result.get("decision") == "human_review"
+        result["decision_source"] = "jev_model"
+        result["decision_question"] = decision_question
         disclosure = fact_bundle.get("disclosure") or {}
-        if disclosure.get("required", True) and disclosure.get("flag") is not True and result["decision"] != "block":
-            result.update(decision="rewrite", risk_type="missing_ai_disclosure")
-            result["evidence"].append("workflow.disclosure: 必须补充 AI 披露")
-        if result["decision"] == "expose" and (result["risk_type"] != "compliant" or result["judge_score"] >= 0.5):
-            result.update(decision="human_review", escalated=True)
-            result["evidence"].append("workflow.consistency: 曝光建议与风险判断冲突")
+        flag = disclosure.get("flag")
+        disclosure_status = "visible" if flag is True else "missing" if flag is False else "unknown"
+        result["disclosure_status"] = disclosure_status
+        result["configuration_notes"] = (
+            [f"ai_disclosure_{disclosure_status}"]
+            if disclosure.get("required", True) and disclosure_status != "visible" else []
+        )
 
 
 def _find_decision_object(value: Any) -> dict | None:
@@ -286,7 +293,7 @@ def _find_decision_object(value: Any) -> dict | None:
         candidate = fenced.group(1) if fenced else text
         if candidate.startswith("{") and candidate.endswith("}"):
             try:
-                return _find_decision_object(json.loads(candidate))
+                return _find_decision_object(_strict_json_loads(candidate))
             except json.JSONDecodeError:
                 return None
     return None

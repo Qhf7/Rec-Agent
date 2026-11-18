@@ -3,11 +3,13 @@
 > 面向电商「猜你喜欢」信息流的生成式推荐与曝光前合规审核链路。
 
 [![Agent](https://img.shields.io/badge/Agent-Rec--Agent-2563eb)](rec-agent-preset/)
-[![Review](https://img.shields.io/badge/Review-Jev%20Exposure%20Gate-7c3aed)](jev_adapter.py)
-[![Tests](https://img.shields.io/badge/tests-139%20passed-16a34a)](tests/)
+[![Review](https://img.shields.io/badge/Review-Jev%20Judgment-7c3aed)](jev_adapter.py)
+[![Tests](https://img.shields.io/badge/tests-287%20passed-16a34a)](tests/)
 [![Data](https://img.shields.io/badge/mock%20data-200%20users%20%2B%20200%20items-0891b2)](data/raw/)
 
 推荐生成与审核通过独立 Python 工作流衔接；DeepSeek Harness 只生成推荐 JSON，独立工作流显式运行 Jev 审核。[运行说明](docs/STANDALONE_WORKFLOW.md)。
+
+[当前工作流验证报告](docs/TEST_REPORT_JEV_MODEL_WORKFLOW_2026-11-18.md)：推荐结果与独立 Jev 判断衔接、模型处置结论回放及协议校验。此前真实调用记录保存在各次测试报告中。
 
 这个项目把「推荐什么」和「能否曝光」拆成两个职责清晰的阶段：Rec-Agent 根据用户画像、行为和场景数据选择商品并生成一句用户可见的推荐理由；Jev 再对推荐理由进行曝光前判定，输出 `expose / rewrite / human_review / block` 四档处置结论。
 
@@ -67,20 +69,22 @@ Jev 接收事实包后输出以下核心字段：
 
 | 字段 | 说明 |
 | --- | --- |
-| `decision` | `expose`、`rewrite`、`human_review`、`block` |
+| `decision` | Jev Q7 选择的 `expose`、`rewrite`、`human_review`、`block`，原样保存 |
 | `risk_type` | 合规、绝对化、功效/医疗、价格误导、披露缺失、主题不符 |
-| `evidence` | 支撑判决的商品字段、规则计算结果或词表命中 |
+| `evidence` | 输入事实引用；通过 `evidence_source` 标明来自模型选择或工作流事实快照 |
 | `judge_score` | 0/1/2 风险等级期望值除以 2，不是校准违规概率 |
-| `escalated` | 是否升级人工审核 |
+| `decision_source` | 固定为 `jev_model`，标明处置来自 Jev |
+| `decision_confidence` | Q7 处置结论的置信度 |
+| `escalated` | 兼容字段，表示结论是否为 `human_review` |
 | `model_version` | 判决模型版本 |
 
-[问题设计与输入字段说明](docs/JEV_JUDGMENT_PROTOCOL.md)。
+[问题设计与输入字段说明](docs/JEV_JUDGMENT_PROTOCOL.md)。[发送给 Jev 的完整问题清单](docs/JEV_QUESTIONS.md)记录九道题的问题原文、题型、选项及评分方式。
 
-当前 Jev 输入使用 `jev-questions-v1` 七步协议（8 个 Choice 加 1 个 Score，共 9 个 API 问题）：候选身份、事实支持、表达风险、商业准确性、场景相关性、安全门禁和最终处置。Jev 只接收当前候选的商品事实、促销快照、最小场景摘要、证据和版本信息；点击历史、CTR、订单、退款、投诉、购物车、搜索词和推荐排序信号不进入 Jev 输入。
+当前 Jev 输入使用 `jev-questions-v2` 九题协议（8 个 Choice 加 1 个 Score）：候选身份、事实支持、表达风险、商业准确性、场景相关性、安全判断和最终处置。Jev 只接收当前候选的商品事实、促销快照、最小场景摘要、证据和版本信息；点击历史、CTR、订单、退款、投诉、购物车、搜索词和推荐排序信号不进入 Jev 输入。
 
-Rec-Agent 不输出 Jev 判决字段，也不启动 Jev 请求。七个逻辑问题并行判断；工作流汇总 Q1–Q6、Q7 建议、风险类别和分数，缺证据、冲突或置信度不足转人工。旧三问响应仅用于离线兼容解析，新版真实请求要求完整标量协议。证据由工作流依据冻结事实呈现并标注来源。
+Q1–Q6、Q7、风险分类与严重度在同一请求中并行判断，Q7根据同一份事实直接作出处置结论。独立工作流负责构建输入、校验响应和保存结果；最终 `decision` 原样采用 Jev Q7。每题置信度、严重度、事实完整性和披露状态一并保留用于分析。`human_review` 是模型的处置标签，项目当前流程到输出结论为止，不包含实际人工复核、派单或回填环节。
 
-本轮已验证统一契约与离线请求构造；新版九问题协议尚未进行真实 API 冒烟，历史三问实验结果不能用作本轮验证。
+新版 Q2 区分客观事实、一般场景、行动建议、主观表达和具体个人状态；披露状态与商品事实完整性独立记录。40条边界样本用于比较题目和观察模型行为；[人工标注模板](docs/JEV_EVALUATION_LABELING.md)用于可选的离线模型质量评估。历史 [v2 对照报告](docs/TEST_REPORT_JEV_V2_2026-11-18.md)保留当时运行结果，当前结论解释以 [工作流验证报告](docs/TEST_REPORT_JEV_MODEL_WORKFLOW_2026-11-18.md)为准。
 
 ## 数据
 
@@ -137,7 +141,7 @@ python3 scripts/run_recommendation_workflow.py \
   --output-dir /tmp/rec-agent-prepare-001
 ```
 
-默认仅生成候选、事实包、请求预览和报告，调用次数为 0。实际导出时替换 `--input` 文件；必须使用新的输出目录。核对实际展示的 AI 披露状态后，可设置 `--ai-disclosure visible` 或 `missing`；默认 `unknown` 保留无法核验状态。单独追加 `--live` 并设置 `MODELGO_API_KEY` 才会调用 Jev。
+默认生成候选、事实包、请求预览、组合结果和报告，调用次数为 0。实际导出时替换 `--input` 文件，并使用新的输出目录。根据实际展示配置设置 `--ai-disclosure visible`、`missing` 或默认 `unknown`，披露状态独立保留。追加 `--live` 并设置 `MODELGO_API_KEY` 即调用 Jev，`workflow_results.json` 将每条推荐与对应模型判断放在同一份缩进 JSON 中。
 
 Jev 输出四档处置；展示、点击采集和真实反馈写入由后续业务流程实现，本脚本不生成这些事件。
 
@@ -172,7 +176,7 @@ pbpaste | python3 scripts/strict_json_output.py
 ├── mcp_server.py             # 只读 MCP 工具服务
 ├── modelgo_agent.py          # 推荐候选生成客户端
 ├── fact_bundle.py            # Jev 事实包构造
-├── jev_adapter.py            # Jev 调用与安全门禁
+├── jev_adapter.py            # Jev 调用、响应校验与结论解析
 ├── rec-agent-viewer.html     # 独立结果查看器
 ├── scripts/                  # 数据校验与结果格式化脚本
 ├── tests/                    # 自动化测试
@@ -182,7 +186,7 @@ pbpaste | python3 scripts/strict_json_output.py
 ## 验证状态
 
 ```text
-pytest -q                 139 passed
+pytest -q                 287 passed
 scripts/validate_data.py  PASS: all hard checks passed
 ```
 

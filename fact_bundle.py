@@ -102,9 +102,23 @@ def build_fact_bundle(candidate: dict, lexicon: Iterable[dict]) -> dict:
     ]
 
     required_disclosure = candidate.get("ai_disclosure_required", True)
-    has_disclosure_flag = "ai_disclosure_flag_from_code" in candidate
+    if type(required_disclosure) is not bool:
+        raise ValueError("ai_disclosure_required must be boolean")
+    disclosure_flag = candidate.get("ai_disclosure_flag_from_code")
+    if disclosure_flag is not None and type(disclosure_flag) is not bool:
+        raise ValueError("ai_disclosure_flag_from_code must be boolean or null")
+    # Presentation configuration is independent of whether product facts can
+    # be verified. Derive it from the code-supplied flag, never model text.
+    disclosure_status = (
+        "visible" if disclosure_flag is True
+        else "missing" if disclosure_flag is False
+        else "unknown"
+    )
+    configuration_notes = []
+    if required_disclosure and disclosure_status != "visible":
+        configuration_notes.append(f"ai_disclosure_{disclosure_status}")
     verification_state = "verified"
-    if not has_disclosure_flag or not isinstance(candidate.get("ai_disclosure_flag_from_code"), bool) or not candidate.get("tool_trace") or not coverage["complete"]:
+    if not candidate.get("tool_trace") or not coverage["complete"]:
         verification_state = "unverifiable"
 
     promo = candidate.get("promo_computed_in_code")
@@ -131,9 +145,11 @@ def build_fact_bundle(candidate: dict, lexicon: Iterable[dict]) -> dict:
         "promo": promo,
         "lexicon_hits": lexicon_hits,
         "disclosure": {
-            "flag": candidate.get("ai_disclosure_flag_from_code"),
+            "flag": disclosure_flag,
             "required": required_disclosure,
+            "status": disclosure_status,
         },
+        "configuration_notes": configuration_notes,
         "tool_trace": candidate.get("tool_trace") or [],
         "coverage": coverage,
         "verification_state": verification_state,

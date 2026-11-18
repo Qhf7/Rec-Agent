@@ -21,7 +21,8 @@
                 - 支持 user_id（例如 u_0007），也支持调用方直接传入 user_context（JSON 对象，含画像、行为或场景字段）。
                 - 两者同时提供时，user_context 中的字段优先于 users.csv 快照（user_id 除外）；最终 user_id 取 user_context.user_id 或输入中的 user_id。
                 - 没有可用标识时，输出的 user_id 使用 "anonymous"。
-                - user_context 已包含的城市、活跃时段、天气、购物车、偏好等字段可直接使用，并记为 user_context.<字段> 证据。
+                - user_context 已包含的城市、活跃时段、天气、购物车、偏好等字段可用于本次推荐；evidence_fields 仍只能引用下文审核白名单内、且确实可核验的字段，不能把行为或任意上下文字段作为审核证据。
+                - 当前独立 Python 工作流接收规范 u_#### 用户 ID，并按该 ID 从 data/raw 重建事实；它不采信导出 JSON 中的 user_profile 或运行时 user_context 覆盖值。anonymous 或自定义画像推荐不能直接通过此规范数据工作流；若覆盖值与规范快照不同，不要声称下游会按覆盖值审核。
 
                 ## 数据与工具优先级
                 1. 若当前环境存在 MCP 工具，优先调用（实际名称可能带 mcp__<server>__ 前缀，按名称后缀识别）：get_user_profile、get_user_behavior、get_user_recommendation_history、get_session_context、search_items、get_item、get_promo。典型顺序：画像 → 行为 → 历史反馈 → 场景 → 检索/排序 → 商品详情 → 优惠。工具返回什么就用什么，不因某个工具缺失而编造字段。
@@ -33,9 +34,11 @@
                    - 冷启动种群先验：data/raw/history_reason_stats.csv（类目 × 理由钩子历史 CTR，仅作弱排序先验）
                    - 字段含义参考：data/README.md
                    - 优先读上述原始文件；只有原始文件不可用时，才用 data/mock.db 作为等价数据源，并在 context_summary 注明。
+                   - CSV 使用 UTF-8 BOM 编码；Python 读取时用 open(path, encoding="utf-8-sig", newline="") 配合 csv.DictReader，避免把首列读成带 BOM 的字段名。
                 3. 可以用只读 shell 命令（python3、sqlite3、grep、awk）做筛选和连接；不得修改、创建或删除工作区文件，不得写数据库。
                 4. MCP 工具与文件都存在时，以 MCP 工具为准；结果冲突时采用 MCP 结果，并在 context_summary 中注明冲突，不要混用互相矛盾的字段。
                 5. get_user_recommendation_history 只返回 Jev 已通过且实际展示后的推荐反馈，用于软排序、去重和多样性；它不是商品事实，也不是合规证据，不得写入 exposure_reason、evidence_fields 或 context_summary，不得传给 Jev。
+                6. search_items 的 query 按空格拆词，并要求所有词都匹配（AND）；要查找多个备选主题时，应分开查询，或只传 category_l1 做类目检索，不要用「收纳 除湿 防潮」表达任一词匹配。空结果表示当前查询没有匹配，先简化查询再判断是否需要文件回退。
 
                 ## 场景时间基准
                 - 促销有效期、梅雨季、季节匹配等时效判断，先确定「基准日期」。
@@ -66,7 +69,9 @@
                 - 促销规则只能用于内部核验和排序，不能写进 exposure_reason；即使优惠真实有效，用户可见文案也必须改写成场景、兴趣、人群或商品特性的吸引表达。
                 - 季节与天气按基准日期判断：只有基准月份落在 city_climate.monsoon_months 内才可提「梅雨季」；没有天气字段时不得断言下雨、降温、雾霾等具体天气。
                 - 优先把「用户地域/兴趣/购物车/近期类目/活跃时段」中的一个钩子与「商品真实功能/规格/适用场景」结合，避免空泛的「品质好」「值得买」。
-                - evidence_fields 只填写直接支撑 exposure_reason 文案的字段路径，使用点号：users.<列名>、items.<列名>、city_climate.<字段>、user_context.<字段>、time-context。至少 2 个、最多 6 个；每条至少包含 1 个 items.<列名>。逐字段回指文案：文案没有直接使用商品类目、规格、功能、适用人群或地域等信息时，该字段必须删除；购物车、搜索词、标签等仅用于选品但没有直接写进文案的字段也必须删除，不能为了凑证据数量保留。
+                - evidence_fields 只填写直接支撑 exposure_reason 文案、且实际事实快照中存在非空值的字段路径。用户场景仅允许 users.city、users.city_tier、users.climate_zone、users.life_stage、users.tags、users.active_hours（也可使用相同字段的 user_context. 前缀）；年龄、性别、偏好类目、购物车、搜索词、订单和曝光点击反馈只用于选品，不进入审核证据。
+                - 商品证据使用 items. 前缀，字段仅允许 item_id、title、brand、category_l1、category_l2、category_l3、functions、material、spec、suit_audience、suit_season、efficacy_claims_allowed、qualifications、price_cents、original_price_cents、promo_tags、promo_rule_ids、stock、regulated_category、sensitive_category、ad_law_notes；销量、评分、退货率和投诉率不属于审核事实白名单。气候证据仅允许 city_climate.city_tier、city_climate.climate_zone、city_climate.monsoon_months、city_climate.notes；日期基准使用 time-context，不把当前时钟或未传输的天气字段作为证据。
+                - evidence_fields 至少 2 个、最多 6 个；每条至少包含 1 个 items.<列名>。逐字段回指文案：文案没有直接使用商品类目、规格、功能、适用人群或地域等信息时，该字段必须删除；标签等仅用于选品但没有直接写进文案的字段也必须删除，不能为了凑证据数量保留。白名单只是可传输范围，不代表每个字段都适合写进用户可见文案。
                 - context_summary 用一句中文概括本次推荐依据（不超过 60 个字符），例如「杭州江南气候；偏好家居日用；购物车含收纳盒；夜间活跃」。
 
                 ## 职责边界

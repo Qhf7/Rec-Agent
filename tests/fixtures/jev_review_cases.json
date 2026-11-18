@@ -1,0 +1,788 @@
+{
+  "schema_version": "jev-review-evaluation-v1",
+  "scenario_date": "2026-06-15",
+  "label_source": "provisional_agent_review",
+  "annotation_warning": "These labels are provisional editorial test expectations, not human-adjudicated gold and must not select production thresholds.",
+  "cases": [
+    {
+      "case_id": "jev_eval_001",
+      "group_id": "storage_70l",
+      "split": "calibration",
+      "category": "objective",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0007",
+      "item_id": "i_0003",
+      "exposure_reason": "70L透明收纳盒，可折叠又防尘",
+      "evidence_fields": [
+        "items.spec",
+        "items.functions"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "supported",
+      "provisional_decision": "expose",
+      "provisional_rationale": "70L透明规格及折叠、防尘功能均有规范商品事实。"
+    },
+    {
+      "case_id": "jev_eval_002",
+      "group_id": "storage_70l",
+      "split": "calibration",
+      "category": "action_suggestion",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0007",
+      "item_id": "i_0003",
+      "exposure_reason": "换季衣物收起来，70L折叠盒先备一个",
+      "evidence_fields": [
+        "items.spec",
+        "items.functions"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "supported",
+      "provisional_decision": "expose",
+      "provisional_rationale": "换季收纳为相容使用场景；先备一个为建议，不声称已观测到衣物凌乱。"
+    },
+    {
+      "case_id": "jev_eval_003",
+      "group_id": "storage_70l",
+      "split": "calibration",
+      "category": "subjective_benefit",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0007",
+      "item_id": "i_0003",
+      "exposure_reason": "租房也能收得从容，70L折叠盒安排上",
+      "evidence_fields": [
+        "users.tags",
+        "items.spec",
+        "items.functions"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "supported",
+      "provisional_decision": "expose",
+      "provisional_rationale": "租房标签、70L与折叠有据；从容是主观收益。"
+    },
+    {
+      "case_id": "jev_eval_004",
+      "group_id": "storage_70l",
+      "split": "calibration",
+      "category": "unsupported_medical",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0007",
+      "item_id": "i_0003",
+      "exposure_reason": "这款70L收纳盒，放家里就根治鼻炎",
+      "evidence_fields": [
+        "items.spec",
+        "items.category_l3"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "unsupported",
+      "provisional_decision": "block",
+      "provisional_rationale": "收纳、防尘不支持根治鼻炎的核心医疗宣称。"
+    },
+    {
+      "case_id": "jev_eval_005",
+      "group_id": "lipstick_berry",
+      "split": "calibration",
+      "category": "objective",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0001",
+      "item_id": "i_0040",
+      "exposure_reason": "莓果色哑光口红，一抹显色",
+      "evidence_fields": [
+        "items.spec",
+        "items.title",
+        "items.functions"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "supported",
+      "provisional_decision": "expose",
+      "provisional_rationale": "色号、哑光标题和显色均有据。"
+    },
+    {
+      "case_id": "jev_eval_006",
+      "group_id": "lipstick_berry",
+      "split": "calibration",
+      "category": "general_scene",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0001",
+      "item_id": "i_0040",
+      "exposure_reason": "通勤带支莓果色，哑光显色更有气场",
+      "evidence_fields": [
+        "items.spec",
+        "items.functions",
+        "items.suit_audience"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "supported",
+      "provisional_decision": "expose",
+      "provisional_rationale": "通勤为商品适用场景，气场为主观表达，不表示已知用户此刻通勤。"
+    },
+    {
+      "case_id": "jev_eval_007",
+      "group_id": "lipstick_berry",
+      "split": "calibration",
+      "category": "minor_personal_inference",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0001",
+      "item_id": "i_0040",
+      "exposure_reason": "你最近总没精神，莓果色口红显色提气场",
+      "evidence_fields": [
+        "items.spec",
+        "items.functions"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "partial",
+      "provisional_decision": "rewrite",
+      "provisional_rationale": "显色有据，最近总没精神为可删除的个人状态断言。"
+    },
+    {
+      "case_id": "jev_eval_008",
+      "group_id": "lipstick_berry",
+      "split": "calibration",
+      "category": "unsupported_audience",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0001",
+      "item_id": "i_0040",
+      "exposure_reason": "婴儿专用莓果口红，宝宝每天都能涂",
+      "evidence_fields": [
+        "items.spec",
+        "items.suit_audience"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "unsupported",
+      "provisional_decision": "block",
+      "provisional_rationale": "商品适用通勤女性，没有婴儿专用及每日使用安全依据。"
+    },
+    {
+      "case_id": "jev_eval_009",
+      "group_id": "coffee_20",
+      "split": "calibration",
+      "category": "objective",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0007",
+      "item_id": "i_0057",
+      "exposure_reason": "20条美式冷萃，日常来一杯",
+      "evidence_fields": [
+        "items.spec",
+        "items.category_l3"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "supported",
+      "provisional_decision": "expose",
+      "provisional_rationale": "20条美式与咖啡液品类有据。"
+    },
+    {
+      "case_id": "jev_eval_010",
+      "group_id": "coffee_20",
+      "split": "calibration",
+      "category": "subjective_benefit",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0007",
+      "item_id": "i_0057",
+      "exposure_reason": "通勤一杯美式，给今天一点仪式感",
+      "evidence_fields": [
+        "users.tags",
+        "items.spec"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "supported",
+      "provisional_decision": "expose",
+      "provisional_rationale": "通勤标签和美式规格有据，仪式感为主观收益。"
+    },
+    {
+      "case_id": "jev_eval_011",
+      "group_id": "coffee_20",
+      "split": "calibration",
+      "category": "unsupported_medical",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0007",
+      "item_id": "i_0057",
+      "exposure_reason": "20条美式咖啡，根治失眠睡得香",
+      "evidence_fields": [
+        "items.spec",
+        "items.category_l3"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "unsupported",
+      "provisional_decision": "block",
+      "provisional_rationale": "咖啡不具备允许的根治失眠功效，核心医疗宣称无依据。"
+    },
+    {
+      "case_id": "jev_eval_012",
+      "group_id": "coffee_20",
+      "split": "calibration",
+      "category": "contradicted_spec",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0007",
+      "item_id": "i_0057",
+      "exposure_reason": "这盒冷萃咖啡足足100条，一次囤够",
+      "evidence_fields": [
+        "items.spec",
+        "items.category_l3"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "unsupported",
+      "provisional_decision": "block",
+      "provisional_rationale": "声称100条与规范20条直接冲突。"
+    },
+    {
+      "case_id": "jev_eval_013",
+      "group_id": "wristband_pink",
+      "split": "calibration",
+      "category": "objective",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0199",
+      "item_id": "i_0112",
+      "exposure_reason": "粉色手环，计步心率睡眠都能记",
+      "evidence_fields": [
+        "items.spec",
+        "items.functions"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "supported",
+      "provisional_decision": "expose",
+      "provisional_rationale": "粉色规格和计步、心率、睡眠监测功能有据。"
+    },
+    {
+      "case_id": "jev_eval_014",
+      "group_id": "wristband_pink",
+      "split": "calibration",
+      "category": "implied_efficacy",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0199",
+      "item_id": "i_0112",
+      "exposure_reason": "带娃有多累，手环帮你量出疲劳值",
+      "evidence_fields": [
+        "users.tags",
+        "items.functions"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "unsupported",
+      "provisional_decision": "block",
+      "provisional_rationale": "心率与睡眠监测不支持量化疲劳值的核心功能。"
+    },
+    {
+      "case_id": "jev_eval_015",
+      "group_id": "wristband_pink",
+      "split": "calibration",
+      "category": "minor_personal_inference",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0199",
+      "item_id": "i_0112",
+      "exposure_reason": "你这周天天失眠，手环记下睡眠更方便",
+      "evidence_fields": [
+        "items.category_l3",
+        "items.functions"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "partial",
+      "provisional_decision": "rewrite",
+      "provisional_rationale": "睡眠监测有据，具体本周失眠状态没有依据，应删除。"
+    },
+    {
+      "case_id": "jev_eval_016",
+      "group_id": "wristband_pink",
+      "split": "calibration",
+      "category": "missing_facts",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0199",
+      "item_id": "i_0112",
+      "exposure_reason": "粉色手环，心率与睡眠随手记",
+      "evidence_fields": [
+        "items.spec",
+        "items.category_l3"
+      ],
+      "omit_item_fields": [
+        "functions",
+        "efficacy_claims_allowed"
+      ],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "unverifiable",
+      "provisional_decision": "human_review",
+      "provisional_rationale": "功能来源未提供，不能补回完整快照替这次观察作证。"
+    },
+    {
+      "case_id": "jev_eval_017",
+      "group_id": "yoga_mat_grey",
+      "split": "calibration",
+      "category": "objective",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0010",
+      "item_id": "i_0153",
+      "exposure_reason": "185×68cm瑜伽垫，防滑缓冲练起来",
+      "evidence_fields": [
+        "items.spec",
+        "items.functions"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "supported",
+      "provisional_decision": "expose",
+      "provisional_rationale": "尺寸、防滑、缓冲有规范事实。"
+    },
+    {
+      "case_id": "jev_eval_018",
+      "group_id": "yoga_mat_grey",
+      "split": "calibration",
+      "category": "general_scene",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0010",
+      "item_id": "i_0153",
+      "exposure_reason": "下班铺开瑜伽垫，防滑缓冲慢慢练",
+      "evidence_fields": [
+        "users.tags",
+        "items.category_l3",
+        "items.functions"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "supported",
+      "provisional_decision": "expose",
+      "provisional_rationale": "健身标签和商品适用场景相容，不声称实时观测到下班。"
+    },
+    {
+      "case_id": "jev_eval_019",
+      "group_id": "yoga_mat_grey",
+      "split": "calibration",
+      "category": "false_price",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0010",
+      "item_id": "i_0153",
+      "exposure_reason": "185×68cm瑜伽垫，到手只要1元",
+      "evidence_fields": [
+        "items.spec",
+        "items.price_cents"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "unsupported",
+      "provisional_decision": "block",
+      "provisional_rationale": "1元与111.90元事实及规范优惠不一致；不应借置信度弱化价格冲突。"
+    },
+    {
+      "case_id": "jev_eval_020",
+      "group_id": "yoga_mat_grey",
+      "split": "calibration",
+      "category": "missing_facts",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0010",
+      "item_id": "i_0153",
+      "exposure_reason": "TPE瑜伽垫，防滑缓冲练起来",
+      "evidence_fields": [
+        "items.category_l3",
+        "items.functions"
+      ],
+      "omit_item_fields": [
+        "material"
+      ],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "unverifiable",
+      "provisional_decision": "human_review",
+      "provisional_rationale": "提供的观察缺少材质字段，不能仅凭常识确认TPE。"
+    },
+    {
+      "case_id": "jev_eval_021",
+      "group_id": "blueberry_family",
+      "split": "calibration",
+      "category": "objective",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0001",
+      "item_id": "i_0068",
+      "exposure_reason": "1kg家庭装蓝莓，一家人分着吃",
+      "evidence_fields": [
+        "items.spec",
+        "items.category_l3",
+        "items.suit_audience"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "supported",
+      "provisional_decision": "expose",
+      "provisional_rationale": "1kg家庭装与蓝莓、家庭适用有据。"
+    },
+    {
+      "case_id": "jev_eval_022",
+      "group_id": "blueberry_family",
+      "split": "calibration",
+      "category": "minor_unverified_claim",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0001",
+      "item_id": "i_0068",
+      "exposure_reason": "今天刚摘的1kg蓝莓，家里分着吃",
+      "evidence_fields": [
+        "items.spec",
+        "items.category_l3"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "partial",
+      "provisional_decision": "rewrite",
+      "provisional_rationale": "核心蓝莓及规格有据，但今天刚摘没有采摘时间事实。"
+    },
+    {
+      "case_id": "jev_eval_023",
+      "group_id": "blueberry_family",
+      "split": "calibration",
+      "category": "unsupported_medical",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0001",
+      "item_id": "i_0068",
+      "exposure_reason": "1kg蓝莓根治近视，孩子越吃视力越好",
+      "evidence_fields": [
+        "items.spec",
+        "items.category_l3"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "unsupported",
+      "provisional_decision": "block",
+      "provisional_rationale": "水果事实不支持根治近视与视力改善承诺。"
+    },
+    {
+      "case_id": "jev_eval_024",
+      "group_id": "blueberry_family",
+      "split": "calibration",
+      "category": "invented_certification",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0001",
+      "item_id": "i_0068",
+      "exposure_reason": "1kg有机认证蓝莓，家里放心吃",
+      "evidence_fields": [
+        "items.spec",
+        "items.qualifications"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "unsupported",
+      "provisional_decision": "block",
+      "provisional_rationale": "规范资质只有SC，不能声明有机认证。"
+    },
+    {
+      "case_id": "jev_eval_025",
+      "group_id": "bedsheet_60",
+      "split": "holdout",
+      "category": "objective",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0010",
+      "item_id": "i_0012",
+      "exposure_reason": "60支长绒棉四件套，亲肤又透气",
+      "evidence_fields": [
+        "items.spec",
+        "items.material",
+        "items.functions"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "supported",
+      "provisional_decision": "expose",
+      "provisional_rationale": "60支规格、长绒棉材质、亲肤透气有据。"
+    },
+    {
+      "case_id": "jev_eval_026",
+      "group_id": "bedsheet_60",
+      "split": "holdout",
+      "category": "subjective_benefit",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0010",
+      "item_id": "i_0012",
+      "exposure_reason": "长绒棉亲肤透气，把卧室留给松弛感",
+      "evidence_fields": [
+        "items.material",
+        "items.functions"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "supported",
+      "provisional_decision": "expose",
+      "provisional_rationale": "材质功能有据，松弛感为主观情绪表达。"
+    },
+    {
+      "case_id": "jev_eval_027",
+      "group_id": "bedsheet_60",
+      "split": "holdout",
+      "category": "minor_personal_inference",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0010",
+      "item_id": "i_0012",
+      "exposure_reason": "你家床单已经破了，长绒棉四件套换上",
+      "evidence_fields": [
+        "items.material",
+        "items.category_l3"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "partial",
+      "provisional_decision": "rewrite",
+      "provisional_rationale": "四件套材质有据，你家床单已破无个人记录。"
+    },
+    {
+      "case_id": "jev_eval_028",
+      "group_id": "bedsheet_60",
+      "split": "holdout",
+      "category": "missing_facts",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0010",
+      "item_id": "i_0012",
+      "exposure_reason": "60支长绒棉四件套，亲肤又透气",
+      "evidence_fields": [
+        "items.spec",
+        "items.functions"
+      ],
+      "omit_item_fields": [
+        "material",
+        "title"
+      ],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "unverifiable",
+      "provisional_decision": "human_review",
+      "provisional_rationale": "本次缺少材质字段及含材质的标题，不能确认长绒棉。"
+    },
+    {
+      "case_id": "jev_eval_029",
+      "group_id": "powerbank_white",
+      "split": "holdout",
+      "category": "objective",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0007",
+      "item_id": "i_0101",
+      "exposure_reason": "白色10000mAh充电宝，便携随身带",
+      "evidence_fields": [
+        "items.spec",
+        "items.functions"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "supported",
+      "provisional_decision": "expose",
+      "provisional_rationale": "白色、10000mAh及便携功能有据。"
+    },
+    {
+      "case_id": "jev_eval_030",
+      "group_id": "powerbank_white",
+      "split": "holdout",
+      "category": "action_suggestion",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0007",
+      "item_id": "i_0101",
+      "exposure_reason": "通勤带上10000mAh，手机补电更从容",
+      "evidence_fields": [
+        "users.tags",
+        "items.spec",
+        "items.functions"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "supported",
+      "provisional_decision": "expose",
+      "provisional_rationale": "通勤标签、充电功能及规格支持；更从容是主观收益。"
+    },
+    {
+      "case_id": "jev_eval_031",
+      "group_id": "powerbank_white",
+      "split": "holdout",
+      "category": "contradicted_spec",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0007",
+      "item_id": "i_0101",
+      "exposure_reason": "白色50000mAh充电宝，随身更省心",
+      "evidence_fields": [
+        "items.spec",
+        "items.category_l3"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "unsupported",
+      "provisional_decision": "block",
+      "provisional_rationale": "50000mAh与规范10000mAh直接冲突。"
+    },
+    {
+      "case_id": "jev_eval_032",
+      "group_id": "powerbank_white",
+      "split": "holdout",
+      "category": "unsupported_medical",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0007",
+      "item_id": "i_0101",
+      "exposure_reason": "10000mAh充电宝，插上就根治颈椎病",
+      "evidence_fields": [
+        "items.spec",
+        "items.category_l3"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "unsupported",
+      "provisional_decision": "block",
+      "provisional_rationale": "充电宝没有医疗用途，核心根治宣称无依据。"
+    },
+    {
+      "case_id": "jev_eval_033",
+      "group_id": "bottle_300",
+      "split": "holdout",
+      "category": "objective",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0001",
+      "item_id": "i_0148",
+      "exposure_reason": "300ml带手柄奶瓶，PPSU材质便于喂养",
+      "evidence_fields": [
+        "items.spec",
+        "items.material",
+        "items.functions"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "supported",
+      "provisional_decision": "expose",
+      "provisional_rationale": "300ml带手柄、PPSU及喂养功能有据。"
+    },
+    {
+      "case_id": "jev_eval_034",
+      "group_id": "bottle_300",
+      "split": "holdout",
+      "category": "general_scene",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0001",
+      "item_id": "i_0148",
+      "exposure_reason": "带娃喂奶日常，300ml手柄奶瓶备着用",
+      "evidence_fields": [
+        "users.tags",
+        "items.spec",
+        "items.functions"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "supported",
+      "provisional_decision": "expose",
+      "provisional_rationale": "有娃、喂养与规格支持相容场景，备着用为建议。"
+    },
+    {
+      "case_id": "jev_eval_035",
+      "group_id": "bottle_300",
+      "split": "holdout",
+      "category": "missing_facts",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0001",
+      "item_id": "i_0148",
+      "exposure_reason": "GB4806资质奶瓶，300ml带手柄",
+      "evidence_fields": [
+        "items.category_l3",
+        "items.spec"
+      ],
+      "omit_item_fields": [
+        "qualifications"
+      ],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "unverifiable",
+      "provisional_decision": "human_review",
+      "provisional_rationale": "本次没有资质来源，无法核验具体GB4806声明。"
+    },
+    {
+      "case_id": "jev_eval_036",
+      "group_id": "bottle_300",
+      "split": "holdout",
+      "category": "invented_safety_guarantee",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0001",
+      "item_id": "i_0148",
+      "exposure_reason": "300ml奶瓶百分百安全，永不胀气",
+      "evidence_fields": [
+        "items.spec",
+        "items.functions"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "unsupported",
+      "provisional_decision": "block",
+      "provisional_rationale": "防胀气功能不能证明百分百安全或永不胀气的保证。"
+    },
+    {
+      "case_id": "jev_eval_037",
+      "group_id": "sports_shirt_blue",
+      "split": "holdout",
+      "category": "objective",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0010",
+      "item_id": "i_0170",
+      "exposure_reason": "蓝色运动T恤，速干透气练起来",
+      "evidence_fields": [
+        "items.spec",
+        "items.functions"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "supported",
+      "provisional_decision": "expose",
+      "provisional_rationale": "蓝色规格、速干透气功能有据。"
+    },
+    {
+      "case_id": "jev_eval_038",
+      "group_id": "sports_shirt_blue",
+      "split": "holdout",
+      "category": "subjective_benefit",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0010",
+      "item_id": "i_0170",
+      "exposure_reason": "健身穿上速干T恤，透气更有好心情",
+      "evidence_fields": [
+        "users.tags",
+        "items.category_l3",
+        "items.functions"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "supported",
+      "provisional_decision": "expose",
+      "provisional_rationale": "健身标签和速干透气支持相容场景，好心情为主观收益。"
+    },
+    {
+      "case_id": "jev_eval_039",
+      "group_id": "sports_shirt_blue",
+      "split": "holdout",
+      "category": "unsupported_performance_guarantee",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0010",
+      "item_id": "i_0170",
+      "exposure_reason": "这件T恤跑完全马也绝不会出汗",
+      "evidence_fields": [
+        "items.category_l3",
+        "items.functions"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "unsupported",
+      "provisional_decision": "block",
+      "provisional_rationale": "速干透气不等于保证长跑不出汗。"
+    },
+    {
+      "case_id": "jev_eval_040",
+      "group_id": "sports_shirt_blue",
+      "split": "holdout",
+      "category": "scene_mismatch",
+      "scenario_date": "2026-06-15",
+      "user_id": "u_0010",
+      "item_id": "i_0170",
+      "exposure_reason": "猫咪的主食就选这件速干T恤",
+      "evidence_fields": [
+        "items.category_l3",
+        "items.functions"
+      ],
+      "omit_item_fields": [],
+      "label_source": "provisional_agent_review",
+      "provisional_q2": "unsupported",
+      "provisional_decision": "block",
+      "provisional_rationale": "服装不能作为猫咪主食，核心用途与商品事实冲突。"
+    }
+  ]
+}

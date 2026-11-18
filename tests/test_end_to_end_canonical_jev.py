@@ -3,6 +3,7 @@ import json
 from fact_bundle import build_fact_bundle
 from generate_full_candidates import build_full_dataset
 from jev_adapter import JevAdapter
+from jev_protocol import JEV_QUESTION_SCHEMA_VERSION
 from run_rule_baseline import load_lexicon
 
 
@@ -18,7 +19,7 @@ def test_canonical_candidate_fact_bundle_and_jev_request_keep_identity_and_block
     assert bundle["item_id"].startswith("i_")
     assert state["candidate"]["item_id"] == bundle["item_id"]
     assert state["trace"]["data_version"] == "canonical-2026-06-15-v1"
-    assert state["question_schema_version"] == "jev-questions-v1"
+    assert state["question_schema_version"] == JEV_QUESTION_SCHEMA_VERSION
     for forbidden in ("history", "ctr", "click", "order", "refund", "complaint", "sorting", "search", "cart"):
         assert forbidden not in json.dumps(state, ensure_ascii=False).lower()
 
@@ -54,7 +55,7 @@ def _old_response(decision, risk_type, score=0.9):
     }
 
 
-def test_hard_risk_unverifiable_and_rewriteable_routes_are_distinct():
+def test_model_dispositions_are_preserved_across_fact_states():
     adapter = JevAdapter(api_key="test-key", dry_run=False)
 
     blocked = adapter.parse_response(
@@ -71,5 +72,5 @@ def test_hard_risk_unverifiable_and_rewriteable_routes_are_distinct():
     )
 
     assert blocked["decision"] == "block"
-    assert unverifiable["decision"] == "human_review"
+    assert unverifiable["decision"] == "block"
     assert rewriteable["decision"] == "rewrite"

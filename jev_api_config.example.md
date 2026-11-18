@@ -9,7 +9,7 @@
 - Authentication：`Authorization: Bearer $MODELGO_API_KEY`
 - Content-Type：`application/json`
 
-历史三问接口实验与当前协议分开看待：本轮验证了九问题协议的本地构造、解析与安全路由，没有发送新版真实 API 请求。上线前需单独做新版单条真实冒烟，再评估效果。
+当前采用九题标量协议，已保存真实API响应用于验证和回放。模型处置与逐题判断见 [当前工作流验证报告](docs/TEST_REPORT_JEV_MODEL_WORKFLOW_2026-11-18.md)。
 
 官方格式参考：[System One API](https://docs.typesafe.ai/api/system-one)、[Choice](https://docs.typesafe.ai/primitives/choice)、[Score](https://docs.typesafe.ai/primitives/score)。
 
@@ -35,9 +35,9 @@
 }
 ```
 
-实际固定问题由 `build_jev_questions()` 定义：Q1 身份、Q2 事实支持、Q3 表达风险、Q4 商业准确性、Q5 场景相关性、Q6 安全门禁、Q7 最终建议，另有 `risk_type` Choice 和 `judge_score` Score。共八个 Choice 和一个 Score；各问并行判断，再由代码汇总。
+实际固定问题由 `build_jev_questions()` 定义：Q1 身份、Q2 事实支持、Q3 表达风险、Q4 商业准确性、Q5 场景相关性、Q6 安全门禁、Q7 最终建议，另有 `risk_type` Choice 和 `judge_score` Score。共八个 Choice 和一个 Score；各问并行判断，最终 `decision` 直接采用 Jev 的 `q7_final_decision.choice`。
 
-Score 使用三级描述（0/1/2），代码从返回分布计算等级期望值并除以 2。`judge_score` 是风险严重度，不是已校准违规概率。所有问题置信度不足 0.7、事实缺失或冲突时转人工；规则层不把模型的拦截变成曝光。
+Score 使用三级描述（0/1/2），代码从返回分布计算等级期望值并除以 2。`judge_score` 是风险严重度，不是已校准违规概率。每题置信度、Q7置信度和最低置信度单独保留。`human_review` 只是模型处置标签；工作流保存模型结果后结束。
 
 ## 运行
 
@@ -60,6 +60,6 @@ python3 scripts/run_recommendation_workflow.py \
 
 只有实际展示配置包含所需 AI 披露时才选择 `visible`；也可选择 `missing`。默认 `unknown` 不推测披露已存在。
 
-结果中的 `evidence_source` 说明证据来源。官方 Choice 不生成自由文本证据，默认 `workflow_fact_snapshot` 由工作流呈现已提供事实及命中的安全门禁；它不声称是模型逐句引用。新真实请求仅接受完整标量协议，旧三问只在离线兼容入口解析。
+结果中的 `evidence_source` 说明证据来源。官方 Choice 不生成自由文本证据，默认 `workflow_fact_snapshot` 由工作流呈现已提供事实与规则线索；它不声称是模型逐句引用。新真实请求仅接受完整标量协议，旧三问只在离线兼容入口解析。
 
 环境变量只在当前终端设置。密钥不写入仓库；Adapter 保持 TLS 证书校验。产物与异常不含 Authorization header。完整产物说明见 [独立工作流](docs/STANDALONE_WORKFLOW.md)。

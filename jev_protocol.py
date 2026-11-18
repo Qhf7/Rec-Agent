@@ -10,7 +10,14 @@ from typing import Any, Mapping
 from canonical_data import CANONICAL_SCHEMA_VERSION, load_canonical_items
 
 
-JEV_QUESTION_SCHEMA_VERSION = "jev-questions-v1"
+LEGACY_JEV_QUESTION_SCHEMA_VERSION = "jev-questions-v1"
+JEV_QUESTION_SCHEMA_VERSION = "jev-questions-v2"
+Q2_LEGACY_QUESTION_SCHEMA_VERSION = "jev-questions-v2-q2-legacy"
+SUPPORTED_JEV_QUESTION_VERSIONS = frozenset({
+    LEGACY_JEV_QUESTION_SCHEMA_VERSION,
+    JEV_QUESTION_SCHEMA_VERSION,
+    Q2_LEGACY_QUESTION_SCHEMA_VERSION,
+})
 JEV_INPUT_SCHEMA_VERSION = "jev-input-v1"
 
 _ALLOWED_EVIDENCE_PREFIXES = (
@@ -94,7 +101,7 @@ _RULE_FEATURE_FIELDS = {
     "price_mismatch",
     "topic_mismatch",
 }
-_DISCLOSURE_FIELDS = {"flag", "required"}
+_DISCLOSURE_FIELDS = {"flag", "required", "status"}
 _COVERAGE_FIELDS = {"missing", "complete"}
 _PROVENANCE_FIELDS = {
     "reason",
@@ -112,7 +119,7 @@ _PROVENANCE_FIELDS = {
 }
 
 
-def build_jev_questions() -> dict[str, dict[str, Any]]:
+def _legacy_jev_questions() -> dict[str, dict[str, Any]]:
     # Seven logical checks, with separate scalar risk and severity questions.
     definitions = {
         "q1_identity": ("确认候选、商品、版本与事实快照能否一致追溯。", {
@@ -142,11 +149,83 @@ def build_jev_questions() -> dict[str, dict[str, Any]]:
     return questions
 
 
+def _question_version(version: str | None) -> str:
+    actual = JEV_QUESTION_SCHEMA_VERSION if version is None else version
+    if not isinstance(actual, str) or actual not in SUPPORTED_JEV_QUESTION_VERSIONS:
+        raise ValueError(f"unsupported Jev question schema version: {actual}")
+    return actual
+
+
+def build_jev_questions(version: str | None = None) -> dict[str, dict[str, Any]]:
+    """Build frozen v1 or the current rubric; A/B varies exactly Q2."""
+    version = _question_version(version)
+    questions = _legacy_jev_questions()
+    if version == LEGACY_JEV_QUESTION_SCHEMA_VERSION:
+        return questions
+    questions["q1_identity"]["instructions"] = (
+        "只检查候选、商品标识、版本与事实来源是否一致可追溯；"
+        "AI披露未知是独立配置状态，不构成身份冲突或事实来源缺失。"
+    )
+    if version != Q2_LEGACY_QUESTION_SCHEMA_VERSION:
+        questions["q2_fact_support"] = {
+            "type": "choice",
+            "instructions": (
+                "仅核验曝光理由中可验证的客观主张及其明确暗示的客观含义，依据facts中的相应商品、场景、时间和商业事实，"
+                "不把候选文案当作事实。规格、材质、功能、功效、资质、量化或确定性收益、具体个人状态和事件需证据支持。"
+                "允许忠实转述及与已知事实相容的一般使用场景；购买建议、祈使语气和纯主观情绪表达本身不要求数据库逐字记载，"
+                "但不能借此暗示不存在的功能、疗效、安全保证或已发生的个人事件。不能从有娃等标签推断孩子尺码、疾病或实时状态。"
+                "先区分可靠事实明确否定主张与关键事实源缺失；缺少未声明完备的资料不等于已证伪。"
+                "coverage.complete及attrs_returned_complete只表示返回字段完整，不表示functions枚举了全部可能功能；"
+                "词表命中和rule_features仅为核验线索，不能替代相应原始事实或资质来源。"
+                "已明确证实的核心硬风险不被其他无关资料缺失抵消。只看本题所需事实，AI披露未知或缺失本身不降低事实支持结论。"
+            ),
+            "criteria": {
+                "supported": "可核验的客观及暗示客观主张均有支持或被事实忠实蕴含；其余只是相容场景、行动建议或不含额外客观承诺的主观表达。",
+                "partial": "核心客观卖点有依据，只有可独立删除的非核心客观断言无依据；不因存在购买建议或主观修辞本身而选择此项。",
+                "unsupported": "可靠且足够的事实明确否定核心主张，或明确完备的功能/允许功效来源不支持核心宣称；不是仅因开放资料没有记载。",
+                "unverifiable": "核验关键主张所需事实源确实缺失、不可追溯或可靠来源相互冲突，无法区分支持与不支持；不由AI披露状态单独触发。",
+            },
+        }
+    questions["q3_expression_risk"]["instructions"] = (
+        "检查文案本身的绝对化、功效医疗、比较或误导性客观暗示。"
+        "普通行动建议、相容场景和纯主观修辞不自动构成风险，但不得掩盖客观承诺。"
+        "AI披露未知只记录配置待确认，不构成表达违规或阻止曝光；"
+        "只有明确required=true且flag=false（missing）才是可补充的披露缺失。"
+    )
+    questions["q5_context_relevance"]["instructions"] = (
+        "核对文案采用或邀请的一般使用场景与scene、商品属性是否相容。"
+        "普通场景叙事不等于声称已观察到实时事件；具体用户状态或身份断言仍需事实，不能额外推测偏好、疾病、孩子尺码。"
+        "AI披露未知或缺失本身不影响场景相关性。"
+    )
+    questions["q6_safety_gate"]["instructions"] = (
+        "判断是否存在核验内容所必需的资料缺失、可靠来源冲突或敏感功效/资质疑点需要人工；"
+        "不能只因出现敏感类目就默认人工，明确核心硬风险应fail。"
+        "AI披露unknown不是事实缺失或人工门禁，不单独阻止展示；"
+        "已确认missing为可补配置问题，不等于不可核验的商品事实。"
+    )
+    questions["q7_final_decision"]["instructions"] = (
+        "独立根据state提出内容处置建议，各问题并行，不假定知道其他问题答案。"
+        "相容的一般场景、购买建议和没有客观承诺的主观修辞可使用；真正客观断言与暗示功效仍需事实支持。"
+        "AI披露未知只作为独立配置待确认记录，不能仅因此选择human_review、rewrite或block，内容满足条件时可expose。"
+        "已明确要求披露且确认missing可rewrite补齐；其他事实不足与真实风险照常判断。"
+    )
+    questions["risk_type"]["instructions"] = (
+        "选择曝光理由的主要内容风险。AI披露unknown仅为配置待确认，不是missing_ai_disclosure，"
+        "没有其他风险时选择compliant；只有明确required=true且flag=false（missing）可选择披露缺失。"
+    )
+    questions["judge_score"]["instructions"] = (
+        "评估内容风险严重度；AI披露unknown仅为配置待确认，不应单独提高严重度。"
+        "分数为有序等级的期望值，不是校准违规概率。"
+    )
+    return questions
+
+
 def _copy_allowed(source: Mapping[str, Any], allowed: set[str]) -> dict[str, Any]:
     return {key: deepcopy(source[key]) for key in allowed if key in source}
 
 
-def build_jev_input(fact_bundle: Mapping[str, Any]) -> dict[str, Any]:
+def build_jev_input(fact_bundle: Mapping[str, Any], *, question_version: str | None = None) -> dict[str, Any]:
+    question_version = _question_version(question_version)
     item = fact_bundle.get("item") or {}
     promo = fact_bundle.get("promo") or {}
     user_context = fact_bundle.get("user_context") or {}
@@ -167,7 +246,7 @@ def build_jev_input(fact_bundle: Mapping[str, Any]) -> dict[str, Any]:
         provenance[key] = text if not key.startswith("user_context") else "data/raw/users.csv"
     payload = {
         "input_schema_version": JEV_INPUT_SCHEMA_VERSION,
-        "question_schema_version": JEV_QUESTION_SCHEMA_VERSION,
+        "question_schema_version": question_version,
         "candidate": candidate,
         "facts": {
             "item": _copy_allowed(item, _ITEM_FIELDS),
@@ -195,7 +274,7 @@ def build_jev_input(fact_bundle: Mapping[str, Any]) -> dict[str, Any]:
             "model_version": fact_bundle.get("model_version", "jev-1.14.0"),
             "snapshot_at": fact_bundle.get("snapshot_at"),
         },
-        "questions": build_jev_questions(),
+        "questions": build_jev_questions(question_version),
     }
     return validate_jev_input(payload)
 
@@ -241,8 +320,9 @@ def validate_jev_input(payload: dict[str, Any]) -> dict[str, Any]:
         raise ValueError("unknown or missing Jev input fields")
     if payload.get("input_schema_version") != JEV_INPUT_SCHEMA_VERSION:
         raise ValueError("unsupported Jev input schema version")
-    if payload.get("question_schema_version") != JEV_QUESTION_SCHEMA_VERSION:
-        raise ValueError("unsupported Jev question schema version")
+    question_version = _question_version(payload.get("question_schema_version"))
+    if payload.get("question_schema_version") is None:
+        raise ValueError("unsupported Jev question schema version: missing")
     candidate = payload.get("candidate")
     if not isinstance(candidate, Mapping):
         raise ValueError("candidate is required")
@@ -306,6 +386,11 @@ def validate_jev_input(payload: dict[str, Any]) -> dict[str, Any]:
                   numbers={"discount_rate"}, booleans={"applicable"})
     _typed_fields(facts["scene"], lists={"tags"})
     _typed_fields(facts["disclosure"], booleans={"flag", "required"}, nullable={"flag"})
+    if "status" in facts["disclosure"]:
+        status = facts["disclosure"]["status"]
+        expected_flag = {"visible": True, "missing": False, "unknown": None}
+        if status not in expected_flag or facts["disclosure"].get("flag") is not expected_flag[status]:
+            raise ValueError("disclosure status must match flag")
     _typed_fields(facts["coverage"], lists={"missing"}, booleans={"complete"})
     _typed_fields(facts["rule_features"],
                   lists={"unsupported_efficacy_terms", "supported_efficacy_terms", "absolute_claim_terms"},
@@ -340,7 +425,7 @@ def validate_jev_input(payload: dict[str, Any]) -> dict[str, Any]:
         raise ValueError("data_version is required and must be canonical")
     if candidate.get("evidence_fields") is None:
         raise ValueError("evidence_fields is required")
-    expected_questions = build_jev_questions()
+    expected_questions = build_jev_questions(question_version)
     if payload["questions"] != expected_questions:
         raise ValueError("questions schema mismatch; expected fixed q1-q7 definition")
     for field in list(candidate.get("evidence_fields") or []):
@@ -401,12 +486,13 @@ def parse_jev_answers(payload: Mapping[str, Any], fact_bundle: Mapping[str, Any]
     answers = payload.get("answers") if isinstance(payload, Mapping) else None
     if not isinstance(answers, Mapping):
         raise ValueError("Jev response answers are required")
-    questions = build_jev_questions()
+    question_version = _question_version(expected_protocol)
+    questions = build_jev_questions(question_version)
     full = "q7_final_decision" in answers
     archived = full and isinstance(answers["q7_final_decision"], Mapping) and "score" in answers["q7_final_decision"]
     if archived and ({"risk_type", "judge_score"} & set(answers)):
         raise ValueError("mixed archived/scalar response format")
-    if expected_protocol == JEV_QUESTION_SCHEMA_VERSION and (not full or archived):
+    if expected_protocol is not None and (not full or archived):
         raise ValueError("response format does not match requested scalar protocol")
     required = set(questions) if full and not archived else set(questions) - {"risk_type", "judge_score"} if full else {"decision", "risk_type", "judge_score"}
     if not required <= set(answers):
@@ -437,12 +523,23 @@ def parse_jev_answers(payload: Mapping[str, Any], fact_bundle: Mapping[str, Any]
     if "escalated" in final and not isinstance(final["escalated"], bool):
         raise ValueError("escalated must be boolean")
     result = {
-        "protocol_completeness": JEV_QUESTION_SCHEMA_VERSION if full else "legacy_3_question",
+        "protocol_completeness": (LEGACY_JEV_QUESTION_SCHEMA_VERSION if archived else question_version) if full else "legacy_3_question",
         "decision": decision, "risk_type": risk_type, "judge_score": score,
-        "confidence": confidence, "evidence": evidence,
-        "escalated": bool(final.get("escalated", decision == "human_review")),
+        "confidence": confidence,
+        "decision_confidence": _unit_number(final.get("confidence", 0.0), "confidence"),
+        "evidence": evidence,
+        "escalated": decision == "human_review",
     }
     if full:
+        result["question_confidences"] = {
+            key: _unit_number(answer["confidence"], "confidence")
+            for key, answer in answers.items()
+            if key in required and "confidence" in answer
+        }
+        result["question_choices"] = {
+            key: answer["choice"] for key, answer in answers.items()
+            if key in required and key != "judge_score"
+        }
         for key, field in (("q1_identity", "identity"), ("q2_fact_support", "fact_support"),
                            ("q3_expression_risk", "expression_risk"), ("q4_commercial_accuracy", "commercial_accuracy"),
                            ("q5_context_relevance", "context_relevance"), ("q6_safety_gate", "safety_gate")):

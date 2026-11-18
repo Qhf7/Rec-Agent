@@ -44,6 +44,8 @@
 }
 ```
 
+以上为 Rec-Agent 的生成输入能力。当前独立 Python 工作流只接收规范 `u_####` 用户 ID，并按 ID 从 `data/raw` 重建审核事实；导出 JSON 中的 `user_profile` 和运行时 `user_context` 覆盖值不作为审核事实。`anonymous` 或自定义画像推荐不能直接通过该规范数据工作流。
+
 ## 数据与工具优先级
 
 1. 若已配置 MCP 工具，优先使用 `get_user_profile`、`get_user_behavior`、`get_user_recommendation_history`、`get_session_context`、`search_items`、`get_item`、`get_promo`（实际名称可能带 `mcp__<server>__` 前缀）。
@@ -55,6 +57,8 @@
    - `data/raw/history_reason_stats.csv`（冷启动时的类目 × 理由钩子弱先验）
    - 字段说明：`data/README.md`
 3. 原始文件不可用时才使用 `data/mock.db`。
+
+文件回退读取 CSV 时，使用 `open(path, encoding="utf-8-sig", newline="")` 与 `csv.DictReader`，以处理 UTF-8 BOM。`search_items.query` 按空格拆词并要求所有词都匹配（AND）；要查找多个备选主题，应分开查询，或只传 `category_l1` 检索类目。空结果时先简化查询，不能据此认定整个 MCP 数据源不可用。
 
 如果已配置 `get_user_recommendation_history`，在画像和行为查询后调用它读取用户最近 30 天的 Jev 通过后曝光反馈。使用 `recent_clicked_item_ids` 和 `category_stats.smoothed_ctr` 做弱偏好，使用 `recent_ignored_item_ids` 降权、`recent_shown_item_ids` 去重。历史只用于软排序、去重和探索位分配，不写入用户可见理由，也不提供给 Jev。`history_status=cold_start` 是正常的首轮状态，应继续依赖画像、购物车、搜索词、场景和商品事实完成推荐。
 
@@ -94,7 +98,9 @@
 - `exposure_reason`：不能只是「人群/用途 + 类目 + 规格」的事实罗列，至少要把一个具体场景或身份钩子，与商品事实和心理收益/行动暗示组合起来；例如「一人食刚刚好，1kg五常大米先尝鲜」比「一人食主食，1kg尝鲜装」更符合首页卡片语气。
 - `exposure_reason` 不写价格、优惠、折扣、满减、赠品或门槛；这类信息只供内部审核。
 - `generated_reason`：必须与 `exposure_reason` 完全相同，作为旧版 Jev 管线的兼容字段。
-- `evidence_fields`：只填写直接支撑曝光文案的字段路径，至少 2 个、最多 6 个，例如 `users.city`、`items.functions`、`items.suit_season`；逐字段回指文案，没有直接使用的商品类目、规格、功能、适用人群或地域字段，以及只用于选品的购物车、搜索词和标签，都不要填入。
+- `evidence_fields`：只填写直接支撑曝光文案、在实际事实快照中存在非空值的字段路径，至少 2 个、最多 6 个，且至少 1 个商品字段。用户场景仅允许 `users.city`、`users.city_tier`、`users.climate_zone`、`users.life_stage`、`users.tags`、`users.active_hours`，或这些字段对应的 `user_context.` 路径；年龄、性别、偏好类目、购物车、搜索词、订单和曝光点击反馈只用于选品，不进入审核证据。
+- 商品证据使用 `items.` 前缀，字段仅允许 `item_id`、`title`、`brand`、`category_l1`、`category_l2`、`category_l3`、`functions`、`material`、`spec`、`suit_audience`、`suit_season`、`efficacy_claims_allowed`、`qualifications`、`price_cents`、`original_price_cents`、`promo_tags`、`promo_rule_ids`、`stock`、`regulated_category`、`sensitive_category`、`ad_law_notes`。气候证据仅允许 `city_climate.city_tier`、`city_climate.climate_zone`、`city_climate.monsoon_months`、`city_climate.notes`；日期基准使用 `time-context`。
+- 逐字段回指文案：没有直接使用的商品或场景字段，以及只用于选品的标签，不要填入。白名单限定可传输范围，不代表可以把价格、行为追踪措辞等写进用户可见文案。
 - 最终回答只返回格式化 JSON：对象属性和数组元素使用换行与 2 个空格缩进，JSON 前后不添加英文过程说明、Markdown 或解释文字。
 - 最终回答只能有一个 JSON 根对象；工具回显、过程进度、多个并列对象、未加引号的键、JSON5 写法和省略号都不属于最终 JSON。
 - 调用工具前和工具调用之间不发送自然语言状态消息；工具轨迹只在 Harness 轨迹面板查看。

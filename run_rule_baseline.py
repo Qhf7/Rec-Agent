@@ -108,10 +108,14 @@ def _topic_mismatch(candidate: dict) -> tuple[bool, list[str]]:
         )
     )
     user = candidate.get("user_context") or {}
-    user_text = "|".join(_field_values(user, ["preferred_categories", "tags", "interests", "recent_categories"]))
+    user_text = "|".join(_field_values(user, ["life_stage", "preferred_categories", "tags", "interests", "recent_categories"]))
     checks = [
         (["猫咪", "猫粮", "猫砂", "狗狗", "宠物"], ["宠物", "猫", "狗"]),
-        (["婴儿", "宝宝", "新手妈妈", "母婴"], ["母婴", "婴儿", "宝宝", "儿童"]),
+        # A parent identity or a family scene does not assert that the product
+        # is for an infant. Only explicit product-use claims trigger this rule;
+        # semantic support for the identity itself remains Jev's Q2/Q5 task.
+        (["婴儿专用", "宝宝专用", "母婴专用", "婴儿用", "宝宝用", "婴儿湿巾", "婴儿奶瓶", "婴儿用品", "母婴用品"],
+         ["母婴", "婴儿", "宝宝", "儿童"]),
         (["玩具"], ["玩具", "潮玩"]),
         (["汽车", "车载"], ["汽车", "车载"]),
     ]

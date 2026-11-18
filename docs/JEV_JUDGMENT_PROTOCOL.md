@@ -1,68 +1,92 @@
 # Jev 判断问题与输入契约
 
-当前实现把推荐生成和曝光审核连接为独立工作流。DeepSeek Harness/Rec-Agent 输出推荐 JSON 后结束；Harness 外的 `scripts/run_recommendation_workflow.py` 接收 JSON 或 canonical JSONL，生成事实包并在显式 `--live` 时调用 Jev。
+DeepSeek Harness/Rec-Agent 接收用户 ID，查询数据并生成推荐商品和曝光理由，输出严格 JSON 后结束。独立的 `scripts/run_recommendation_workflow.py` 导入这份结果，构建 Fact Bundle，再显式调用 Jev；Jev 输出各题判断和处置结论。工作流将两阶段结果按推荐条目关联保存。
 
 ## 一、供 Jev 判断的问题
 
-| 逻辑问题 | 核验重点 | 允许回答 | 例子 |
-| --- | --- | --- | --- |
-| Q1 身份一致性 | 理由 ID、商品 ID、数据版本、事实来源是否一致 | valid / invalid / unverifiable | 推荐 i_0001，事实却来自另一商品，不能放行 |
-| Q2 事实支持 | 理由中每个主张是否被商品/场景事实支持 | supported / partial / unsupported / unverifiable | 收纳盒只有折叠功能，不能宣称治疗鼻炎 |
-| Q3 表达风险 | 绝对化、功效医疗、商业误导、披露及跑题 | clean / rewriteable / blocking | 绝对化措辞可建议改写；明确无依据医疗宣称应拦截 |
-| Q4 商业准确性 | 价格、折扣、门槛、赠品、适用范围和起止时间 | verified / mismatch / not_mentioned / unverifiable | 商品在活动范围内不代表购物篮已满足满减门槛 |
-| Q5 场景相关性 | 理由采用的场景、身份与商品是否匹配 | relevant / off_topic / unverifiable | 城市和标签不能支持模型额外推测用户身份 |
-| Q6 安全门禁 | 缺失、冲突、敏感类目、资质及人工审核需求 | pass / human_review / fail | 关键功效资料缺失先转人工，不猜测为真 |
-| Q7 处置建议 | 独立根据同一份事实提出曝光建议 | expose / rewrite / human_review / block | 改写/人工/拦截均不允许原文直接曝光 |
+| 逻辑问题 | 核验重点 | 允许回答 |
+| --- | --- | --- |
+| Q1 身份一致性 | 理由 ID、商品 ID、数据版本、事实来源是否一致 | valid / invalid / unverifiable |
+| Q2 事实支持 | 核验客观及明确暗示的主张，区分一般场景、行动建议和纯主观表达 | supported / partial / unsupported / unverifiable |
+| Q3 表达风险 | 绝对化、功效医疗、商业误导及其它表达风险 | clean / rewriteable / blocking |
+| Q4 商业准确性 | 价格、折扣、门槛、赠品、适用范围和起止时间 | verified / mismatch / not_mentioned / unverifiable |
+| Q5 场景相关性 | 理由采用的场景、身份与商品是否匹配 | relevant / off_topic / unverifiable |
+| Q6 安全判断 | 资料缺失、冲突、敏感功效或资质疑点所对应的判断 | pass / human_review / fail |
+| Q7 处置结论 | Jev 根据同一份输入事实决定当前文案的处置 | expose / rewrite / human_review / block |
 
-另有两个 API 问题：`risk_type` 选择六类主要风险，`judge_score` 评估三级风险严重度。总计八个 Choice、一个 Score。正式定义见 `jev_protocol.build_jev_questions()`。
+另有两个 API 问题：`risk_type` 选择六类主要风险，`judge_score` 评估三级风险严重度。总计八道单选、一道评分，一条推荐对应一次请求。
 
-这些问题在一次请求中并行判断。Q7 只是处置建议，工作流再结合 Q1–Q6、置信度和确定性规则决定最终结果；Q7 不能跳过其它门禁。
+当前默认版本为 `jev-questions-v2`。`jev-questions-v2-q2-legacy` 只将 Q2 换回冻结旧题，用于固定其他变量的对照。Q4 保留原文。判断边界见 [审核口径](JEV_REVIEW_RUBRIC.md)，实际发送的原文、选项和评分标准见 [问题清单](JEV_QUESTIONS.md)。
+
+九题在同一请求中并行判断，Q7 根据同一份事实独立作出处置，不能假定它先读取了 Q1–Q6 的答案。Q1–Q6、风险分类、严重度与置信度用于呈现模型各维度判断；工作流最终 `decision` 直接采用 Q7。
 
 ## 二、交给 Jev 的信息
 
 | 输入层 | 实际字段/内容 | 来源与用途 |
 | --- | --- | --- |
 | 候选 | reason_id、item_id、exposure_reason、generated_reason、evidence_fields、schema/data version | 固定本次审核文本；两份理由必须完全相同 |
-| 商品 | 标题、品牌、三级类目、功能、材质、规格、人群、季节、允许功效、资质、价格、库存、监管与风险说明 | 只来自同版本 data/raw/items.csv；不包含销售量、评分、退货或投诉率 |
-| 商业快照 | promo_id、规则类型、适用范围、有效期、门槛、减额、折扣和赠品 | data/raw/promo_rules.json；按快照日期计算，不能把单品适用性当作购物篮满足门槛 |
+| 商品 | 标题、品牌、三级类目、功能、材质、规格、人群、季节、允许功效、资质、价格、库存、监管与风险说明 | 来自同版本 data/raw/items.csv；销售量、评分、退货或投诉率不进入 Jev 输入 |
+| 商业快照 | promo_id、规则类型、适用范围、有效期、门槛、减额、折扣和赠品 | data/raw/promo_rules.json；按快照日期计算，单品适用性不代表购物篮满足门槛 |
 | 最小场景 | 城市、城市层级、气候区、生命周期、场景标签、活跃时段 | data/raw/users.csv 的受限字段 |
-| 气候与时间 | 规范城市气候区、梅雨月份、场景日期、快照时间与时区 | data/raw/city_climate.json + 冻结 snapshot_at；不当作实时天气 |
-| 校验与来源 | 词表命中、规则特征、字段覆盖、verification_state、provenance、AI 披露状态 | 工作流计算并冻结；与模型生成文案分开 |
-| 追踪 | reason_id、item_id、候选/事实/问题/数据版本、agent/model version | 用于追溯与回放；Jev 不接收 user_id |
+| 气候与时间 | 规范城市气候区、梅雨月份、场景日期、快照时间与时区 | data/raw/city_climate.json + 冻结 snapshot_at；标明模拟场景时间 |
+| 校验与来源 | 词表命中、规则特征、字段覆盖、verification_state、provenance、AI 披露状态 | 工作流计算并冻结，作为模型核验线索及追溯信息 |
+| 追踪 | reason_id、item_id、候选/事实/问题/数据版本、agent/model version | 用于关联与回放；Jev 不接收 user_id |
 
-不传给 Jev：推荐点击历史、CTR、曝光统计、原始搜索词、购物车明细、订单、退款、投诉、账户标识、设备、排序分、相似用户统计、人工 gold 标签、模拟潜在结果。`context_summary` 可留在本地候选供排查，不把含行为细节的自由文本直接当成 Jev 事实。
+推荐点击历史、CTR、曝光统计、原始搜索词、购物车明细、订单、退款、投诉、账户标识、设备、排序分、相似用户统计、人工 gold 标签和模拟潜在结果不传给 Jev。`context_summary` 可留在本地候选供排查，含行为细节的自由文本不直接作为 Jev 事实。
 
-所有字段同时校验键与值的类型，数组逐项检查。不能借助披露标记、功能列表或其它白名单字段嵌入未知对象或未来结果。证据路径还必须指向实际发送且有值的字段。
+输入校验同时检查键和值的类型，数组逐项检查。证据路径必须指向实际发送且有值的字段；快照和版本存在漂移时作为数据错误处理。
 
-## 三、代码如何汇总
+## 三、处置结论与结果字段
 
-1. 事实无法核验、存在冲突、Q1 身份异常、Q6 需要人工、模型已升级或任一关键回答置信度低于 0.7：`human_review`。
-2. 明确的无依据核心主张、不可修复表达、商业事实冲突或 Q6 fail：`block`。
-3. 可修复的部分支持、绝对化、跑题或缺少披露：`rewrite`；已拦截的结果保持拦截。
-4. 只有建议为 expose、风险为 compliant、事实通过且各门禁通过时才允许 `expose`。曝光建议与中高风险分数冲突则转人工。规则未命中不能把模型拦截改成曝光。
+| 字段 | 含义 |
+| --- | --- |
+| `decision` | Jev Q7 的原始选择，四档处置之一 |
+| `decision_source` | `jev_model` |
+| `decision_question` | 当前协议为 `q7_final_decision`；历史三问回放为 `decision` |
+| `decision_confidence` | 处置题的置信度 |
+| `question_choices` | 各单选题的选择，保留题间差异 |
+| `question_confidences` | 每题置信度 |
+| `confidence` | 全部问题最低置信度，用于分析 |
+| `risk_type` | Jev 选择的主要风险分类 |
+| `judge_score` | 严重度期望值归一化至 0–1 |
+| `disclosure_status` / `configuration_notes` | 展示配置状态及独立注记 |
+| `escalated` | 兼容标记，表示处置是否为 `human_review` |
 
-Score 的等级为 0/1/2，从返回概率分布计算期望等级后除以 2。它表示风险严重度，不是经过真实业务结果校准的违规概率。模型置信度和风险分数用途不同，分别用于审核可靠性和风险程度。
+`human_review` 表示模型给出的“人工复核”处置标签。当前工作流到结果输出为止，不包含实际人工复核、派单或复核回填。`rewrite` 同样表示模型判定需要改写，不自动启动生成器改写。
 
-`evidence` 默认由工作流呈现输入事实、词表命中和触发的门禁，`evidence_source=workflow_fact_snapshot`。该值不声称是 Jev 自由生成的逐句解释。审核结果另存，不回填到推荐 JSON。
+工作流解析并原样保存 Jev 的处置；Q1–Q6、置信度、分数、事实完整性和披露配置不会通过本地规则改写这个结论。它们可以与 Q7 存在不一致，结果会完整保留以供分析。接口失败、响应格式错误、身份或模型版本不匹配进入错误产物，不伪造一条审核结论。
 
-## 四、数据统一与回放
+Score 的等级为 0/1/2，从返回概率分布计算期望等级后除以 2。该值表示风险严重度，不是经过真实业务结果校准的违规概率。各题置信度与严重度分开保存。
+
+`evidence` 默认呈现输入事实引用，`evidence_source=workflow_fact_snapshot`。它不声称是 Jev 自由生成的逐句解释；模型提供有效证据路径时单独标明来源。模型响应与解析结果分别落盘。
+
+## 四、工作流产物
+
+`workflow_results.json` 把推荐商品、曝光理由和对应 `jev_audit` 放在一份缩进 JSON 中，同时保留独立候选、事实包、请求、原始响应和模型结论文件。输入文件中的 Harness 推荐保持原始职责，审核字段由独立工作流关联。
+
+```mermaid
+flowchart LR
+    U[用户 ID] --> H[DeepSeek Harness / Rec-Agent]
+    H --> R[推荐商品与曝光理由 JSON]
+    R --> F[独立工作流：规范化与 Fact Bundle]
+    F --> J[独立 Jev：九题判断]
+    J --> O[推荐与 Jev 处置组合结果]
+```
+
+## 五、数据统一与回放
 
 唯一规范源为 `data/raw/`。商品 ID 为 `i_####`，金额为整数分，候选契约 `rec-candidate-v2`，事实包 `fact-bundle-v2`，数据版本 `canonical-2026-06-15-v1`。MCP、离线生成器和工作流共享加载器。
 
-旧 `item_####` 通过 `scripts/migrate_legacy_candidates.py` 显式迁移，必须同时核对数字后缀、标题和品牌，不能按后缀猜测同一商品。冲突中断且不会覆盖已有输出。canonical 候选禁止快照字段漂移或伪造功效/促销。
+旧 `item_####` 通过 `scripts/migrate_legacy_candidates.py` 显式迁移，同时核对数字后缀、标题和品牌。canonical 候选禁止快照字段漂移或伪造功效、促销。
 
-Harness 导出会创建本次 canonical 快照；已有 JSONL 回放保留原快照子集、原时间和原查询记录，缺字段不会补成已核验。模拟场景基准为 2026-06-15，与执行当天不同。
+Harness 导出会创建本次 canonical 快照；已有 JSONL 回放保留原快照子集、原时间和原查询记录，缺字段保留缺失状态。模拟场景基准为 2026-06-15，与执行当天不同。
 
-## 五、运行与验证边界
+## 六、运行与验证
 
 ```bash
 python3 scripts/run_recommendation_workflow.py \
   --input examples/harness_recommendations.json \
-  --output-dir /tmp/rec-agent-protocol-prepare
+  --output-dir runs/recommendation-prepare-001
 ```
 
-默认只写候选、事实包、请求和报告，`network_calls=0`。实际运行模型需设置 `MODELGO_API_KEY` 并显式增加 `--live`，披露状态按真实展示配置填写。
-
-本轮已运行 139 项自动化测试、数据硬校验、340 条合成候选请求构造，以及 300 条独立 CLI 批量准备。真实新版 API 冒烟、真实曝光点击采集、人工审核平台和生产部署尚未在本轮完成。合成标签一致性不代表 Jev 的真实效果。
-
-完整命令、披露状态与产物说明见 [独立工作流](STANDALONE_WORKFLOW.md)。
+默认准备输入和请求，`network_calls=0`。设置 `MODELGO_API_KEY` 并显式增加 `--live` 即调用 Jev，披露参数依据实际展示配置填写。完整命令与产物说明见 [独立工作流](STANDALONE_WORKFLOW.md)，当前验证见 [工作流验证报告](TEST_REPORT_JEV_MODEL_WORKFLOW_2026-11-18.md)。

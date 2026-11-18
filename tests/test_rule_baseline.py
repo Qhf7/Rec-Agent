@@ -145,3 +145,54 @@ def test_canonical_price_cents_supports_literal_yuan_price_without_promo():
     assert evaluate_candidate(candidate, lexicon)["decision"] == "expose"
     candidate["generated_reason"] = "仅需39.90元"
     assert evaluate_candidate(candidate, lexicon)["decision"] == "block"
+
+
+def test_supported_mother_identity_does_not_require_baby_product():
+    from canonical_data import load_canonical_items, load_canonical_users
+    candidate = base_candidate(
+        "新手妈妈也别忘了自己，正红一涂就显色",
+        user_context=load_canonical_users()["u_0001"],
+        item_attrs_returned=load_canonical_items()["i_0037"],
+    )
+    result = evaluate_candidate(candidate, LEXICON)
+    assert result["decision"] == "expose"
+    assert result["risk_type"] == "compliant"
+
+
+@pytest.mark.parametrize("reason", [
+    "新手妈妈也能用的婴儿专用口红",
+    "宝宝用的正红口红，显色更轻松",
+    "母婴专用口红，正红一涂就显色",
+])
+def test_user_mother_identity_cannot_prove_infant_product_suitability(reason):
+    from canonical_data import load_canonical_items, load_canonical_users
+    candidate = base_candidate(
+        reason,
+        user_context=load_canonical_users()["u_0001"],
+        item_attrs_returned=load_canonical_items()["i_0037"],
+    )
+    result = evaluate_candidate(candidate, LEXICON)
+    assert result["decision"] == "rewrite"
+    assert result["risk_type"] == "off_topic"
+
+
+def test_parent_scene_does_not_require_infant_product():
+    from canonical_data import load_canonical_items
+    candidate = base_candidate(
+        "宝宝睡了，正红口红也留一点时间给自己",
+        user_context={"life_stage": "新手妈妈", "tags": ["有娃", "宝妈"]},
+        item_attrs_returned=load_canonical_items()["i_0037"],
+    )
+    assert evaluate_candidate(candidate, LEXICON)["decision"] == "expose"
+
+
+def test_pet_product_mismatch_is_preserved_with_parent_identity():
+    from canonical_data import load_canonical_items
+    candidate = base_candidate(
+        "新手妈妈给猫咪的宠物玩具",
+        user_context={"life_stage": "新手妈妈", "tags": ["有娃"]},
+        item_attrs_returned=load_canonical_items()["i_0037"],
+    )
+    result = evaluate_candidate(candidate, LEXICON)
+    assert result["decision"] == "rewrite"
+    assert result["risk_type"] == "off_topic"

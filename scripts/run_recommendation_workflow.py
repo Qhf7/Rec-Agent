@@ -20,6 +20,7 @@ from canonical_data import CANONICAL_SCHEMA_VERSION, load_canonical_items, load_
 from fact_bundle import build_fact_bundle
 from generate_full_candidates import promo_snapshot, user_snapshot
 from jev_adapter import JevAdapter, JevConfigurationError, validate_decision
+from jev_protocol import JEV_QUESTION_SCHEMA_VERSION, SUPPORTED_JEV_QUESTION_VERSIONS
 from run_rule_baseline import load_lexicon
 from scripts.migrate_legacy_candidates import CANDIDATE_SCHEMA_VERSION, validate_candidate_contract
 
@@ -30,7 +31,8 @@ AUDIT_FIELDS = {"decision", "risk_type", "judge_score", "escalated", "evidence"}
 ARTIFACT_NAMES = {
     "candidates": "candidates.jsonl", "fact_bundles": "fact_bundles.jsonl",
     "jev_requests": "jev_requests.jsonl", "decisions": "jev_decisions.jsonl",
-    "errors": "jev_errors.jsonl", "report": "workflow_report.json",
+    "responses": "jev_responses.jsonl", "errors": "jev_errors.jsonl", "report": "workflow_report.json",
+    "workflow_results": "workflow_results.json",
 }
 
 
@@ -75,7 +77,10 @@ def parse_recommendation_input(text: str, *, input_format: str = "auto") -> tupl
                 recommendations = document["recommendations"]
                 if not isinstance(recommendations, list):
                     raise ValueError("recommendations must be a list")
-                _validate_user_id(document.get("user_id"))
+                # An unknown user can correctly produce no recommendations.
+                # Keep the ID format strict, but require stored facts only for
+                # exports that actually contain candidates to audit.
+                _validate_user_id(document.get("user_id"), require_known=bool(recommendations))
                 rows = []
                 for recommendation in recommendations:
                     rec = deepcopy(_require_object(recommendation, "recommendation"))
@@ -104,10 +109,10 @@ def _check_no_audit(row: dict) -> None:
         raise ValueError("recommendation input must not contain Jev audit fields")
 
 
-def _validate_user_id(value: Any) -> str:
+def _validate_user_id(value: Any, *, require_known: bool = True) -> str:
     if not isinstance(value, str) or not re.fullmatch(r"u_\d{4}", value):
         raise ValueError("user_id must be a canonical u_#### string")
-    if value not in load_canonical_users():
+    if require_known and value not in load_canonical_users():
         raise ValueError(f"unknown user_id: {value}")
     return value
 
@@ -213,19 +218,78 @@ def _write_jsonl(path: Path, rows: list[dict]) -> None:
             handle.write(json.dumps(row, ensure_ascii=False, allow_nan=False, separators=(",", ":")) + "\n")
 
 
+def build_workflow_results(candidates: list[dict], decisions: list[dict], errors: list[dict], *, mode: str) -> dict:
+    """Join recommendations with Jev results by reason ID for readable export."""
+    if mode not in {"prepare", "live", "replay"}:
+        raise ValueError("workflow result mode must be prepare, live or replay")
+    candidate_ids = [candidate["reason_id"] for candidate in candidates]
+    if len(set(candidate_ids)) != len(candidate_ids):
+        raise ValueError("workflow results require unique candidate reason_id")
+    by_id, errors_by_id = {}, {}
+    for decision in decisions:
+        validate_decision(decision)
+        reason_id = decision["reason_id"]
+        if reason_id not in candidate_ids or reason_id in by_id:
+            raise ValueError("unknown or duplicate workflow decision reason_id")
+        choices = decision.get("question_choices") or {}
+        if "q7_final_decision" in choices and decision["decision"] != choices["q7_final_decision"]:
+            raise ValueError("workflow decision differs from Jev Q7")
+        by_id[reason_id] = deepcopy(decision)
+    for error in errors:
+        reason_id = error["reason_id"]
+        if reason_id not in candidate_ids or reason_id in errors_by_id or reason_id in by_id:
+            raise ValueError("unknown, duplicate or conflicting workflow error reason_id")
+        errors_by_id[reason_id] = deepcopy(error)
+    if mode != "prepare" and len(by_id) + len(errors_by_id) != len(candidates):
+        raise ValueError("completed workflow requires a result or error for every recommendation")
+    recommendations = []
+    for candidate in candidates:
+        reason_id = candidate["reason_id"]
+        item_id = candidate["item_id"]
+        recommendations.append({
+            "reason_id": reason_id, "user_id": candidate["user_id"], "item_id": item_id,
+            "title": load_canonical_items()[item_id]["title"],
+            "exposure_reason": candidate["exposure_reason"],
+            "generated_reason": candidate["generated_reason"],
+            "evidence_fields": list(candidate.get("evidence_fields") or []),
+            "context_summary": candidate.get("context_summary", ""),
+            "audit_status": "completed" if reason_id in by_id else "error" if reason_id in errors_by_id else "prepared",
+            "jev_audit": by_id.get(reason_id),
+        })
+    return {
+        "schema_version": "recommendation-jev-workflow-v1", "mode": mode,
+        "decision_source": "jev_model", "recommendations": recommendations,
+        "errors": deepcopy(errors),
+    }
+
+
 def run_workflow(
     input_path: str | Path, output_dir: str | Path, *, input_format: str = "auto",
     ai_disclosure: str = "unknown", live: bool = False, adapter: Any = None,
-    lexicon_path: str | Path | None = None,
+    lexicon_path: str | Path | None = None, question_version: str = JEV_QUESTION_SCHEMA_VERSION,
 ) -> dict:
     """Persist prepare artifacts; only an explicit live run invokes adapter.judge."""
+    if question_version not in SUPPORTED_JEV_QUESTION_VERSIONS:
+        raise ValueError("unsupported Jev question version")
+    if adapter is not None and getattr(adapter, "question_version", question_version) != question_version:
+        raise ValueError("adapter question version conflicts with workflow question_version")
     input_path, output_dir = Path(input_path).resolve(), Path(output_dir).resolve()
     actual_format, rows = parse_recommendation_input(input_path.read_text(encoding="utf-8-sig"), input_format=input_format)
     candidates = canonicalize_recommendations(rows, input_format=actual_format, ai_disclosure=ai_disclosure)
     lexicon = load_lexicon(str(lexicon_path or ROOT / "data/raw/compliance_lexicon.txt"))
     bundles = [build_fact_bundle(candidate, lexicon) for candidate in candidates]
-    if adapter is None:
-        adapter = JevAdapter(dry_run=not live)
+    response_path = output_dir / ARTIFACT_NAMES["responses"]
+    recorded_responses = []
+
+    def record_response(reason_id: str, response_body: str) -> None:
+        record = {"reason_id": reason_id, "response_body": response_body}
+        # Write before parsing so a rejected response remains inspectable.
+        with response_path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(record, ensure_ascii=False, allow_nan=False, separators=(",", ":")) + "\n")
+        recorded_responses.append(reason_id)
+
+    if adapter is None and bundles:
+        adapter = JevAdapter(dry_run=not live, response_observer=record_response if live else None, question_version=question_version)
         if live and not adapter.api_key:
             raise JevConfigurationError("MODELGO_API_KEY is required for --live")
     requests = [{
@@ -248,6 +312,9 @@ def run_workflow(
                 decision = validate_decision(adapter.judge(bundle))
                 if decision["reason_id"] != bundle["reason_id"]:
                     raise ValueError("Jev response reason_id does not match request")
+                choices = decision.get("question_choices") or {}
+                if "q7_final_decision" in choices and decision["decision"] != choices["q7_final_decision"]:
+                    raise ValueError("workflow decision differs from Jev Q7")
                 decisions.append(decision)
             except Exception as exc:
                 errors.append({"reason_id": bundle["reason_id"], "error_type": type(exc).__name__, "message": str(exc)})
@@ -256,11 +323,20 @@ def run_workflow(
         if errors:
             artifacts["errors"] = str(output_dir / ARTIFACT_NAMES["errors"])
             _write_jsonl(Path(artifacts["errors"]), errors)
+        if recorded_responses:
+            artifacts["responses"] = str(response_path)
+    artifacts["workflow_results"] = str(output_dir / ARTIFACT_NAMES["workflow_results"])
+    combined = build_workflow_results(candidates, decisions, errors, mode="live" if live else "prepare")
+    Path(artifacts["workflow_results"]).write_text(
+        json.dumps(combined, ensure_ascii=False, allow_nan=False, indent=2) + "\n", encoding="utf-8",
+    )
     report = {
-        "workflow_version": "standalone-recommendation-v1", "mode": "live" if live else "prepare",
+        "workflow_version": "standalone-recommendation-v2", "mode": "live" if live else "prepare",
         "status": "completed_with_errors" if errors else "prepared" if not live else "completed",
         "input_format": actual_format, "scenario_date": SCENARIO_DATE,
         "data_version": CANONICAL_SCHEMA_VERSION, "ai_disclosure": ai_disclosure,
+        "question_schema_version": question_version,
+        "decision_source": "jev_model",
         "candidate_count": len(candidates), "fact_bundle_count": len(bundles),
         "request_count": len(requests), "decision_count": len(decisions),
         "error_count": len(errors), "network_calls": calls,
@@ -277,9 +353,10 @@ def main() -> None:
     parser.add_argument("--input-format", choices=("auto", "harness", "jsonl"), default="auto")
     parser.add_argument("--ai-disclosure", choices=("visible", "missing", "unknown"), default="unknown", help="actual display disclosure state; default unknown")
     parser.add_argument("--live", action="store_true", help="explicitly call Jev using MODELGO_API_KEY")
+    parser.add_argument("--question-version", choices=sorted(SUPPORTED_JEV_QUESTION_VERSIONS), default=JEV_QUESTION_SCHEMA_VERSION)
     args = parser.parse_args()
     try:
-        report = run_workflow(args.input, args.output_dir, input_format=args.input_format, ai_disclosure=args.ai_disclosure, live=args.live)
+        report = run_workflow(args.input, args.output_dir, input_format=args.input_format, ai_disclosure=args.ai_disclosure, live=args.live, question_version=args.question_version)
     except (ValueError, OSError, JevConfigurationError) as exc:
         raise SystemExit(f"workflow failed: {exc}") from exc
     print(json.dumps(report, ensure_ascii=False, indent=2))
