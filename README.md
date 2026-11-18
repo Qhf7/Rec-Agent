@@ -4,7 +4,7 @@
 
 [![Agent](https://img.shields.io/badge/Agent-Rec--Agent-2563eb)](rec-agent-preset/)
 [![Review](https://img.shields.io/badge/Review-Jev%20Exposure%20Gate-7c3aed)](jev_adapter.py)
-[![Tests](https://img.shields.io/badge/tests-48%20passed-16a34a)](tests/)
+[![Tests](https://img.shields.io/badge/tests-66%20passed-16a34a)](tests/)
 [![Data](https://img.shields.io/badge/mock%20data-200%20users%20%2B%20200%20items-0891b2)](data/raw/)
 
 这个项目把「推荐什么」和「能否曝光」拆成两个职责清晰的阶段：Rec-Agent 根据用户画像、行为和场景数据选择商品并生成一句用户可见的推荐理由；Jev 再对推荐理由进行曝光前判定，输出 `expose / rewrite / human_review / block` 四档处置结论。
@@ -21,6 +21,7 @@
 | --- | --- | --- |
 | **Rec-Agent preset** | 编排选品、生成用户可见曝光理由、输出严格 JSON | [`rec-agent-preset/`](rec-agent-preset/) |
 | **MCP data layer** | 只读查询用户、行为、推荐反馈、商品、促销和会话场景 | [`mcp_server.py`](mcp_server.py) |
+| **Canonical data contract** | 统一 `data/raw/`、`i_####` 商品 ID 和版本元数据 | [`canonical_data.py`](canonical_data.py) |
 | **ModelGo Agent** | 为批量候选生成提供 dry-run / HTTP 客户端 | [`modelgo_agent.py`](modelgo_agent.py) |
 | **Fact Bundle** | 将候选结果转换为可审核、可追溯的事实包 | [`fact_bundle.py`](fact_bundle.py) |
 | **Jev Adapter** | 调用或模拟 `jev-1.14.0` 的审核判决 | [`jev_adapter.py`](jev_adapter.py) |
@@ -70,6 +71,8 @@ Jev 接收事实包后输出以下核心字段：
 | `escalated` | 是否升级人工审核 |
 | `model_version` | 判决模型版本 |
 
+当前 Jev 输入使用 `jev-questions-v1` 七步协议：候选身份、事实支持、表达风险、商业准确性、场景相关性、安全门禁和最终处置。Jev 只接收当前候选的商品事实、促销快照、最小场景摘要、证据和版本信息；点击历史、CTR、订单、退款、投诉、购物车、搜索词和推荐排序信号不进入 Jev 输入。
+
 Rec-Agent 不输出 Jev 判决字段，避免生成模型替代下游合规判定。
 
 ## 数据
@@ -77,7 +80,7 @@ Rec-Agent 不输出 Jev 判决字段，避免生成模型替代下游合规判�
 规范数据位于 [`data/raw/`](data/raw/)：
 
 - `users.csv`：200 条用户画像、地域、兴趣、行为、购物车、活跃时段和账户状态；
-- `items.csv`：200 条商品属性、类目、功能、规格、适用人群、库存和风险标签；
+- `items.csv`：200 条商品属性、类目、功能、规格、适用人群、库存和风险标签，商品 ID 固定为 `i_####`；
 - `promo_rules.json`：促销规则及有效期；
 - `city_climate.json`：城市气候与季节场景；
 - `compliance_lexicon.txt`：审核词表；
@@ -158,7 +161,7 @@ pbpaste | python3 scripts/strict_json_output.py
 ## 验证状态
 
 ```text
-pytest -q                 48 passed
+pytest -q                 66 passed
 scripts/validate_data.py  PASS: all hard checks passed
 ```
 

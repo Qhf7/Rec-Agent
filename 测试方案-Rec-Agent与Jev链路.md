@@ -142,12 +142,15 @@ score_name
 ### J3：Dry-run 安全
 
 ```bash
-python3 run_jev_batch.py --dry-run \
-  --input fact_bundle.jsonl \
-  --output /tmp/jev-result.jsonl
+python3 run_jev_batch.py \
+  --bundles fact_bundle.jsonl \
+  --output /tmp/jev-request-preview.jsonl \
+  --report /tmp/jev-dry-run-report.json
 ```
 
-断言：不发起网络请求，结果包含请求预览和可追溯的 `reason_id`。
+`run_jev_batch.py` 默认是 dry-run；只有显式增加 `--send` 才会请求 Jev endpoint。断言：不发起网络请求，结果包含 `jev-questions-v1` 七问请求、canonical `item_id` 和可追溯的 `reason_id`。
+
+Jev 输入必须只包含当前候选的商品事实、有效促销快照、最小场景摘要、证据和版本信息；点击历史、CTR、订单、退款、投诉、购物车、搜索词和排序信号必须被排除。
 
 ## 五、Harness 手工验收
 

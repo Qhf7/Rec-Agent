@@ -152,7 +152,11 @@ def build_jev_input(fact_bundle: Mapping[str, Any]) -> dict[str, Any]:
             "promo": _copy_allowed(promo, _PROMO_FIELDS),
             "scene": _copy_allowed(user_context, _SCENE_FIELDS),
             "lexicon_hits": fact_bundle.get("lexicon_hits") or [],
-            "coverage": fact_bundle.get("coverage") or {},
+            "coverage": {
+                key: (fact_bundle.get("coverage") or {}).get(key)
+                for key in ("missing", "complete")
+                if key in (fact_bundle.get("coverage") or {})
+            },
             "verification_state": fact_bundle.get("verification_state"),
             "rule_features": fact_bundle.get("rule_features") or {},
             "disclosure": fact_bundle.get("disclosure") or {},

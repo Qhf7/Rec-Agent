@@ -36,7 +36,9 @@ Harness 中对应的工具名为：`mcp__rec-agent-data__get_user_profile`、
 `mcp__rec-agent-data__search_items`、`mcp__rec-agent-data__get_item`、
 `mcp__rec-agent-data__get_promo`。
 
-这些工具只读 `data/raw/` 和 `data/recommendation_feedback_history.csv`，不修改数据，也不调用 Jev。推荐历史只提供给 Rec-Agent 做候选排序参考，不会进入 Jev 审核输入。
+这些工具只读 `data/raw/` 和 `data/recommendation_feedback_history.csv`，不修改数据，也不调用 Jev。`data/raw/` 是唯一 canonical 数据源，商品 ID 使用 `i_####`；推荐历史只提供给 Rec-Agent 做候选排序参考，不会进入 Jev 审核输入。
+
+离线候选、Fact Bundle 和 Jev 请求使用同一 `canonical-2026-06-15-v1` 数据版本。Jev 请求使用 `jev-questions-v1` 七步协议：候选身份、事实支持、表达风险、商业准确性、场景相关性、安全门禁和最终处置。Jev 只接收当前候选事实、促销快照、最小场景摘要、证据和版本，不接收点击历史、CTR、订单、退款、投诉、购物车、搜索词或排序分。
 
 事件级参考数据位于 `data/recommendation_feedback_history.csv`：每行是一条已通过 Jev 并实际展示的推荐事件，包含 `event_time`、`exposure_reason`、`clicked`、`click_time`、`position`、`traffic_source`、`device_type` 和 `session_id`。它是合成冷启动演示数据，接入真实链路后应由展示服务按同一字段追加真实反馈。
 
