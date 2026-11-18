@@ -15,9 +15,9 @@
 
 ## 一眼看懂项目链路
 
-![Rec-Agent 与 Jev 个性化推荐与曝光审核架构图](docs/assets/rec-agent-jev-framework-1080p.png)
+![Rec-Agent 与 Jev 推荐与合规判决模型框架](docs/assets/rec_agent_core_framework_1080p.png)
 
-高清架构图：1920 × 1080；[SVG 矢量版](docs/assets/rec-agent-jev-framework-1080p.svg)。五栏主链路为「多源上下文 → Rec-Agent 生成 → 独立 Python 工作流构建事实包 → Jev 九题审核 → 四档处置输出」。实线表示当前数据流，虚线表示后续业务接入；下方分别展示模拟反馈读取、模拟离线评测与待接入的业务执行。图中 Rec-Agent 使用项目 R 字图形，Jev 模块使用本地保存的 [TypeSafe AI 官方公司 wordmark](docs/assets/typesafe-ai-official-logo.svg)。
+模型框架图（1920 × 1080），展示多源上下文、Rec-Agent、事实与规则、Jev 判决及四档处置。当前功能边界与运行方式见[独立工作流说明](docs/STANDALONE_WORKFLOW.md)，验证范围见[工作流验证报告](docs/TEST_REPORT_JEV_MODEL_WORKFLOW_2026-11-18.md)。
 
 ## 当前实现
 
