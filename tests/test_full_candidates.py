@@ -17,7 +17,7 @@ def test_full_dataset_has_200_natural_and_100_stress_candidates():
 def test_full_candidates_have_valid_foreign_keys_and_stratified_splits():
     candidates, labels = build_full_dataset(seed=20261116)
     user_ids = {f"u_{i:04d}" for i in range(1, 201)}
-    item_ids = {f"item_{i:04d}" for i in range(1, 201)}
+    item_ids = {f"i_{i:04d}" for i in range(1, 201)}
 
     assert all(row["user_id"] in user_ids for row in candidates)
     assert all(row["item_id"] in item_ids for row in candidates)

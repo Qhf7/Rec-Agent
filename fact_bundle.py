@@ -7,10 +7,11 @@ import re
 from pathlib import Path
 from typing import Iterable
 
+from canonical_data import CANONICAL_SCHEMA_VERSION, normalize_item_id
 from run_rule_baseline import _price_evidence, _supported_efficacy, _topic_mismatch, find_lexicon_hits
 
 
-FACT_BUNDLE_SCHEMA = "fact-bundle-v1"
+FACT_BUNDLE_SCHEMA = "fact-bundle-v2"
 
 
 def load_candidates(path: str | Path) -> list[dict]:
@@ -28,7 +29,7 @@ def _returned_fields(candidate: dict) -> set[str]:
 def _coverage(candidate: dict) -> dict:
     item = candidate.get("item_attrs_returned") or {}
     returned = _returned_fields(candidate)
-    expected = {"category", "functions", "suitable_scenes", "price"}
+    expected = {"category_l1", "functions", "suit_audience", "price_cents"}
     missing = sorted(field for field in expected if field not in item and field not in returned)
     complete = bool(candidate.get("attrs_returned_complete", False)) and not missing
     return {
@@ -43,25 +44,27 @@ def _provenance(candidate: dict) -> dict:
     item_id = candidate.get("item_id", "unknown")
     promo = candidate.get("promo_computed_in_code") or {}
     promo_id = promo.get("promo_id") or "none"
-    item_source = f"items.csv:item_id={item_id}"
-    user_source = f"users.csv:user_id={user_id}"
+    item_source = f"data/raw/items.csv:item_id={item_id}"
+    user_source = f"data/raw/users.csv:user_id={user_id}"
     return {
-        "reason": "reason_candidates.jsonl:exposure_reason",
+        "reason": "canonical-candidate:exposure_reason",
         "user_context": user_source,
         "user_context.city": f"{user_source}:city",
         "item": item_source,
-        "item.category": f"{item_source}:category",
+        "item.category_l1": f"{item_source}:category_l1",
         "item.functions": f"{item_source}:functions",
-        "item.suitable_scenes": f"{item_source}:suitable_scenes",
-        "item.price": f"{item_source}:price",
-        "promo": f"promo_rules.json:promo_id={promo_id}",
-        "lexicon_hits": "compliance_lexicon.txt:matched_terms",
-        "tool_trace": "reason_candidates.jsonl:tool_trace",
-        "disclosure": "reason_candidates.jsonl:ai_disclosure_flag_from_code",
+        "item.suit_audience": f"{item_source}:suit_audience",
+        "item.price_cents": f"{item_source}:price_cents",
+        "promo": f"data/raw/promo_rules.json:promo_id={promo_id}",
+        "lexicon_hits": "data/raw/compliance_lexicon.txt:matched_terms",
+        "tool_trace": "canonical-candidate:tool_trace",
+        "disclosure": "canonical-candidate:ai_disclosure_flag_from_code",
     }
 
 
 def build_fact_bundle(candidate: dict, lexicon: Iterable[dict]) -> dict:
+    if str(candidate.get("item_id", "")).startswith("item_"):
+        raise ValueError("legacy candidate item_id must be migrated before Fact Bundle construction")
     exposure_reason = candidate.get("exposure_reason") or candidate.get("generated_reason", "")
     generated_reason = candidate.get("generated_reason") or exposure_reason
     reason = exposure_reason
@@ -138,7 +141,7 @@ def build_fact_bundle(candidate: dict, lexicon: Iterable[dict]) -> dict:
         },
         "provenance": _provenance(candidate),
         "snapshot_at": candidate.get("snapshot_at"),
-        "data_version": candidate.get("data_version") or {},
+        "data_version": candidate.get("data_version") or CANONICAL_SCHEMA_VERSION,
     }
 
 
@@ -158,7 +161,7 @@ def main() -> None:
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--candidates", default="reason_candidates.jsonl")
-    parser.add_argument("--lexicon", default="compliance_lexicon.txt")
+    parser.add_argument("--lexicon", default="data/raw/compliance_lexicon.txt")
     parser.add_argument("--output", default="fact_bundle.jsonl")
     args = parser.parse_args()
 

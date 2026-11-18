@@ -8,68 +8,70 @@ import json
 import random
 from pathlib import Path
 
+from canonical_data import CANONICAL_SCHEMA_VERSION, load_canonical_items, load_canonical_promos, load_canonical_users
 
 ROOT = Path(__file__).resolve().parent
 
 def split_values(value, sep="|"):
+    if isinstance(value, list):
+        return [str(x) for x in value if str(x)]
     return [x for x in str(value).split(sep) if x]
 
 
 def user_snapshot(user):
     return {
-        "province": user["province"],
         "city": user["city"],
-        "age_band": user["age_band"],
-        "interests": split_values(user["interests"]),
-        "recent_categories": split_values(user["recent_categories"]),
-        "browse_time_slots": split_values(user["browse_time_slots"]),
-        "preferred_price_range": user["preferred_price_range"],
-        "weather_sensitivity": user["weather_sensitivity"],
+        "city_tier": user["city_tier"],
+        "climate_zone": user["climate_zone"],
+        "life_stage": user["life_stage"],
+        "interests": list(user["preferred_categories"]),
+        "recent_categories": list(user["preferred_categories"]),
+        "browse_time_slots": [user["active_hours"]],
+        "preferred_price_range": user["price_sensitivity"],
+        "weather_sensitivity": user["climate_zone"],
         "account_status": user["account_status"],
-        "profile_version": user["profile_version"],
+        "profile_version": "canonical-users-v1",
     }
 
 
 def item_snapshot(item, complete=True):
-    base = {
-        "title": item["title"], "category": item["category"], "subcategory": item["subcategory"],
-        "brand": item["brand"], "description": item["description"],
-        "functions": split_values(item["functions"]), "materials": split_values(item["materials"]),
-        "suitable_scenes": split_values(item["suitable_scenes"]), "target_tags": split_values(item["target_tags"]),
-        "price": float(item["price"]), "original_price": float(item["original_price"]),
-        "stock": int(item["stock"]), "promo_ids": split_values(item["promo_ids"]),
-        "activity_flag": item["activity_flag"],
-    }
+    base = dict(item)
     if complete:
         return base
-    return {"title": base["title"], "category": base["category"], "subcategory": base["subcategory"],
-            "price": base["price"], "promo_ids": base["promo_ids"]}
+    return {
+        "item_id": base["item_id"],
+        "title": base["title"],
+        "brand": base["brand"],
+        "category_l1": base["category_l1"],
+        "price_cents": base["price_cents"],
+        "promo_rule_ids": base["promo_rule_ids"],
+    }
 
 
 def promo_snapshot(item, promo_rules):
-    promo_ids = split_values(item["promo_ids"])
+    promo_ids = list(item["promo_rule_ids"])
     if not promo_ids:
         return {}
     rule = promo_rules[promo_ids[0]]
     return {
-        "promo_id": rule["promo_id"], "type": rule["type"],
-        "applicable": bool(rule["enabled"] and item["item_id"] in rule["scope"]["item_ids"]),
+        "promo_id": rule["rule_id"], "type": rule["type"],
+        "applicable": bool(rule["start"] <= "2026-06-15" <= rule["end"] and item["category_l1"] in rule["scope"].get("category_l1", [])),
         "threshold_cents": rule["threshold_cents"], "discount_cents": rule["discount_cents"],
-        "discount_rate": rule["discount_rate"], "gift_item": rule["gift_item"],
-        "member_level": rule["member_level"], "fine_print": rule["fine_print"],
+        "discount_rate": rule["discount_percent"] / 100 if rule["discount_percent"] else 0,
+        "gift_item": rule["gift"], "member_level": "all", "fine_print": rule["fine_print"],
         "computed_by": "full_rule_engine_v1",
     }
 
 
 def tool_trace(item, complete, include_promo):
     trace = [
-        {"tool": "get_user_profile", "latency_ms": 2, "returned_fields": ["city", "interests", "recent_categories", "preferred_price_range"]},
-        {"tool": "get_user_behavior", "latency_ms": 2, "returned_fields": ["purchase_history_item_ids", "cart_item_ids", "browse_time_slots"]},
-        {"tool": "search_items", "latency_ms": 4, "returned_fields": ["item_id", "category", "price"]},
-        {"tool": "get_item", "latency_ms": 3, "returned_fields": ["title", "category", "subcategory", "price"]},
+        {"tool": "get_user_profile", "latency_ms": 2, "returned_fields": ["city", "preferred_categories", "life_stage", "active_hours"]},
+        {"tool": "get_user_behavior", "latency_ms": 2, "returned_fields": ["recent_cart_item_ids", "recent_order_item_ids", "last_search_terms"]},
+        {"tool": "search_items", "latency_ms": 4, "returned_fields": ["item_id", "category_l1", "price_cents"]},
+        {"tool": "get_item", "latency_ms": 3, "returned_fields": ["title", "category_l1", "category_l2", "price_cents"]},
     ]
     if complete:
-        trace[-1]["returned_fields"] += ["functions", "materials", "suitable_scenes", "target_tags"]
+        trace[-1]["returned_fields"] += ["functions", "material", "spec", "suit_audience", "suit_season"]
     if include_promo:
         trace.append({"tool": "get_promo", "latency_ms": 2, "returned_fields": ["promo_id", "type", "applicable", "threshold_cents", "discount_cents"]})
     return trace
@@ -93,12 +95,9 @@ CATEGORY_MAP = {
 
 
 def _load_tables():
-    with (ROOT / "users.csv").open(encoding="utf-8-sig", newline="") as handle:
-        users = {row["user_id"]: row for row in csv.DictReader(handle)}
-    with (ROOT / "items.csv").open(encoding="utf-8-sig", newline="") as handle:
-        items = {row["item_id"]: row for row in csv.DictReader(handle)}
-    with (ROOT / "promo_rules.json").open(encoding="utf-8") as handle:
-        promo_rules = {row["promo_id"]: row for row in json.load(handle)["rules"]}
+    users = load_canonical_users()
+    items = load_canonical_items()
+    promo_rules = {row["rule_id"]: row for row in load_canonical_promos()}
     return users, items, promo_rules
 
 
@@ -112,14 +111,14 @@ def _split_for_user(index: int) -> str:
 
 def _choose_item(user: dict, items: dict, index: int) -> str:
     desired = []
-    for category in split_values(user["recent_categories"]):
+    for category in split_values(user.get("preferred_categories", [])):
         desired.append(category)
-    for interest in split_values(user["interests"]):
+    for interest in split_values(user.get("preferred_categories", [])):
         mapped = CATEGORY_MAP.get(interest)
         if mapped:
             desired.append(mapped)
     desired = list(dict.fromkeys(desired))
-    candidates = [row for row in items.values() if row["category"] in desired]
+    candidates = [row for row in items.values() if row["category_l1"] in desired]
     if not candidates:
         candidates = list(items.values())
     candidates.sort(key=lambda row: row["item_id"])
@@ -128,8 +127,8 @@ def _choose_item(user: dict, items: dict, index: int) -> str:
 
 def _natural_reason(user: dict, item: dict, index: int) -> str:
     functions = split_values(item["functions"])
-    scenes = split_values(item["suitable_scenes"])
-    scene = scenes[index % len(scenes)] if scenes else item["subcategory"]
+    scenes = [value for value in (item.get("suit_audience"), item.get("suit_season")) if value]
+    scene = scenes[index % len(scenes)] if scenes else item["category_l2"]
     city = user["city"]
     if "除湿" in functions and user["weather_sensitivity"] == "高":
         return f"{city}梅雨季，低噪除湿适合{scene}"
@@ -141,7 +140,7 @@ def _natural_reason(user: dict, item: dict, index: int) -> str:
         return f"{scene}用定时加湿，日常更方便"
     if "便携" in functions:
         return f"出行带上便携款，{scene}更好整理"
-    function = functions[index % len(functions)] if functions else item["subcategory"]
+    function = functions[index % len(functions)] if functions else item["category_l2"]
     return f"{scene}用它{function}，日常更方便"
 
 
@@ -152,6 +151,9 @@ def _candidate(user_id, item_id, user, item, reason, source, mode, split, comple
         "reason_id": None,
         "user_id": user_id,
         "item_id": item_id,
+        "schema_version": "rec-candidate-v2",
+        "data_version": CANONICAL_SCHEMA_VERSION,
+        "exposure_reason": reason,
         "generated_reason": reason,
         "generation_mode": mode,
         "source": source,
@@ -163,12 +165,6 @@ def _candidate(user_id, item_id, user, item, reason, source, mode, split, comple
         "ai_disclosure_flag_from_code": ai_flag,
         "tool_trace": tool_trace(item, complete=complete, include_promo=bool(promo)),
         "snapshot_at": "2026-11-16T22:30:00+08:00",
-        "data_version": {
-            "users": "mock-users-v1",
-            "items": "mock-items-v1",
-            "promo_rules": "promo-rules-v1",
-            "lexicon": "compliance-lexicon-v1",
-        },
     }
 
 

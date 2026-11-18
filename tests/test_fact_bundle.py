@@ -1,23 +1,23 @@
 import json
 from pathlib import Path
 
+from canonical_data import load_canonical_items
 from fact_bundle import build_fact_bundle, load_candidates
 from run_rule_baseline import load_lexicon
 
 
 def test_verified_candidate_builds_auditable_fact_bundle():
+    item = load_canonical_items()["i_0001"]
     candidate = {
+        "schema_version": "rec-candidate-v2",
+        "data_version": "canonical-2026-06-15-v1",
         "reason_id": "r_test_verified",
         "user_id": "u_0001",
-        "item_id": "item_0001",
+        "item_id": "i_0001",
+        "exposure_reason": "折叠收纳，卧室整理更方便",
         "generated_reason": "折叠收纳，卧室整理更方便",
         "user_context": {"city": "杭州", "interests": ["家居收纳"]},
-        "item_attrs_returned": {
-            "category": "家居日用",
-            "functions": ["折叠", "分区收纳"],
-            "suitable_scenes": ["卧室整理"],
-            "price": 39.9,
-        },
+        "item_attrs_returned": item,
         "attrs_returned_complete": True,
         "promo_computed_in_code": {},
         "ai_disclosure_flag_from_code": True,
@@ -31,7 +31,7 @@ def test_verified_candidate_builds_auditable_fact_bundle():
     assert bundle["verification_state"] == "verified"
     assert bundle["disclosure"]["flag"] is True
     assert bundle["disclosure"]["required"] is True
-    assert bundle["provenance"]["item.functions"].startswith("items.csv:")
+    assert bundle["provenance"]["item.functions"].startswith("data/raw/items.csv:")
     assert bundle["tool_trace"]
 
 
@@ -39,7 +39,7 @@ def test_fact_bundle_preserves_user_facing_exposure_reason():
     candidate = {
         "reason_id": "r_exposure",
         "user_id": "u_0001",
-        "item_id": "item_0001",
+        "item_id": "i_0001",
         "exposure_reason": "通勤大容量更好装",
         "generated_reason": "通勤大容量更好装",
         "item_attrs_returned": {},

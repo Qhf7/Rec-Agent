@@ -8,6 +8,7 @@ import json
 import time
 from pathlib import Path
 
+from scripts.migrate_legacy_candidates import validate_candidate_contract
 from modelgo_agent import ModelGoAgent
 
 
@@ -41,7 +42,7 @@ def merge_agent_cards(base_candidates: list[dict], cards: list[dict], model: str
         row["generation_mode"] = "modelgo_agent_fallback_v1"
         row["agent_model"] = model
         row["agent_evidence_fields"] = card["evidence_fields"]
-        merged.append(row)
+        merged.append(validate_candidate_contract(row))
     return merged
 
 

@@ -24,9 +24,13 @@ def load_lexicon(path: str | Path) -> list[dict]:
             if not line or line.startswith("#"):
                 continue
             parts = line.split("|", 6)
-            if len(parts) != 7:
+            if len(parts) not in {6, 7}:
                 raise ValueError(f"invalid lexicon row: {line}")
-            term, risk_type, severity, rule_basis, canonical_term, match_type, note = parts
+            if len(parts) == 6:
+                term, canonical_term, risk_type, severity, rule_basis, note = parts
+                match_type = "exact"
+            else:
+                term, risk_type, severity, rule_basis, canonical_term, match_type, note = parts
             entries.append(
                 {
                     "term": term,
@@ -328,7 +332,7 @@ def evaluate_report(
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--candidates", default="reason_candidates.jsonl")
-    parser.add_argument("--lexicon", default="compliance_lexicon.txt")
+    parser.add_argument("--lexicon", default="data/raw/compliance_lexicon.txt")
     parser.add_argument("--labels", default="dev_labels.csv")
     parser.add_argument("--output", default="result_rule_baseline.jsonl")
     parser.add_argument("--report", default="rule_baseline_report.json")

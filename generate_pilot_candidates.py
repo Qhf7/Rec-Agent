@@ -2,15 +2,14 @@ import csv
 import json
 from pathlib import Path
 
+from canonical_data import CANONICAL_SCHEMA_VERSION, load_canonical_items, load_canonical_promos, load_canonical_users
+
 ROOT = Path(__file__).resolve().parent
 
-with (ROOT / "users.csv").open(encoding="utf-8-sig", newline="") as f:
-    users = {row["user_id"]: row for row in csv.DictReader(f)}
-with (ROOT / "items.csv").open(encoding="utf-8-sig", newline="") as f:
-    items = {row["item_id"]: row for row in csv.DictReader(f)}
-with (ROOT / "promo_rules.json").open(encoding="utf-8") as f:
-    promo_payload = json.load(f)
-promo_rules = {rule["promo_id"]: rule for rule in promo_payload["rules"]}
+users = load_canonical_users()
+canonical_items = load_canonical_items()
+items = {f"item_{item_id.split('_', 1)[1]}": item for item_id, item in canonical_items.items()}
+promo_rules = {rule["rule_id"]: rule for rule in load_canonical_promos()}
 
 pilot_user_ids = [f"u_{i:04d}" for i in range(1, 21)]
 pilot_item_ids = [f"item_{i:04d}" for i in range(1, 21)]
@@ -72,51 +71,33 @@ def split_values(value, sep="|"):
 
 def user_snapshot(user):
     return {
-        "province": user["province"],
         "city": user["city"],
-        "age_band": user["age_band"],
-        "interests": split_values(user["interests"]),
-        "recent_categories": split_values(user["recent_categories"]),
-        "browse_time_slots": split_values(user["browse_time_slots"]),
-        "preferred_price_range": user["preferred_price_range"],
-        "weather_sensitivity": user["weather_sensitivity"],
+        "city_tier": user["city_tier"],
+        "climate_zone": user["climate_zone"],
+        "life_stage": user["life_stage"],
+        "interests": list(user["preferred_categories"]),
+        "recent_categories": list(user["preferred_categories"]),
+        "browse_time_slots": [user["active_hours"]],
+        "preferred_price_range": user["price_sensitivity"],
+        "weather_sensitivity": user["climate_zone"],
         "account_status": user["account_status"],
-        "profile_version": user["profile_version"],
+        "profile_version": "canonical-users-v1",
     }
 
 
 def item_snapshot(item, complete=True):
-    base = {
-        "title": item["title"],
-        "category": item["category"],
-        "subcategory": item["subcategory"],
-        "brand": item["brand"],
-        "description": item["description"],
-        "functions": split_values(item["functions"]),
-        "materials": split_values(item["materials"]),
-        "suitable_scenes": split_values(item["suitable_scenes"]),
-        "target_tags": split_values(item["target_tags"]),
-        "price": float(item["price"]),
-        "original_price": float(item["original_price"]),
-        "stock": int(item["stock"]),
-        "promo_ids": split_values(item["promo_ids"]),
-        "activity_flag": item["activity_flag"],
-    }
+    base = dict(item)
     if complete:
         return base
     # Simulate a truncated tool result. The product still has a category and
     # title, but the key function/scene fields are unavailable for verification.
-    return {
-        "title": base["title"],
-        "category": base["category"],
-        "subcategory": base["subcategory"],
-        "price": base["price"],
-        "promo_ids": base["promo_ids"],
-    }
+    return {"item_id": base["item_id"], "title": base["title"], "brand": base["brand"],
+            "category_l1": base["category_l1"], "price_cents": base["price_cents"],
+            "promo_rule_ids": base["promo_rule_ids"]}
 
 
 def promo_snapshot(item, user_id):
-    promo_ids = split_values(item["promo_ids"])
+    promo_ids = list(item["promo_rule_ids"])
     if not promo_ids:
         return {}
     pid = promo_ids[0]
@@ -124,12 +105,12 @@ def promo_snapshot(item, user_id):
     out = {
         "promo_id": pid,
         "type": rule["type"],
-        "applicable": bool(rule["enabled"] and item["item_id"] in rule["scope"]["item_ids"]),
+        "applicable": bool(rule["start"] <= "2026-06-15" <= rule["end"] and item["category_l1"] in rule["scope"].get("category_l1", [])),
         "threshold_cents": rule["threshold_cents"],
         "discount_cents": rule["discount_cents"],
-        "discount_rate": rule["discount_rate"],
-        "gift_item": rule["gift_item"],
-        "member_level": rule["member_level"],
+        "discount_rate": rule["discount_percent"] / 100 if rule["discount_percent"] else 0,
+        "gift_item": rule["gift"],
+        "member_level": "all",
         "fine_print": rule["fine_print"],
         "computed_by": "pilot_rule_engine_v1",
     }
@@ -141,16 +122,16 @@ def tool_trace(item, complete, include_promo):
         {
             "tool": "get_user_profile",
             "latency_ms": 2,
-            "returned_fields": ["city", "interests", "recent_categories", "preferred_price_range"],
+            "returned_fields": ["city", "preferred_categories", "life_stage", "active_hours"],
         },
         {
             "tool": "get_item",
             "latency_ms": 3,
-            "returned_fields": ["title", "category", "subcategory", "price"],
+            "returned_fields": ["title", "category_l1", "category_l2", "price_cents"],
         },
     ]
     if complete:
-        trace[-1]["returned_fields"] += ["functions", "materials", "suitable_scenes", "target_tags"]
+        trace[-1]["returned_fields"] += ["functions", "material", "spec", "suit_audience", "suit_season"]
     if include_promo:
         trace.append({"tool": "get_promo", "latency_ms": 2, "returned_fields": ["promo_id", "type", "applicable", "threshold_cents", "discount_cents"]})
     return trace
@@ -161,13 +142,17 @@ for index, (spec, source) in enumerate(specs, start=1):
     user_id, item_id, reason, gold_risk, gold_decision, gold_evidence = spec
     user = users[user_id]
     item = items[item_id]
+    canonical_item_id = item["item_id"]
     incomplete = source == "stress" and index in {26, 40}
     ai_flag = not (index in {24, 40})
     promo = promo_snapshot(item, user_id)
     candidate = {
+        "schema_version": "rec-candidate-v2",
+        "data_version": CANONICAL_SCHEMA_VERSION,
         "reason_id": f"r_pilot_{index:04d}",
         "user_id": user_id,
-        "item_id": item_id,
+        "item_id": canonical_item_id,
+        "exposure_reason": reason,
         "generated_reason": reason,
         "generation_mode": "template_pilot",
         "source": source,
@@ -179,12 +164,6 @@ for index, (spec, source) in enumerate(specs, start=1):
         "ai_disclosure_flag_from_code": ai_flag,
         "tool_trace": tool_trace(item, complete=not incomplete, include_promo=bool(promo)),
         "snapshot_at": "2026-11-16T20:00:00+08:00",
-        "data_version": {
-            "users": "mock-users-v1",
-            "items": "mock-items-v1",
-            "promo_rules": "promo-rules-v1",
-            "lexicon": "compliance-lexicon-v1",
-        },
     }
     candidates.append(candidate)
     labels.append({
