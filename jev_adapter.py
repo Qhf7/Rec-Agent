@@ -10,6 +10,13 @@ import urllib.error
 import urllib.request
 from typing import Any
 
+from jev_protocol import (
+    JEV_QUESTION_SCHEMA_VERSION,
+    build_jev_input,
+    build_jev_questions,
+    parse_jev_answers,
+)
+
 
 DEFAULT_ENDPOINT = "https://api.modelgo.ai/v1/systemone"
 DEFAULT_MODEL = "jev-1.14.0"
@@ -126,51 +133,22 @@ class JevAdapter:
         self.dry_run = dry_run
 
     def build_payload(self, fact_bundle: dict) -> dict:
-        state = json.dumps(fact_bundle, ensure_ascii=False, separators=(",", ":"))
+        jev_input = build_jev_input(fact_bundle)
+        state = json.dumps(jev_input, ensure_ascii=False, separators=(",", ":"))
         return {
             "model": self.model,
+            "question_schema_version": JEV_QUESTION_SCHEMA_VERSION,
             "state": state,
-            "questions": {
-                "decision": {
-                    "type": "choice",
-                    "instructions": "请选择这条推荐理由的最终曝光处置结论。",
-                    "criteria": {
-                        "expose": "事实成立、无风险且可以直接曝光。",
-                        "rewrite": "存在可机械修复的问题，改写后可以曝光。",
-                        "human_review": "关键字段缺失、证据冲突或置信度不足，需要人工审核。",
-                        "block": "存在无法安全修复的事实性、功效性或价格合规风险，禁止曝光。",
-                    },
-                },
-                "risk_type": {
-                    "type": "choice",
-                    "instructions": "请选择驱动处置结论的主要风险类型。",
-                    "criteria": {
-                        "compliant": "事实成立、切题且没有需要处置的风险。",
-                        "absolute_claim": "存在绝对化、最高级或无法证明的比较表达。",
-                        "efficacy_or_medical_claim": "功效或医疗宣称没有商品属性、资质或允许清单支持。",
-                        "price_misleading": "价格、折扣、满减或赠品表达与促销规则不一致。",
-                        "missing_ai_disclosure": "按业务规则需要披露 AI 生成，但披露标记缺失。",
-                        "off_topic": "理由与商品属性或用户语境不相关。",
-                    },
-                },
-                "judge_score": {
-                    "type": "score",
-                    "instructions": "请评估这条推荐理由的不安全概率，分数越高表示风险越高。",
-                    "criteria": [
-                        "低风险，概率接近 0。",
-                        "中风险，概率约为 0.5。",
-                        "高风险，概率接近 1。",
-                    ],
-                },
-            },
+            "questions": build_jev_questions(),
         }
 
     def judge(self, fact_bundle: dict) -> dict:
-        payload = self.build_payload(fact_bundle)
         if self.dry_run:
+            payload = self.build_payload(fact_bundle)
             return {"dry_run": True, "request": payload}
         if not self.api_key:
             raise JevConfigurationError("MODELGO_API_KEY is required when dry_run=False")
+        payload = self.build_payload(fact_bundle)
 
         request = urllib.request.Request(
             self.endpoint,
@@ -209,23 +187,18 @@ class JevAdapter:
         return validate_decision(result)
 
     def _parse_systemone_response(self, payload: dict, fact_bundle: dict) -> dict:
-        answers = payload["answers"]
         try:
-            decision = answers["decision"]["choice"]
-            risk_type = answers["risk_type"]["choice"]
-            judge_score = _normalize_score(answers["judge_score"])
-        except (KeyError, TypeError) as exc:
-            raise JevResponseError("SystemOne response missing decision/risk_type/judge_score") from exc
+            parsed_answers = parse_jev_answers(payload, fact_bundle)
+        except (KeyError, TypeError, ValueError) as exc:
+            raise JevResponseError("SystemOne response missing a valid Jev question answer") from exc
 
-        confidence_values = []
-        for key in ("decision", "risk_type", "judge_score"):
-            value = answers.get(key) or {}
-            if isinstance(value.get("confidence"), (int, float)):
-                confidence_values.append(float(value["confidence"]))
-        confidence = min(confidence_values) if confidence_values else 1.0
+        decision = parsed_answers["decision"]
+        risk_type = parsed_answers["risk_type"]
+        judge_score = parsed_answers["judge_score"]
+        confidence = float(parsed_answers.get("confidence", 1.0))
         state = fact_bundle.get("verification_state", "verified")
-        escalated = state in {"unverifiable", "conflict"} or confidence < 0.7 or decision == "human_review"
-        evidence = build_evidence_from_fact_bundle(fact_bundle)
+        escalated = state in {"unverifiable", "conflict"} or confidence < 0.7 or decision == "human_review" or bool(parsed_answers.get("escalated"))
+        evidence = list(parsed_answers.get("evidence") or []) or build_evidence_from_fact_bundle(fact_bundle)
 
         if state in {"unverifiable", "conflict"}:
             decision = "human_review"
@@ -291,6 +264,7 @@ class JevAdapter:
             "escalated": escalated,
             "model_version": payload.get("model", self.model),
             "score_name": self.score_name,
+            "protocol_completeness": parsed_answers["protocol_completeness"],
         }
         return validate_decision(result)
 

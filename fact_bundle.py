@@ -118,6 +118,7 @@ def build_fact_bundle(candidate: dict, lexicon: Iterable[dict]) -> dict:
         "item_id": candidate.get("item_id"),
         "exposure_reason": exposure_reason,
         "generated_reason": generated_reason,
+        "evidence_fields": candidate.get("evidence_fields") or [],
         "user_context": candidate.get("user_context") or {},
         "item": item,
         "promo": promo,
@@ -141,6 +142,7 @@ def build_fact_bundle(candidate: dict, lexicon: Iterable[dict]) -> dict:
         },
         "provenance": _provenance(candidate),
         "snapshot_at": candidate.get("snapshot_at"),
+        "agent_version": candidate.get("agent_version", "rec-agent-v2"),
         "data_version": candidate.get("data_version") or CANONICAL_SCHEMA_VERSION,
     }
 

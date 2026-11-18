@@ -5,21 +5,51 @@ import pytest
 from jev_adapter import JevAdapter, JevConfigurationError, validate_decision
 
 
+def _payload_bundle():
+    return {
+        "schema_version": "fact-bundle-v2",
+        "reason_id": "r1",
+        "user_id": "u_0001",
+        "item_id": "i_0001",
+        "exposure_reason": "折叠收纳",
+        "generated_reason": "折叠收纳",
+        "evidence_fields": ["items.functions"],
+        "user_context": {"city": "广州"},
+        "item": {"item_id": "i_0001", "title": "收纳盒", "functions": ["折叠"]},
+        "promo": {},
+        "coverage": {"missing": [], "complete": True},
+        "verification_state": "verified",
+        "disclosure": {"flag": True, "required": True},
+        "rule_features": {},
+        "provenance": {"item": "data/raw/items.csv:item_id=i_0001"},
+        "data_version": "canonical-2026-06-15-v1",
+    }
+
+
 def test_build_payload_uses_systemone_contract():
     adapter = JevAdapter(api_key="test-key", dry_run=True)
-    bundle = {"reason_id": "r1", "generated_reason": "折叠收纳", "verification_state": "verified"}
+    bundle = _payload_bundle()
 
     payload = adapter.build_payload(bundle)
 
     assert payload["model"] == "jev-1.14.0"
     assert "r1" in payload["state"]
-    assert set(payload["questions"]) == {"decision", "risk_type", "judge_score"}
-    assert payload["questions"]["decision"]["type"] == "choice"
+    assert payload["question_schema_version"] == "jev-questions-v1"
+    assert set(payload["questions"]) == {
+        "q1_identity",
+        "q2_fact_support",
+        "q3_expression_risk",
+        "q4_commercial_accuracy",
+        "q5_context_relevance",
+        "q6_safety_gate",
+        "q7_final_decision",
+    }
+    assert payload["questions"]["q1_identity"]["type"] == "choice"
 
 
 def test_dry_run_does_not_make_a_network_call():
     adapter = JevAdapter(api_key="test-key", dry_run=True)
-    result = adapter.judge({"reason_id": "r1", "generated_reason": "折叠收纳"})
+    result = adapter.judge(_payload_bundle())
 
     assert result["dry_run"] is True
     assert result["request"]["model"] == "jev-1.14.0"
