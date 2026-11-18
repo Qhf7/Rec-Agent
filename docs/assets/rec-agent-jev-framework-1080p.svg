@@ -1,0 +1,225 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-labelledby="figure-title figure-desc">
+<title id="figure-title">Rec-Agent × Jev：个性化推荐与曝光审核架构</title>
+<desc id="figure-desc">五栏主链路：只读上下文检索、DeepSeek Harness推荐生成、独立Python工作流重建事实包、Jev九题并行审核、四档处置与组合JSON。实线表示当前实现；虚线表示待接入业务。模拟反馈经MCP返回Rec-Agent，模拟评测与生产接入分区展示。最终处置直接采用Jev Q7选择。</desc>
+<defs>
+ <radialGradient id="bg" cx="48%" cy="15%" r="88%"><stop stop-color="#142442"/><stop offset="1" stop-color="#070D19"/></radialGradient>
+ <linearGradient id="rec-panel" x2="0" y2="1"><stop stop-color="#102B4C"/><stop offset="1" stop-color="#0D172B"/></linearGradient>
+ <linearGradient id="jev-panel" x2="0" y2="1"><stop stop-color="#2D1A3D"/><stop offset="1" stop-color="#15152B"/></linearGradient>
+ <linearGradient id="rec-r" x2="1" y2="1"><stop stop-color="#48DBFF"/><stop offset=".5" stop-color="#4D81FF"/><stop offset="1" stop-color="#67E8C4"/></linearGradient>
+
+<marker id="cyan" viewBox="0 0 10 10" markerWidth="8" markerHeight="8" refX="8" refY="5" orient="auto"><path d="M1 1L9 5L1 9Z" fill="#54C9F8"/></marker>
+<marker id="blue" viewBox="0 0 10 10" markerWidth="8" markerHeight="8" refX="8" refY="5" orient="auto"><path d="M1 1L9 5L1 9Z" fill="#6FA1FF"/></marker>
+<marker id="teal" viewBox="0 0 10 10" markerWidth="8" markerHeight="8" refX="8" refY="5" orient="auto"><path d="M1 1L9 5L1 9Z" fill="#45D6C5"/></marker>
+<marker id="pink" viewBox="0 0 10 10" markerWidth="8" markerHeight="8" refX="8" refY="5" orient="auto"><path d="M1 1L9 5L1 9Z" fill="#DF8EEC"/></marker>
+<marker id="green" viewBox="0 0 10 10" markerWidth="8" markerHeight="8" refX="8" refY="5" orient="auto"><path d="M1 1L9 5L1 9Z" fill="#5CDBB0"/></marker>
+<marker id="future" viewBox="0 0 10 10" markerWidth="8" markerHeight="8" refX="8" refY="5" orient="auto"><path d="M1 1L9 5L1 9Z" fill="#99A8BD"/></marker>
+<style>text{font-family:"Avenir Next","PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;font-variant-numeric:tabular-nums} .mono{font-family:"SF Mono",Menlo,monospace}</style></defs>
+<rect x="0" y="0" width="1920" height="1080" rx="0" fill="url(#bg)" stroke="none" stroke-width="1.3"/>
+<rect x="48" y="34" width="54" height="54" rx="16" fill="#133653" stroke="#3776B5" stroke-width="1.3"/>
+<g transform="translate(61 47) scale(1.16)" fill="none" stroke="#72DEFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+<rect x="8" y="1" width="8" height="6" rx="2"/><rect x="1" y="17" width="8" height="6" rx="2"/><rect x="15" y="17" width="8" height="6" rx="2"/><path d="M12 7v6M5 17v-4h14v4"/>
+</g>
+<text x="120" y="68" font-size="37" font-weight="750" fill="#F3F7FF" text-anchor="start">Rec-Agent × Jev</text>
+<text x="120" y="103" font-size="25" font-weight="550" fill="#C8D8ED" text-anchor="start">个性化推荐与曝光审核架构</text>
+<text x="784" y="64" font-size="20" font-weight="500" fill="#B4C7E0" text-anchor="start">从用户上下文到推荐文案，再到可追溯的曝光判定</text>
+<text x="784" y="97" font-size="17" font-weight="450" fill="#88A2C2" text-anchor="start">生成与审核分工明确 · 事实输入受限 · 模型结论完整留存</text>
+<rect x="1532" y="43" width="340" height="56" rx="14" fill="#11243A" stroke="#31506E" stroke-width="1.3"/>
+<text x="1702" y="67" font-size="17" font-weight="600" fill="#DDEBFF" text-anchor="middle">rec-agent-v2  /  jev-1.14.0</text>
+<text x="1702" y="88" font-size="14" font-weight="450" fill="#91A9C6" text-anchor="middle">当前实现与业务接入边界</text>
+<rect x="48" y="131" width="682" height="35" rx="10" fill="#112B46" stroke="#294E78" stroke-width="1.3"/>
+<text x="66" y="154" font-size="17" font-weight="650" fill="#8AD7FF" text-anchor="start">A  推荐生成</text>
+<text x="710" y="154" font-size="16" font-weight="450" fill="#A3BEDB" text-anchor="end">DeepSeek Harness + 只读数据工具</text>
+<rect x="768" y="131" width="1104" height="35" rx="10" fill="#201D36" stroke="#4F3C68" stroke-width="1.3"/>
+<text x="786" y="154" font-size="17" font-weight="650" fill="#E0B7F1" text-anchor="start">B  独立审核与结果保存</text>
+<text x="1854" y="154" font-size="16" font-weight="450" fill="#BAABCD" text-anchor="end">Python 工作流 → Jev → 组合 JSON</text>
+<rect x="48" y="184" width="300" height="568" rx="20" fill="#101C2E" stroke="#3BBBF1" stroke-width="1.3"/>
+<rect x="386" y="184" width="344" height="568" rx="20" fill="url(#rec-panel)" stroke="#5289FF" stroke-width="1.3"/>
+<rect x="768" y="184" width="330" height="568" rx="20" fill="#0E202C" stroke="#32BEB5" stroke-width="1.3"/>
+<rect x="1136" y="184" width="350" height="568" rx="20" fill="url(#jev-panel)" stroke="#CB77DC" stroke-width="1.3"/>
+<rect x="1524" y="184" width="348" height="568" rx="20" fill="#102329" stroke="#31C699" stroke-width="1.3"/>
+<text x="68" y="216" font-size="14" font-weight="700" fill="#65CFFB" text-anchor="start">01  /  CONTEXT</text>
+<text x="68" y="252" font-size="25" font-weight="700" fill="#F4F8FF" text-anchor="start">多源上下文</text>
+<text x="68" y="280" font-size="17" font-weight="450" fill="#9DB7D3" text-anchor="start">MCP 只读检索</text>
+<rect x="64" y="304" width="268" height="106" rx="12" fill="#101F34" stroke="#243852" stroke-width="1.3"/>
+<g transform="translate(79 319) scale(0.82)" fill="none" stroke="#67CBF2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+<circle cx="12" cy="7" r="4"/><path d="M4 22v-2a8 8 0 0 1 16 0v2"/>
+</g>
+<text x="109" y="334" font-size="19" font-weight="650" fill="#EFF5FF" text-anchor="start">用户画像与行为</text>
+<text x="81" y="362" font-size="17" font-weight="450" fill="#B5C4DB" text-anchor="start">城市 / 标签 / 活跃时段</text>
+<text x="81" y="386" font-size="17" font-weight="450" fill="#B5C4DB" text-anchor="start">偏好 / 购物车 / 搜索 / 历史</text>
+<rect x="64" y="422" width="268" height="106" rx="12" fill="#101F34" stroke="#243852" stroke-width="1.3"/>
+<g transform="translate(79 437) scale(0.82)" fill="none" stroke="#7BB7FA" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+<path d="M2 7l10-5 10 5v12l-10 5-10-5zM2 7l10 5 10-5M12 12v12M7 4.5l10 5"/>
+</g>
+<text x="109" y="452" font-size="19" font-weight="650" fill="#EFF5FF" text-anchor="start">商品结构化属性</text>
+<text x="81" y="480" font-size="17" font-weight="450" fill="#B5C4DB" text-anchor="start">类目 / 功能 / 规格 / 人群</text>
+<text x="81" y="504" font-size="17" font-weight="450" fill="#B5C4DB" text-anchor="start">价格 / 库存 / 活动规则</text>
+<rect x="64" y="540" width="268" height="106" rx="12" fill="#101F34" stroke="#243852" stroke-width="1.3"/>
+<g transform="translate(79 555) scale(0.82)" fill="none" stroke="#78DFD3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+<circle cx="9" cy="9" r="4"/><path d="M9 1v2M1 9h2M3 3l1.5 1.5M15 3l-1.5 1.5M5 20h14a4 4 0 0 0 0-8 6 6 0 0 0-11-1 4.5 4.5 0 0 0-3 9z"/>
+</g>
+<text x="109" y="570" font-size="19" font-weight="650" fill="#EFF5FF" text-anchor="start">时间与场景</text>
+<text x="81" y="598" font-size="17" font-weight="450" fill="#B5C4DB" text-anchor="start">场景日期 / 城市气候</text>
+<text x="81" y="622" font-size="17" font-weight="450" fill="#B5C4DB" text-anchor="start">季节判断 / 活跃时段</text>
+<rect x="64" y="658" width="268" height="74" rx="12" fill="#12253C" stroke="#316080" stroke-width="1.3"/>
+<text x="80" y="685" font-size="18" font-weight="650" fill="#ECF5FF" text-anchor="start">200 用户 + 200 商品</text>
+<text x="80" y="711" font-size="16" font-weight="450" fill="#A9BED8" text-anchor="start">规范模拟数据 · data/raw/</text>
+<text x="406" y="216" font-size="14" font-weight="700" fill="#81B0FF" text-anchor="start">02  /  GENERATE</text>
+<rect x="406" y="230" width="39" height="39" rx="11" fill="#0A1830" stroke="#376BB3" stroke-width="1.3"/>
+<path d="M416 259V239H425C438 239 438 252 425 252H417M425 252L435 262" fill="none" stroke="url(#rec-r)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="458" y="258" font-size="28" font-weight="750" fill="#F5F9FF" text-anchor="start">Rec-Agent</text>
+<text x="406" y="286" font-size="17" font-weight="450" fill="#A5C0E2" text-anchor="start">DeepSeek Harness 编排</text>
+<rect x="402" y="304" width="312" height="106" rx="12" fill="#101F34" stroke="#243852" stroke-width="1.3"/>
+<text x="419" y="334" font-size="19" font-weight="650" fill="#EFF5FF" text-anchor="start">检索、匹配与选品</text>
+<text x="419" y="362" font-size="17" font-weight="450" fill="#B5C4DB" text-anchor="start">软排序 / 去重 / 场景适配</text>
+<text x="419" y="386" font-size="17" font-weight="450" fill="#B5C4DB" text-anchor="start">选出 1–3 个真实存在的商品</text>
+<rect x="402" y="422" width="312" height="116" rx="12" fill="#101F34" stroke="#243852" stroke-width="1.3"/>
+<text x="419" y="452" font-size="19" font-weight="650" fill="#EFF5FF" text-anchor="start">生成一句曝光理由</text>
+<text x="419" y="480" font-size="17" font-weight="450" fill="#B5C4DB" text-anchor="start">场景钩子 × 商品事实 × 心理收益</text>
+<text x="419" y="504" font-size="17" font-weight="450" fill="#B5C4DB" text-anchor="start">≤24 汉字，直接面向用户</text>
+<text x="419" y="528" font-size="17" font-weight="450" fill="#B5C4DB" text-anchor="start">文案不含价格与优惠</text>
+<rect x="402" y="550" width="312" height="96" rx="12" fill="#101F34" stroke="#243852" stroke-width="1.3"/>
+<text x="419" y="580" font-size="19" font-weight="650" fill="#EFF5FF" text-anchor="start">绑定文案支撑字段</text>
+<text x="419" y="608" font-size="17" font-weight="450" fill="#B5C4DB" text-anchor="start">evidence_fields 逐项对应文案</text>
+<text x="419" y="632" font-size="17" font-weight="450" fill="#B5C4DB" text-anchor="start">context_summary 保留选品上下文</text>
+<rect x="402" y="658" width="312" height="74" rx="12" fill="#12253C" stroke="#426DAB" stroke-width="1.3"/>
+<text x="418" y="685" font-size="18" font-weight="650" fill="#ECF5FF" text-anchor="start">推荐 JSON</text>
+<text x="418" y="711" font-size="16" font-weight="450" fill="#A9BED8" text-anchor="start">用户信息 + 商品 ID / 名称 / 理由</text>
+<text x="788" y="216" font-size="14" font-weight="700" fill="#6EDCCE" text-anchor="start">03  /  FACT CONTRACT</text>
+<text x="788" y="252" font-size="24" font-weight="700" fill="#EFFCF9" text-anchor="start">事实包与输入契约</text>
+<text x="788" y="280" font-size="17" font-weight="450" fill="#A2C6C9" text-anchor="start">独立 Python 工作流</text>
+<rect x="784" y="304" width="298" height="106" rx="12" fill="#101F34" stroke="#243852" stroke-width="1.3"/>
+<text x="801" y="334" font-size="19" font-weight="650" fill="#EFF5FF" text-anchor="start">导入并关联推荐 JSON</text>
+<text x="801" y="362" font-size="17" font-weight="450" fill="#B5C4DB" text-anchor="start">按商品 ID 查询规范数据</text>
+<text x="801" y="386" font-size="17" font-weight="450" fill="#B5C4DB" text-anchor="start">按 reason_id 关联推荐与判断</text>
+<rect x="784" y="422" width="298" height="116" rx="12" fill="#101F34" stroke="#243852" stroke-width="1.3"/>
+<text x="801" y="452" font-size="19" font-weight="650" fill="#EFF5FF" text-anchor="start">冻结可核验事实</text>
+<text x="801" y="480" font-size="17" font-weight="450" fill="#B5C4DB" text-anchor="start">商品 / 最小场景 / 披露状态</text>
+<text x="801" y="504" font-size="17" font-weight="450" fill="#B5C4DB" text-anchor="start">coverage · provenance</text>
+<text x="801" y="528" font-size="17" font-weight="450" fill="#B5C4DB" text-anchor="start">rule_features 作为审核线索</text>
+<rect x="784" y="550" width="298" height="96" rx="12" fill="#101F34" stroke="#243852" stroke-width="1.3"/>
+<text x="801" y="580" font-size="19" font-weight="650" fill="#EFF5FF" text-anchor="start">构建白名单 Jev 输入</text>
+<text x="801" y="608" font-size="17" font-weight="450" fill="#B5C4DB" text-anchor="start">当前事实 + 证据 + 版本</text>
+<text x="801" y="632" font-size="17" font-weight="450" fill="#B5C4DB" text-anchor="start">原始行为与反馈留在推荐侧</text>
+<rect x="784" y="658" width="298" height="74" rx="12" fill="#12253C" stroke="#2D817D" stroke-width="1.3"/>
+<text x="800" y="685" font-size="18" font-weight="650" fill="#ECF5FF" text-anchor="start">Fact Bundle → Jev state</text>
+<text x="800" y="711" font-size="16" font-weight="450" fill="#A9BED8" text-anchor="start">JSON 序列化 · 请求可追溯</text>
+<text x="1156" y="216" font-size="14" font-weight="700" fill="#E7A5F3" text-anchor="start">04  /  JUDGE</text>
+<g transform="translate(1346 201) scale(.155)"><ns0:g xmlns:ns0="http://www.w3.org/2000/svg">
+<ns0:path fill-rule="evenodd" clip-rule="evenodd" d="M76.4576 17.5651V42.3984L98.8152 56.9225L98.8213 111.911L49.4046 144L22.3637 126.441V100.92L0 86.3963V32.0953L2.12872 30.7086L49.4106 0L76.4576 17.5651ZM35.6044 123.899L49.3985 132.858L85.5624 109.362L71.7744 100.41L35.6044 123.899ZM54.0756 61.9949V86.4024L31.7058 100.927V115.292L67.1155 92.296V53.5286L54.0756 61.9949ZM76.4576 92.3082L89.4732 100.762V61.9888L76.4576 53.5347V92.3082ZM13.2467 83.8601L27.0347 92.8191L40.8289 83.8601L27.0408 74.9072L13.2467 83.8601ZM9.34204 37.1617V75.26L22.3637 66.7998V42.3923L44.7396 27.8561V14.1652L9.34204 37.1617ZM31.7058 66.7937L44.7335 75.2539V61.9888L31.7058 53.5286V66.7937ZM35.6044 44.9225L49.4106 53.8875L63.2048 44.9285L49.4046 35.9635L35.6044 44.9225ZM54.0817 27.8561L67.1155 36.3223V22.6376L54.0817 14.1652V27.8561Z" fill="#E2C4EB" fill-opacity="0.86" />
+<ns0:path d="M733.646 27.7818V118.712H718.699V27.7818H733.646Z" fill="#E2C4EB" fill-opacity="0.86" />
+<ns0:path d="M661.919 27.7818H678.61L713.985 118.712H698.041L689.073 95.045H650.833L641.989 118.712H626.543L661.919 27.7818ZM669.89 44.3485L655.815 81.9661H684.09L669.89 44.3485Z" fill="#E2C4EB" fill-opacity="0.86" />
+<ns0:path d="M601.622 98.1591C599.629 111.114 589.041 120.207 573.72 120.207C555.534 120.207 542.829 106.38 542.829 86.4503C542.829 67.0187 556.032 52.445 573.72 52.445C592.279 52.445 602.618 66.7696 602.618 84.831C602.618 86.824 602.493 88.1942 602.12 90.1872H556.531C557.776 102.768 565.125 108.622 573.72 108.622C581.941 108.622 586.923 104.512 588.667 98.1591H601.622ZM573.595 64.0293C563.88 64.0293 558.648 70.7556 557.029 79.5994H588.667C588.543 71.3784 583.187 64.0293 573.595 64.0293Z" fill="#E2C4EB" fill-opacity="0.86" />
+<ns0:path d="M515.655 46.2169C515.655 34.1344 523.004 27.7818 535.087 27.7818H542.311V39.6151H536.457C531.973 39.6151 529.855 41.6081 529.855 46.2169V53.9397H542.311V65.7731H529.855V118.712H515.655V65.7731H507.434V53.9397H515.655V46.2169Z" fill="#E2C4EB" fill-opacity="0.86" />
+<ns0:path d="M483.501 78.3538C487.736 77.731 489.978 75.738 489.978 72.0012C489.978 67.1433 485.743 63.531 478.27 63.531C470.422 63.531 465.814 67.3924 465.066 73.6205H450.742C451.987 62.0363 461.703 52.445 478.394 52.445C495.957 52.445 503.929 61.4135 503.929 75.9872V105.508C503.929 109.868 504.178 114.103 504.676 118.712H491.099C490.601 116.221 490.352 113.48 490.227 110.74C486.615 116.345 479.017 120.207 470.547 120.207C458.34 120.207 447.877 112.982 447.877 100.65C447.877 87.5714 457.717 82.3398 470.671 80.3468L483.501 78.3538ZM461.454 100.028C461.454 106.256 466.187 109.37 472.664 109.37C481.882 109.37 489.978 103.889 489.978 93.0521V87.4468L474.035 90.0626C466.935 91.3082 461.454 93.4258 461.454 100.028Z" fill="#E2C4EB" fill-opacity="0.86" />
+<ns0:path d="M371.225 90.3118H387.169C388.913 102.021 397.259 107.252 409.715 107.252C420.8 107.252 429.395 102.394 429.395 93.5504C429.395 86.3258 425.285 83.0872 415.943 81.2188L397.134 77.3574C384.678 74.8661 374.339 68.3889 374.339 53.8152C374.339 38.245 387.667 26.2871 407.722 26.2871C428.523 26.2871 441.478 37.3731 443.346 54.9363H427.9C426.904 45.8433 419.804 39.2415 407.473 39.2415C396.636 39.2415 388.913 44.9713 388.913 52.5696C388.913 59.1714 392.65 62.1608 401.12 63.9047L419.43 67.3924C434.502 70.3819 444.342 78.1047 444.342 92.4293C444.342 109.494 428.648 120.207 409.59 120.207C387.792 120.207 372.969 109.37 371.225 90.3118Z" fill="#E2C4EB" fill-opacity="0.86" />
+<ns0:path d="M369.039 98.1591C367.046 111.114 356.458 120.207 341.137 120.207C322.951 120.207 310.246 106.38 310.246 86.4503C310.246 67.0187 323.45 52.445 341.137 52.445C359.697 52.445 370.035 66.7696 370.035 84.831C370.035 86.824 369.911 88.1942 369.537 90.1872H323.948C325.193 102.768 332.542 108.622 341.137 108.622C349.358 108.622 354.341 104.512 356.084 98.1591H369.039ZM341.013 64.0293C331.297 64.0293 326.065 70.7556 324.446 79.5994H356.084C355.96 71.3784 350.604 64.0293 341.013 64.0293Z" fill="#E2C4EB" fill-opacity="0.86" />
+<ns0:path d="M243.191 142.379V53.9398H257.64V63.0328C261.252 57.1784 268.601 52.445 277.694 52.445C294.759 52.445 305.845 67.6415 305.845 86.3258C305.845 105.01 294.759 120.207 277.694 120.207C268.601 120.207 261.252 115.473 257.64 109.619V142.379H243.191ZM274.206 108.622C285.168 108.622 291.271 99.6539 291.271 86.3258C291.271 72.9977 285.168 64.0293 274.206 64.0293C263.37 64.0293 257.017 72.9977 257.017 86.3258C257.017 99.6539 263.37 108.622 274.206 108.622Z" fill="#E2C4EB" fill-opacity="0.86" />
+<ns0:path d="M213.27 126.435C209.533 136.524 204.052 142.379 191.472 142.379H185.493V130.545H191.098C196.454 130.545 199.693 128.552 201.188 123.445L202.184 120.331L177.895 53.9398H192.967L209.159 103.017L224.979 53.9398H239.552L213.27 126.435Z" fill="#E2C4EB" fill-opacity="0.86" />
+<ns0:path d="M197.867 41.1099H167.848V118.712H152.901V41.1099H122.882V27.7818H197.867V41.1099Z" fill="#E2C4EB" fill-opacity="0.86" />
+</ns0:g>
+</g>
+<text x="1156" y="252" font-size="25" font-weight="700" fill="#FFF3FF" text-anchor="start">Jev 曝光审核</text>
+<text x="1156" y="280" font-size="17" font-weight="450" fill="#CAABD6" text-anchor="start">jev-1.14.0 · 九题并行</text>
+<rect x="1152" y="304" width="318" height="106" rx="12" fill="#101F34" stroke="#243852" stroke-width="1.3"/>
+<text x="1169" y="334" font-size="19" font-weight="650" fill="#EFF5FF" text-anchor="start">8 Choice + 1 Score</text>
+<text x="1169" y="362" font-size="17" font-weight="450" fill="#B5C4DB" text-anchor="start">Q1–Q6：分维度检查</text>
+<text x="1169" y="386" font-size="17" font-weight="450" fill="#B5C4DB" text-anchor="start">Q7：直接给出最终处置</text>
+<rect x="1152" y="422" width="318" height="116" rx="12" fill="#101F34" stroke="#243852" stroke-width="1.3"/>
+<text x="1169" y="452" font-size="19" font-weight="650" fill="#EFF5FF" text-anchor="start">风险分类与严重度</text>
+<text x="1169" y="480" font-size="17" font-weight="450" fill="#B5C4DB" text-anchor="start">主要风险分类 · 六选一</text>
+<text x="1169" y="504" font-size="17" font-weight="450" fill="#B5C4DB" text-anchor="start">严重度 E[level]/2 ∈ [0,1]</text>
+<text x="1169" y="528" font-size="17" font-weight="450" fill="#B5C4DB" text-anchor="start">Q7 置信度单独保留</text>
+<rect x="1152" y="550" width="318" height="96" rx="12" fill="#101F34" stroke="#243852" stroke-width="1.3"/>
+<text x="1169" y="580" font-size="19" font-weight="650" fill="#EFF5FF" text-anchor="start">证据引用与审计</text>
+<text x="1169" y="608" font-size="17" font-weight="450" fill="#B5C4DB" text-anchor="start">逐题结果 / 冻结事实引用</text>
+<text x="1169" y="632" font-size="17" font-weight="450" fill="#B5C4DB" text-anchor="start">依据来源标明 evidence_source</text>
+<rect x="1152" y="658" width="318" height="74" rx="12" fill="#12253C" stroke="#80538E" stroke-width="1.3"/>
+<text x="1168" y="685" font-size="18" font-weight="650" fill="#ECF5FF" text-anchor="start">decision = Q7 原始选择</text>
+<text x="1168" y="711" font-size="16" font-weight="450" fill="#A9BED8" text-anchor="start">严重度与置信度用于分析</text>
+<text x="1544" y="216" font-size="14" font-weight="700" fill="#73E0BC" text-anchor="start">05  /  DECISION</text>
+<text x="1544" y="252" font-size="25" font-weight="700" fill="#F0FFF8" text-anchor="start">四档处置输出</text>
+<text x="1544" y="280" font-size="17" font-weight="450" fill="#A8CFC4" text-anchor="start">保存模型判断与原推荐</text>
+<rect x="1540" y="304" width="316" height="74" rx="12" fill="#0E302D" stroke="#50DCAD" stroke-width="1.3"/>
+<rect x="1554" y="325" width="32" height="32" rx="10" fill="#0E302D" stroke="#50DCAD" stroke-width="1.3"/>
+<g transform="translate(1559 330) scale(0.9)" fill="none" stroke="#50DCAD" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+<path d="M5 12l5 5 9-11"/>
+</g>
+<text x="1600" y="334" font-size="20" font-weight="700" fill="#50DCAD" text-anchor="start">expose</text>
+<text x="1600" y="361" font-size="18" font-weight="500" fill="#DFEAEF" text-anchor="start">可曝光</text>
+<rect x="1540" y="390" width="316" height="74" rx="12" fill="#302A1C" stroke="#F1C56E" stroke-width="1.3"/>
+<rect x="1554" y="411" width="32" height="32" rx="10" fill="#302A1C" stroke="#F1C56E" stroke-width="1.3"/>
+<g transform="translate(1559 416) scale(0.9)" fill="none" stroke="#F1C56E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+<path d="M4 20l1-6L17 2l5 5L10 19zM14 5l5 5M4 20l6-1"/>
+</g>
+<text x="1600" y="420" font-size="20" font-weight="700" fill="#F1C56E" text-anchor="start">rewrite</text>
+<text x="1600" y="447" font-size="18" font-weight="500" fill="#DFEAEF" text-anchor="start">建议改写</text>
+<rect x="1540" y="476" width="316" height="74" rx="12" fill="#24203C" stroke="#B89BFF" stroke-width="1.3"/>
+<rect x="1554" y="497" width="32" height="32" rx="10" fill="#24203C" stroke="#B89BFF" stroke-width="1.3"/>
+<g transform="translate(1559 502) scale(0.9)" fill="none" stroke="#B89BFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+<circle cx="12" cy="7" r="4"/><path d="M4 22v-2a8 8 0 0 1 16 0v2"/>
+</g>
+<text x="1600" y="506" font-size="20" font-weight="700" fill="#B89BFF" text-anchor="start">human_review</text>
+<text x="1600" y="533" font-size="18" font-weight="500" fill="#DFEAEF" text-anchor="start">建议人工复核</text>
+<rect x="1540" y="562" width="316" height="74" rx="12" fill="#351F2D" stroke="#FF8E9A" stroke-width="1.3"/>
+<rect x="1554" y="583" width="32" height="32" rx="10" fill="#351F2D" stroke="#FF8E9A" stroke-width="1.3"/>
+<g transform="translate(1559 588) scale(0.9)" fill="none" stroke="#FF8E9A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+<circle cx="12" cy="12" r="9"/><path d="M6 18L18 6"/>
+</g>
+<text x="1600" y="592" font-size="20" font-weight="700" fill="#FF8E9A" text-anchor="start">block</text>
+<text x="1600" y="619" font-size="18" font-weight="500" fill="#DFEAEF" text-anchor="start">禁止曝光</text>
+<rect x="1540" y="658" width="316" height="74" rx="12" fill="#12253C" stroke="#39846F" stroke-width="1.3"/>
+<text x="1556" y="685" font-size="18" font-weight="650" fill="#ECF5FF" text-anchor="start">workflow_results.json</text>
+<text x="1556" y="711" font-size="16" font-weight="450" fill="#A9BED8" text-anchor="start">原推荐 + Jev 判断，按商品查阅</text>
+<path d="M351 470H381" fill="none" stroke="#54C9F8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#cyan)"/>
+<text x="367.0" y="450" font-size="14" font-weight="600" fill="#54C9F8" text-anchor="middle">检索</text>
+<path d="M733 470H763" fill="none" stroke="#6FA1FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#blue)"/>
+<text x="749.0" y="450" font-size="14" font-weight="600" fill="#6FA1FF" text-anchor="middle">JSON</text>
+<path d="M1101 470H1131" fill="none" stroke="#45D6C5" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#teal)"/>
+<text x="1117.0" y="450" font-size="14" font-weight="600" fill="#45D6C5" text-anchor="middle">state</text>
+<path d="M1489 470H1519" fill="none" stroke="#DF8EEC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#pink)"/>
+<text x="1505.0" y="450" font-size="14" font-weight="600" fill="#DF8EEC" text-anchor="middle">判决</text>
+<path d="M557 838V758" fill="none" stroke="#5CDBB0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#green)"/>
+<text x="574" y="798" font-size="17" font-weight="550" fill="#76DDBA" text-anchor="start">历史反馈 → 软排序 / 去重</text>
+<path d="M1208 752V832" fill="none" stroke="#6FA1FF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#blue)"/>
+<text x="1190" y="798" font-size="17" font-weight="550" fill="#91BAFF" text-anchor="end">审核输出 → 离线分析</text>
+<path d="M1698 752V832" fill="none" stroke="#99A8BD" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#future)" stroke-dasharray="7 6"/>
+<text x="1680" y="798" font-size="17" font-weight="550" fill="#B3C2D5" text-anchor="end">业务执行</text>
+<text x="1716" y="798" font-size="16" font-weight="450" fill="#91A4BD" text-anchor="start">待接入</text>
+<rect x="48" y="838" width="682" height="150" rx="16" fill="#0D2528" stroke="#2B786A" stroke-width="1.3"/>
+<g transform="translate(68 860) scale(0.95)" fill="none" stroke="#66DFB4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+<path d="M21 8a9 9 0 0 0-16-3L2 8M2 2v6h6M3 16a9 9 0 0 0 16 3l3-3M22 22v-6h-6"/>
+</g>
+<text x="104" y="880" font-size="22" font-weight="700" fill="#7DE6BF" text-anchor="start">模拟反馈读取</text>
+<rect x="612" y="853" width="98" height="29" rx="9" fill="#17483C" stroke="none" stroke-width="1.3"/>
+<text x="661" y="874" font-size="15" font-weight="650" fill="#9CF2CD" text-anchor="middle">已实现</text>
+<text x="72" y="918" font-size="18" font-weight="500" fill="#D6E9E4" text-anchor="start">通过 / 展示标记过滤，并按时间切片</text>
+<text x="72" y="946" font-size="18" font-weight="450" fill="#A4C8C2" text-anchor="start">模拟曝光与点击历史 → MCP → Rec-Agent</text>
+<text x="72" y="973" font-size="17" font-weight="450" fill="#8CACAA" text-anchor="start">用于软排序、去重与探索</text>
+<rect x="768" y="838" width="600" height="150" rx="16" fill="#101F36" stroke="#3C5F91" stroke-width="1.3"/>
+<g transform="translate(788 860) scale(0.95)" fill="none" stroke="#84B4FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+<path d="M3 2v20h20M7 17v-5M13 17V8M19 17V4"/>
+</g>
+<text x="824" y="880" font-size="22" font-weight="700" fill="#A0C5FF" text-anchor="start">模拟离线评测</text>
+<text x="792" y="918" font-size="18" font-weight="500" fill="#D4E0F3" text-anchor="start">14 天观察窗 · 分桶统计与关联分析</text>
+<text x="792" y="946" font-size="18" font-weight="450" fill="#AABFD9" text-anchor="start">退款 / 投诉使用合成结果，验证分析流程</text>
+<text x="792" y="973" font-size="17" font-weight="450" fill="#89A1C0" text-anchor="start">真实业务效果需独立数据验证</text>
+<rect x="1404" y="838" width="468" height="150" rx="16" fill="#1B2230" stroke="#738199" stroke-width="1.3" stroke-dasharray="7 6"/>
+<g transform="translate(1424 860) scale(0.95)" fill="none" stroke="#ADBFD7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+<rect x="8" y="1" width="8" height="6" rx="2"/><rect x="1" y="17" width="8" height="6" rx="2"/><rect x="15" y="17" width="8" height="6" rx="2"/><path d="M12 7v6M5 17v-4h14v4"/>
+</g>
+<text x="1460" y="880" font-size="22" font-weight="700" fill="#D6E2F2" text-anchor="start">业务执行与采集</text>
+<rect x="1760" y="853" width="92" height="29" rx="9" fill="#30394A" stroke="none" stroke-width="1.3"/>
+<text x="1806" y="874" font-size="15" font-weight="650" fill="#D0DAE7" text-anchor="middle">待接入</text>
+<text x="1428" y="918" font-size="18" font-weight="500" fill="#C3D0E2" text-anchor="start">页面展示 · 自动改写 · 人工派单</text>
+<text x="1428" y="946" font-size="18" font-weight="450" fill="#A8BAD0" text-anchor="start">采集获准展示后的曝光与点击事件</text>
+<text x="1428" y="973" font-size="17" font-weight="450" fill="#8D9FB6" text-anchor="start">真实事件可沿相同反馈契约接入</text>
+<path d="M1638 988V1018H389V990" fill="none" stroke="#99A8BD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#future)" stroke-dasharray="7 6"/>
+<rect x="774" y="1004" width="508" height="28" rx="8" fill="#0C1728" stroke="none" stroke-width="1.3"/>
+<text x="1028" y="1024" font-size="16" font-weight="500" fill="#A8BBD2" text-anchor="middle">后续接入：真实展示事件 → 反馈数据</text>
+<path d="M48 1050H86" fill="none" stroke="#6FC9E3" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="98" y="1056" font-size="15" font-weight="450" fill="#9CB2CC" text-anchor="start">当前数据流</text>
+<path d="M252 1050H290" fill="none" stroke="#99A8BD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#future)" stroke-dasharray="6 5"/>
+<text x="302" y="1056" font-size="15" font-weight="450" fill="#9CB2CC" text-anchor="start">后续业务接入</text>
+<text x="1872" y="1056" font-size="16" font-weight="450" fill="#9DB1CA" text-anchor="end">Jev 输入：仅当前审核事实与版本  ·  历史反馈用于推荐阶段</text>
+</svg>
