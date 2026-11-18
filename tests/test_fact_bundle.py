@@ -16,14 +16,14 @@ def test_verified_candidate_builds_auditable_fact_bundle():
         "item_id": "i_0001",
         "exposure_reason": "折叠收纳，卧室整理更方便",
         "generated_reason": "折叠收纳，卧室整理更方便",
-        "user_context": {"city": "杭州", "interests": ["家居收纳"]},
+        "user_context": {"city": "广州", "interests": ["家居收纳"]},
         "item_attrs_returned": item,
         "attrs_returned_complete": True,
         "promo_computed_in_code": {},
         "ai_disclosure_flag_from_code": True,
         "tool_trace": [{"tool": "get_item", "returned_fields": ["functions", "suitable_scenes"]}],
         "snapshot_at": "2026-11-16T20:00:00+08:00",
-        "data_version": {"items": "mock-items-v1"},
+        "data_version": "canonical-2026-06-15-v1",
     }
     bundle = build_fact_bundle(candidate, [])
 
@@ -37,6 +37,8 @@ def test_verified_candidate_builds_auditable_fact_bundle():
 
 def test_fact_bundle_preserves_user_facing_exposure_reason():
     candidate = {
+        "schema_version": "rec-candidate-v2",
+        "data_version": "canonical-2026-06-15-v1",
         "reason_id": "r_exposure",
         "user_id": "u_0001",
         "item_id": "i_0001",
@@ -56,9 +58,13 @@ def test_fact_bundle_preserves_user_facing_exposure_reason():
 
 def test_incomplete_attributes_are_marked_unverifiable():
     candidate = {
+        "schema_version": "rec-candidate-v2",
+        "data_version": "canonical-2026-06-15-v1",
         "reason_id": "r_test_missing",
+        "user_id": "u_0001",
+        "item_id": "i_0001",
         "generated_reason": "梅雨季防潮神器",
-        "item_attrs_returned": {"category": "家居日用"},
+        "item_attrs_returned": {"category_l1": "家居日用"},
         "attrs_returned_complete": False,
         "ai_disclosure_flag_from_code": True,
         "tool_trace": [{"tool": "get_item", "returned_fields": ["category"]}],

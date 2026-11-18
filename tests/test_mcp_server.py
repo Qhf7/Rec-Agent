@@ -40,6 +40,8 @@ def test_get_item_and_active_promo_are_read_only_structured_results():
 
     assert item["found"] is True
     assert item["title"] == "栖物 可折叠防尘收纳盒 35L 奶油白"
+    assert item["schema_version"] == "canonical-2026-06-15-v1"
+    assert item["data_version"] == "canonical-2026-06-15-v1"
     assert promo["active"] is True
     assert promo["rules"][0]["rule_id"] == "P010"
 

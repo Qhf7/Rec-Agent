@@ -104,3 +104,44 @@ def test_project_lexicon_covers_pilot_claim_variants():
     terms = {entry["term"] for entry in load_lexicon("compliance_lexicon.txt")}
     assert "最便宜" in terms
     assert "改善失眠" in terms
+
+
+def test_canonical_categories_and_audiences_are_topic_evidence():
+    candidate = base_candidate("宝宝用的婴儿湿巾", item_attrs_returned={
+        "item_id": "i_0131", "category_l1": "母婴亲子", "category_l3": "婴儿湿巾",
+        "suit_audience": "婴幼儿", "functions": ["清洁"], "price_cents": 5990,
+    })
+    result = evaluate_candidate(candidate, LEXICON)
+    assert result["decision"] == "expose"
+    assert "functions" in " ".join(result["evidence"])
+
+
+def test_product_title_cannot_prove_unsupported_efficacy():
+    candidate = base_candidate("治疗鼻炎", item_attrs_returned={
+        "item_id": "i_0001", "title": "治疗鼻炎神器", "functions": ["收纳"],
+        "efficacy_claims_allowed": [], "category_l1": "家居日用",
+    })
+    lexicon = [{"term": "治疗", "risk_type": "efficacy_or_medical_claim", "severity": "critical", "canonical_term": "治疗"}]
+    assert evaluate_candidate(candidate, lexicon)["decision"] == "block"
+
+
+@pytest.mark.parametrize("overrides", [
+    {"applicable": False}, {"start": "2026-05-01", "end": "2026-05-31"},
+    {"scope": {"category_l1": ["3C数码"]}},
+])
+def test_promo_matching_amounts_still_require_valid_time_and_scope(overrides):
+    promo = {"type": "full_reduction", "threshold_cents": 9900, "discount_cents": 1000,
+             "applicable": True, "start": "2026-06-01", "end": "2026-06-30",
+             "scope": {"category_l1": ["家居日用"]}}
+    promo.update(overrides)
+    candidate = base_candidate("满99减10", promo_computed_in_code=promo, snapshot_at="2026-06-15T08:00:00+08:00",
+                               item_attrs_returned={"category_l1": "家居日用", "price_cents": 5990})
+    assert evaluate_candidate(candidate, LEXICON)["decision"] == "block"
+
+
+def test_canonical_price_cents_supports_literal_yuan_price_without_promo():
+    candidate = base_candidate("仅需59.90元", item_attrs_returned={"price_cents": 5990})
+    lexicon = [{"term": "仅需", "risk_type": "price_misleading", "severity": "medium", "canonical_term": "仅需"}]
+    assert evaluate_candidate(candidate, lexicon)["decision"] == "expose"
+    candidate["generated_reason"] = "仅需39.90元"
+    assert evaluate_candidate(candidate, lexicon)["decision"] == "block"

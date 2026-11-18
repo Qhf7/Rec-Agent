@@ -60,11 +60,13 @@ def test_question_schema_has_fixed_q1_to_q7():
         "q5_context_relevance",
         "q6_safety_gate",
         "q7_final_decision",
+        "risk_type",
+        "judge_score",
     }
     assert JEV_QUESTION_SCHEMA_VERSION == "jev-questions-v1"
     assert questions["q1_identity"]["type"] == "choice"
-    assert "human_review" in questions["q6_safety_gate"]["choices"]
-    assert "expose" in questions["q7_final_decision"]["choices"]
+    assert "human_review" in questions["q6_safety_gate"]["criteria"]
+    assert "expose" in questions["q7_final_decision"]["criteria"]
 
 
 def test_jev_input_contains_facts_versions_and_minimal_scene_only():
@@ -76,6 +78,8 @@ def test_jev_input_contains_facts_versions_and_minimal_scene_only():
     assert payload["facts"]["item"]["price_cents"] == 5790
     assert payload["facts"]["promo"]["promo_id"] == "P010"
     assert payload["facts"]["scene"]["city"] == "广州"
+    assert "user_id" not in payload["candidate"]
+    assert "user_id" not in payload["trace"]
     assert "recent_clicked_item_ids" not in str(payload)
     assert "ctr" not in str(payload).lower()
 
@@ -102,6 +106,39 @@ def test_jev_input_requires_identity_and_data_version():
     del payload["trace"]["data_version"]
     with pytest.raises(ValueError, match="data_version"):
         validate_jev_input(payload)
+
+
+def test_jev_input_rejects_cross_layer_identity_version_and_unknown_fields():
+    payload = build_jev_input(_bundle())
+    payload["trace"]["item_id"] = "i_0002"
+    with pytest.raises(ValueError, match="item_id"):
+        validate_jev_input(payload)
+
+    payload = build_jev_input(_bundle())
+    payload["trace"]["data_version"] = "other-version"
+    with pytest.raises(ValueError, match="data_version"):
+        validate_jev_input(payload)
+
+    payload = build_jev_input(_bundle())
+    payload["facts"]["rule_features"]["unknown_signal"] = True
+    with pytest.raises(ValueError, match="unknown"):
+        validate_jev_input(payload)
+
+
+def test_jev_parser_rejects_invalid_final_choices():
+    payload = {
+        "answers": {
+            "q1_identity": {"choice": "valid"},
+            "q2_fact_support": {"choice": "supported"},
+            "q3_expression_risk": {"choice": "clean"},
+            "q4_commercial_accuracy": {"choice": "not_mentioned"},
+            "q5_context_relevance": {"choice": "relevant"},
+            "q6_safety_gate": {"choice": "pass"},
+            "q7_final_decision": {"choice": "unknown", "risk_type": "compliant", "score": 0.1},
+        }
+    }
+    with pytest.raises(ValueError, match="decision"):
+        parse_jev_answers(payload, _bundle())
 
 
 def test_old_three_question_response_is_explicitly_compatible():
@@ -148,3 +185,80 @@ def test_new_q7_response_is_complete():
     assert parsed["risk_type"] == "compliant"
     assert parsed["judge_score"] == 0.02
     assert parsed["evidence"] == ["items.functions"]
+
+def test_official_wire_uses_supported_primitives_only():
+    for question in build_jev_questions().values():
+        assert set(question) == {'type', 'instructions', 'criteria'}
+        assert question['type'] in {'choice', 'score'}
+        assert isinstance(question['criteria'], dict if question['type'] == 'choice' else list)
+
+def test_scalar_q1_q7_answers_parse_with_separate_risk_and_score():
+    answers = {key:{'choice':next(iter(q['criteria'])), 'confidence':.96}
+               for key,q in build_jev_questions().items() if q['type']=='choice'}
+    answers['judge_score'] = {'score':1,'probabilities':{'0':0,'1':1,'2':0},'confidence':.96}
+    parsed = parse_jev_answers({'answers':answers}, _bundle())
+    assert parsed['judge_score'] == .5
+    assert parsed['protocol_completeness'] == JEV_QUESTION_SCHEMA_VERSION
+
+@pytest.mark.parametrize('confidence', [float('nan'), float('inf'), -.1, 1.1, True])
+def test_invalid_confidence_is_rejected(confidence):
+    response={'answers': {'decision':{'choice':'expose','confidence':confidence},
+                         'risk_type':{'choice':'compliant','confidence':.9},
+                         'judge_score':{'score':0}}}
+    with pytest.raises(ValueError, match='confidence'):
+        parse_jev_answers(response, _bundle())
+
+def test_evidence_must_exist_in_transmitted_snapshot():
+    payload=build_jev_input(_bundle())
+    payload['candidate']['evidence_fields']=['items.qualifications']
+    with pytest.raises(ValueError, match='evidence'):
+        validate_jev_input(payload)
+
+def _scalar_response():
+    answers={key:{'choice':next(iter(q['criteria'])),'confidence':.99}
+             for key,q in build_jev_questions().items() if q['type']=='choice'}
+    answers['judge_score']={'score':0,'confidence':.99,'probabilities':{'0':1,'1':0,'2':0}}
+    return {'answers':answers}
+
+def test_score_scale_cannot_be_chosen_by_response():
+    body=_scalar_response()
+    body['answers']['judge_score']={'score':2,'confidence':.99,'probabilities':{'0':0,'100':1}}
+    with pytest.raises(ValueError,match='scale|probabilities'):
+        parse_jev_answers(body,_bundle())
+
+def test_all_scalar_questions_require_confidence():
+    body=_scalar_response()
+    del body['answers']['q6_safety_gate']['confidence']
+    with pytest.raises(ValueError,match='confidence'):
+        parse_jev_answers(body,_bundle())
+
+@pytest.mark.parametrize('section,key,value', [
+    ('disclosure','flag',{'impressions':99}),
+    ('item','functions',[{'gold_decision':'expose'}]),
+    ('scene','tags',[{'impressions':99}]),
+    ('coverage','complete',{'gold_decision':'expose'}),
+    ('rule_features','price_mismatch',{'gold_decision':'expose'}),
+])
+def test_nested_untyped_data_is_rejected(section,key,value):
+    payload=build_jev_input(_bundle())
+    payload['facts'][section][key]=value
+    with pytest.raises(ValueError):
+        validate_jev_input(payload)
+
+def test_mixed_archive_and_scalar_response_is_rejected():
+    body=_scalar_response()
+    body['answers']['q7_final_decision'].update(score=0,risk_type='compliant')
+    body['answers']['risk_type']['choice']='price_misleading'
+    with pytest.raises(ValueError,match='mixed|format'):
+        parse_jev_answers(body,_bundle())
+
+def test_high_risk_probabilities_cannot_claim_zero_score():
+    body=_scalar_response()
+    body['answers']['judge_score']['probabilities']={'0':0,'1':0,'2':1}
+    assert parse_jev_answers(body,_bundle())['judge_score']==1
+
+def test_live_protocol_rejects_archived_three_question_response():
+    old={'answers':{'decision':{'choice':'expose','confidence':.9},
+                    'risk_type':{'choice':'compliant','confidence':.9},'judge_score':{'score':0}}}
+    with pytest.raises(ValueError,match='format'):
+        parse_jev_answers(old,_bundle(), expected_protocol='jev-questions-v1')

@@ -76,3 +76,7 @@ pbpaste | python3 scripts/strict_json_output.py
 ```
 
 请从对话区最终回答旁的“复制”按钮复制内容；不要从“轨迹”面板的工具结果卡片复制，因为工具卡片是便于阅读的对象预览，可能包含未加引号的键或 `…`，不属于完整 JSON。
+
+## 独立工作流交接
+
+推荐生成完成后导出严格 JSON，在 Harness 外运行 `scripts/run_recommendation_workflow.py --input <导出文件> --output-dir <新目录>`。默认只生成候选、事实包和请求预览；显式 `--live` 才由工作流调用 Jev。Rec-Agent/MCP 不自动调用审核模型，也不启动审核脚本。详见 `docs/STANDALONE_WORKFLOW.md`。

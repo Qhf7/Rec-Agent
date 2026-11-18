@@ -8,6 +8,7 @@ import re
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Mapping
+from copy import deepcopy
 
 
 ROOT = Path(__file__).resolve().parent
@@ -80,14 +81,14 @@ def _normalize_item(row: Mapping[str, Any]) -> dict[str, Any]:
 
 
 @lru_cache(maxsize=1)
-def load_canonical_users() -> dict[str, dict[str, Any]]:
+def _load_users() -> dict[str, dict[str, Any]]:
     with (RAW / "users.csv").open(encoding="utf-8-sig", newline="") as handle:
         rows = {_row["user_id"]: _normalize_user(_row) for _row in csv.DictReader(handle)}
     return rows
 
 
 @lru_cache(maxsize=1)
-def load_canonical_items() -> dict[str, dict[str, Any]]:
+def _load_items() -> dict[str, dict[str, Any]]:
     with (RAW / "items.csv").open(encoding="utf-8-sig", newline="") as handle:
         rows = {_row["item_id"]: _normalize_item(_row) for _row in csv.DictReader(handle)}
     for item in rows.values():
@@ -96,8 +97,43 @@ def load_canonical_items() -> dict[str, dict[str, Any]]:
 
 
 @lru_cache(maxsize=1)
-def load_canonical_promos() -> list[dict[str, Any]]:
+def _load_promos() -> list[dict[str, Any]]:
     return json.loads((RAW / "promo_rules.json").read_text(encoding="utf-8"))
+
+
+def load_canonical_users() -> dict[str, dict[str, Any]]:
+    return deepcopy(_load_users())
+
+
+def load_canonical_items() -> dict[str, dict[str, Any]]:
+    return deepcopy(_load_items())
+
+
+def load_canonical_promos() -> list[dict[str, Any]]:
+    return deepcopy(_load_promos())
+
+
+def load_canonical_climate() -> dict[str, Any]:
+    return json.loads((RAW / "city_climate.json").read_text(encoding="utf-8"))
+
+
+def canonical_promo_snapshot(item: Mapping[str, Any], *, as_of: str) -> dict[str, Any]:
+    """Freeze the first assigned promotion with its scope and item/date eligibility."""
+    ids = item.get("promo_rule_ids") or []
+    if not ids:
+        return {}
+    rule = next(row for row in load_canonical_promos() if row["rule_id"] == ids[0])
+    scope = rule.get("scope") or {}
+    return {
+        "promo_id": rule["rule_id"], "type": rule["type"], "title": rule["title"],
+        "applicable": bool(rule["start"] <= as_of <= rule["end"] and scope and all(item.get(k) in values for k, values in scope.items())),
+        "scope": deepcopy(scope), "start": rule["start"], "end": rule["end"],
+        "threshold_cents": rule["threshold_cents"], "discount_cents": rule["discount_cents"],
+        "discount_percent": rule["discount_percent"],
+        "discount_rate": rule["discount_percent"] / 100 if rule["discount_percent"] else 0,
+        "gift_item": rule["gift"], "fine_print": rule["fine_print"],
+        "computed_by": "canonical_fixture_rule_engine_v2",
+    }
 
 
 def normalize_item_id(value: str, *, legacy_item: Mapping[str, Any] | None = None) -> str:
@@ -116,13 +152,16 @@ def normalize_item_id(value: str, *, legacy_item: Mapping[str, Any] | None = Non
         raise CanonicalDataError(
             f"legacy item_id {value!r} requires title and brand identity for migration"
         )
+    for field in ("title", "brand"):
+        if field not in legacy_item or not str(legacy_item.get(field, "")).strip():
+            raise CanonicalDataError(f"legacy item_id {value!r} requires {field} identity for migration")
     legacy_suffix = legacy_item.get("item_id") or legacy_item.get("id")
     if legacy_suffix is not None:
         suffix_match = _ITEM_ID_RE.fullmatch(str(legacy_suffix).strip())
         if not suffix_match or suffix_match.group(1) != match.group(1):
             raise CanonicalDataError(f"item_id suffix mismatch for {value!r}")
     for field in ("title", "brand"):
-        if field in legacy_item and str(legacy_item[field]).strip() != str(canonical.get(field, "")).strip():
+        if str(legacy_item[field]).strip() != str(canonical.get(field, "")).strip():
             raise CanonicalDataError(f"{field} mismatch for {value!r}")
     return canonical_id
 

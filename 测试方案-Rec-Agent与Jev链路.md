@@ -148,7 +148,7 @@ python3 run_jev_batch.py \
   --report /tmp/jev-dry-run-report.json
 ```
 
-`run_jev_batch.py` 默认是 dry-run；只有显式增加 `--send` 才会请求 Jev endpoint。断言：不发起网络请求，结果包含 `jev-questions-v1` 七问请求、canonical `item_id` 和可追溯的 `reason_id`。
+`run_jev_batch.py` 默认是 dry-run；只有显式增加 `--send` 才会请求 Jev endpoint。断言：不发起网络请求，结果包含 `jev-questions-v1` 七个逻辑问题加风险类别/严重度，共九个标量问题的请求、canonical `item_id` 和可追溯的 `reason_id`。
 
 Jev 输入必须只包含当前候选的商品事实、有效促销快照、最小场景摘要、证据和版本信息；点击历史、CTR、订单、退款、投诉、购物车、搜索词和排序信号必须被排除。
 
@@ -172,3 +172,7 @@ Jev 输入必须只包含当前候选的商品事实、有效促销快照、最�
 ## 六、建议的测试顺序
 
 先运行自动化基础回归和 MCP 测试，再做 R1、R2、R5 三个 Agent 场景，最后验证 J1–J3。这样可以先排除数据和工具问题，再判断推荐策略和曝光审核是否正确。
+
+## 独立工作流验收
+
+运行 `pytest tests/test_recommendation_workflow.py tests/test_jev_protocol.py -q`。默认 prepare 不调用 judge；显式 live 分支以假适配器验证调用及产物隔离。全量 300 条与 pilot 40 条样本均验证候选→事实包→请求构造。JSONL 回放保留部分快照、原时间和原工具轨迹，无法核验不得升级为已核验。线上模型效果需另外使用新版协议开展真实测试。

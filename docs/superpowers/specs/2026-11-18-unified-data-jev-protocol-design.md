@@ -4,6 +4,8 @@
 
 把 Rec-Agent 离线候选、Fact Bundle、MCP 数据层和 Jev 审核输入统一到同一个 canonical 数据契约，消除根目录 `item_####` 与 `data/raw/i_####` 两套数据源造成的回放断链；同时把 Jev 当前的三问扩展为可校验、可追溯的七步判断协议，为后续真实 Jev API 接入提供稳定输入输出。
 
+推荐生成与 Jev 审核由 Harness 外的独立 Python 工作流衔接。Agent Harness/MCP 只生成推荐和读取事实，不调用 Jev，也不启动审核脚本。工作流默认 prepare，显式 `--live` 才调用模型。
+
 本次工作的边界是“契约和离线链路先打通”。真实曝光点击埋点、在线推荐排序、人工审核平台和生产部署继续作为后续工作，不伪装成已经完成的能力。
 
 ## 现状与约束
@@ -89,18 +91,20 @@ payload 增加 `question_schema_version: "jev-questions-v1"`，保留现有 `dec
 | 问题 | 结构化回答 | 判断目的 |
 |---|---|---|
 | Q1 候选身份 | `valid / invalid / unverifiable` | 确认 reason、商品、版本和事实包是否完整一致 |
-| Q2 事实支持 | `supported / partial / unsupported / unverifiable` + evidence | 逐句核验推荐理由是否能由商品/场景字段支撑 |
-| Q3 表达风险 | `clean / rewriteable / blocking` + risk type | 检查绝对化、功效/医疗、误导性或披露缺失表达 |
+| Q2 事实支持 | `supported / partial / unsupported / unverifiable` | 逐句核验推荐理由是否能由商品/场景字段支撑 |
+| Q3 表达风险 | `clean / rewriteable / blocking` | 检查绝对化、功效/医疗、误导性或披露缺失表达 |
 | Q4 商业准确性 | `verified / mismatch / not_mentioned / unverifiable` | 核验价格、折扣、满减、赠品和有效期 |
 | Q5 场景相关性 | `relevant / off_topic / unverifiable` | 判断用户场景与商品事实是否相关，避免无依据个性化 |
-| Q6 安全门禁 | `pass / human_review / fail` + escalation reason | 处理缺字段、冲突、敏感类目和低置信度情况 |
-| Q7 最终处置 | `expose / rewrite / human_review / block` + score/confidence/evidence | 输出可执行的最终审核结果 |
+| Q6 安全门禁 | `pass / human_review / fail` | 处理缺字段、冲突、敏感类目和低置信度情况 |
+| Q7 最终处置 | `expose / rewrite / human_review / block` | 输出可执行的最终审核结果 |
+
+七个逻辑问题通过 7 个 Choice 表达；另加 `risk_type` Choice 和 `judge_score` Score，共 9 个 API 问题。请求只包含官方 `choice/score` primitive（`instructions + criteria`）。各问并行判断；Q7 不依赖本次调用的其它答案，工作流再汇总。Score 为 0/1/2 等级期望值，除以 2 后输出 0～1 严重度，不视为违规概率。证据由工作流冻结事实渲染，使用 `evidence_source` 标注来源。
 
 处置优先级固定为：不可验证或事实冲突进入 `human_review`；无法安全修复的硬风险进入 `block`；可以机械修复的表达或披露问题进入 `rewrite`；事实完整、相关且无硬风险才允许 `expose`。
 
 ## 兼容与验收
 
-- 旧版只返回三问的 Jev 响应仍可解析；缺少 Q1–Q6 时由协议适配层标记为兼容响应，不把缺失问题伪装成完整七问。
+- 旧版只返回三问的 Jev 响应仅在离线兼容解析入口接受；新请求必须返回完整标量协议；缺少 Q1–Q6 时由协议适配层标记为兼容响应，不把缺失问题伪装成完整七问。
 - 新 payload 必须通过严格 Schema 校验，证据引用只能指向事实包白名单路径。
 - 离线候选经过 canonical loader 后，必须可以直接调用 MCP `get_item(i_####)` 找回同一商品。
 - Fact Bundle、候选和 Jev payload 的 `item_id`、`reason_id`、`data_version` 必须保持一致。

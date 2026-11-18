@@ -45,6 +45,13 @@ def test_unknown_or_malformed_item_id_is_rejected():
         normalize_item_id("item_bad")
 
 
+def test_legacy_migration_requires_both_title_and_brand_identity():
+    item = load_canonical_items()["i_0001"]
+
+    with pytest.raises(CanonicalDataError, match="brand"):
+        normalize_item_id("item_0001", legacy_item={"title": item["title"]})
+
+
 def test_canonical_item_validation_requires_integer_cents_and_canonical_id():
     item = dict(load_canonical_items()["i_0001"])
     assert validate_canonical_item(item)["item_id"] == "i_0001"
@@ -62,3 +69,18 @@ def test_mcp_item_reads_the_same_canonical_snapshot():
     assert item["item_id"] == canonical["item_id"]
     assert item["title"] == canonical["title"]
     assert item["price_cents"] == canonical["price_cents"]
+
+def test_canonical_loaders_return_isolated_nested_snapshots():
+    from canonical_data import load_canonical_items, load_canonical_users, load_canonical_promos
+    item=load_canonical_items()['i_0001']
+    original=list(item['functions'])
+    item['functions'].append('伪造功效')
+    assert load_canonical_items()['i_0001']['functions']==original
+    user=load_canonical_users()['u_0001']
+    original_tags=list(user['tags'])
+    user['tags'].append('伪造标签')
+    assert load_canonical_users()['u_0001']['tags']==original_tags
+    promos=load_canonical_promos()
+    first=promos[0]['scope'].copy()
+    promos[0]['scope']['category_l1']=['伪造类目']
+    assert load_canonical_promos()[0]['scope']==first

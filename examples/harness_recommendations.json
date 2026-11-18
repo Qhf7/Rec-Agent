@@ -1,0 +1,18 @@
+{
+  "user_id": "u_0007",
+  "recommendations": [
+    {
+      "item_id": "i_0057",
+      "title": "素造 冷萃咖啡液 20条 美式",
+      "exposure_reason": "成都通勤，20条美式陪你开启一天",
+      "generated_reason": "成都通勤，20条美式陪你开启一天",
+      "evidence_fields": [
+        "users.city",
+        "users.tags",
+        "items.spec"
+      ],
+      "context_summary": "成都通勤场景；商品规格20条美式"
+    }
+  ],
+  "agent_version": "rec-agent-v2"
+}

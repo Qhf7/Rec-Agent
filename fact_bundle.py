@@ -7,8 +7,9 @@ import re
 from pathlib import Path
 from typing import Iterable
 
-from canonical_data import CANONICAL_SCHEMA_VERSION, normalize_item_id
+from canonical_data import CANONICAL_SCHEMA_VERSION, load_canonical_climate, load_canonical_users
 from run_rule_baseline import _price_evidence, _supported_efficacy, _topic_mismatch, find_lexicon_hits
+from scripts.migrate_legacy_candidates import validate_candidate_contract
 
 
 FACT_BUNDLE_SCHEMA = "fact-bundle-v2"
@@ -30,7 +31,7 @@ def _coverage(candidate: dict) -> dict:
     item = candidate.get("item_attrs_returned") or {}
     returned = _returned_fields(candidate)
     expected = {"category_l1", "functions", "suit_audience", "price_cents"}
-    missing = sorted(field for field in expected if field not in item and field not in returned)
+    missing = sorted(field for field in expected if field not in item or item[field] in (None, "", []))
     complete = bool(candidate.get("attrs_returned_complete", False)) and not missing
     return {
         "returned": sorted(set(item) | returned),
@@ -63,8 +64,7 @@ def _provenance(candidate: dict) -> dict:
 
 
 def build_fact_bundle(candidate: dict, lexicon: Iterable[dict]) -> dict:
-    if str(candidate.get("item_id", "")).startswith("item_"):
-        raise ValueError("legacy candidate item_id must be migrated before Fact Bundle construction")
+    candidate = validate_candidate_contract(candidate)
     exposure_reason = candidate.get("exposure_reason") or candidate.get("generated_reason", "")
     generated_reason = candidate.get("generated_reason") or exposure_reason
     reason = exposure_reason
@@ -104,7 +104,7 @@ def build_fact_bundle(candidate: dict, lexicon: Iterable[dict]) -> dict:
     required_disclosure = candidate.get("ai_disclosure_required", True)
     has_disclosure_flag = "ai_disclosure_flag_from_code" in candidate
     verification_state = "verified"
-    if not has_disclosure_flag or not candidate.get("tool_trace") or not coverage["complete"]:
+    if not has_disclosure_flag or not isinstance(candidate.get("ai_disclosure_flag_from_code"), bool) or not candidate.get("tool_trace") or not coverage["complete"]:
         verification_state = "unverifiable"
 
     promo = candidate.get("promo_computed_in_code")
@@ -113,6 +113,7 @@ def build_fact_bundle(candidate: dict, lexicon: Iterable[dict]) -> dict:
 
     return {
         "schema_version": FACT_BUNDLE_SCHEMA,
+        "candidate_schema_version": candidate.get("schema_version", "rec-candidate-v2"),
         "reason_id": candidate.get("reason_id"),
         "user_id": candidate.get("user_id"),
         "item_id": candidate.get("item_id"),
@@ -120,6 +121,12 @@ def build_fact_bundle(candidate: dict, lexicon: Iterable[dict]) -> dict:
         "generated_reason": generated_reason,
         "evidence_fields": candidate.get("evidence_fields") or [],
         "user_context": candidate.get("user_context") or {},
+        "city_climate": load_canonical_climate().get(load_canonical_users()[candidate["user_id"]]["city"], {}),
+        "time_context": {
+            "scenario_date": str(candidate["snapshot_at"])[:10],
+            "snapshot_at": candidate["snapshot_at"],
+            "timezone": "Asia/Shanghai",
+        } if candidate.get("snapshot_at") else {},
         "item": item,
         "promo": promo,
         "lexicon_hits": lexicon_hits,

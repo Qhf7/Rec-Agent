@@ -126,3 +126,7 @@
 ## 修改与重装
 
 编辑 `cordis.patch.yml` 后，用 `plugin_manager` 的 `install_bundle` 重新安装本目录；profile 使用 `link:` 指向本目录，重装可让 Loader 重新读取最新声明。已存在的 Session 保留其启动时的插件修订，验证修改请新建 Session。
+
+## 独立审核交接
+
+Rec-Agent 不调用 Jev，也不通过终端启动审核脚本。生成完成后导出最终 JSON，由 Harness 外的 `scripts/run_recommendation_workflow.py` 接收。默认只准备事实与请求，显式 `--live` 才调用 Jev。该工作流也接受离线 canonical JSONL，无需启动 DeepSeek Harness。详见 [独立工作流](../docs/STANDALONE_WORKFLOW.md)。

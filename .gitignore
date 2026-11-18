@@ -32,3 +32,6 @@ rule_baseline_full_report.json
 /items.csv
 /promo_rules.json
 /compliance_lexicon.txt
+
+# Local standalone workflow artifacts
+/runs/

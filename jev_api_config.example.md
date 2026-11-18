@@ -1,106 +1,65 @@
-# Jev API 接入配置说明
+# Jev API 接入配置
 
-## 1. 已验证的接口
+推荐 Agent 只输出候选 JSON。Jev 审核由独立 Python 工作流运行，默认生成请求预览；显式 `--live` 才请求模型。
 
-本项目实际验证通过的是 ModelGo 的 SystemOne 协议：
+## 当前配置与验证边界
 
 - Endpoint：`https://api.modelgo.ai/v1/systemone`
 - Model：`jev-1.14.0`
 - Authentication：`Authorization: Bearer $MODELGO_API_KEY`
 - Content-Type：`application/json`
 
-你提供的 `/v1/content_generation/tasks` 对 `jev-1.14.0` 返回了 `model_protocol_not_offered`，因此不作为 Jev 判决接口使用。
+历史三问接口实验与当前协议分开看待：本轮验证了九问题协议的本地构造、解析与安全路由，没有发送新版真实 API 请求。上线前需单独做新版单条真实冒烟，再评估效果。
 
-## 2. 环境变量
+官方格式参考：[System One API](https://docs.typesafe.ai/api/system-one)、[Choice](https://docs.typesafe.ai/primitives/choice)、[Score](https://docs.typesafe.ai/primitives/score)。
 
-```bash
-export MODELGO_API_KEY="<your-api-key>"
-```
+## 输入与问题
 
-密钥只通过环境变量提供，不写入代码、Markdown、JSON、日志或 Git 提交。
+外层请求只有 `model`、`state`、`questions`。版本保存在 `state` 内，不增加自定义 API 顶层字段。
 
-## 3. SystemOne 请求格式
+`state` 由 `jev_protocol.build_jev_input` 从事实包白名单构建：候选理由、商品事实、最小场景、规范气候/时间、促销条件、规则特征、覆盖、披露与来源。用户 ID、历史点击/CTR、曝光统计、订单退款投诉、购物车搜索、排序分与评测标签均不能进入输入。
+
+`questions` 使用官方标量格式：
 
 ```json
 {
-  "model": "jev-1.14.0",
-  "state": "{\\"reason_id\\":\\"r_0001\\",\\"generated_reason\\":\\"折叠收纳，卧室整理更方便\\"}",
-  "questions": {
-    "decision": {
-      "type": "choice",
-      "instructions": "请选择这条推荐理由的最终曝光处置结论。",
-      "criteria": {
-        "expose": "事实成立、无风险且可以直接曝光。",
-        "rewrite": "存在可机械修复的问题，改写后可以曝光。",
-        "human_review": "关键字段缺失、证据冲突或置信度不足，需要人工审核。",
-        "block": "存在无法安全修复的风险，禁止曝光。"
-      }
-    },
-    "risk_type": {
-      "type": "choice",
-      "instructions": "请选择主要风险类型。",
-      "criteria": {
-        "compliant": "事实成立且无风险。",
-        "absolute_claim": "绝对化表达。",
-        "efficacy_or_medical_claim": "功效或医疗宣称缺少依据。",
-        "price_misleading": "价格或促销误导。",
-        "missing_ai_disclosure": "缺少 AI 披露。",
-        "off_topic": "与商品或用户语境无关。"
-      }
-    },
-    "judge_score": {
-      "type": "score",
-      "instructions": "请评估这条理由的不安全概率，分数越高表示风险越高。",
-      "criteria": [
-        "低风险，概率接近 0。",
-        "中风险，概率约为 0.5。",
-        "高风险，概率接近 1。"
-      ]
+  "q1_identity": {
+    "type": "choice",
+    "instructions": "核验候选与事实是否一致可追溯",
+    "criteria": {
+      "valid": "身份与版本一致",
+      "invalid": "身份或版本冲突",
+      "unverifiable": "证据不足"
     }
   }
 }
 ```
 
-## 4. 本项目 Adapter
+实际固定问题由 `build_jev_questions()` 定义：Q1 身份、Q2 事实支持、Q3 表达风险、Q4 商业准确性、Q5 场景相关性、Q6 安全门禁、Q7 最终建议，另有 `risk_type` Choice 和 `judge_score` Score。共八个 Choice 和一个 Score；各问并行判断，再由代码汇总。
 
-```text
-JevAdapter.judge(fact_bundle) -> JevDecision
+Score 使用三级描述（0/1/2），代码从返回分布计算等级期望值并除以 2。`judge_score` 是风险严重度，不是已校准违规概率。所有问题置信度不足 0.7、事实缺失或冲突时转人工；规则层不把模型的拦截变成曝光。
+
+## 运行
+
+```bash
+python3 scripts/run_recommendation_workflow.py \
+  --input examples/harness_recommendations.json \
+  --output-dir /tmp/rec-agent-jev-prepare
 ```
 
-Adapter 位于：`jev_adapter.py`。
+先检查候选、事实包与请求预览；真实调用在新目录执行：
 
-它负责：
-
-- 构造 SystemOne 请求；
-- 发送 HTTP 请求；
-- 解析 `answers.decision`、`answers.risk_type` 和 `answers.judge_score`；
-- 将 0/1/2 的评分量表归一化到 0~1；
-- 由代码生成 `evidence`；
-- 检查六类风险、四档处置和分数范围；
-- 对 `unverifiable/conflict` 事实阻止直接 `expose`；
-- 支持 dry-run 和本地测试。
-
-## 5. 最小调用方式
-
-先使用 dry-run：
-
-```python
-import json
-from pathlib import Path
-from jev_adapter import JevAdapter
-
-bundle = json.loads(Path("fact_bundle.jsonl").read_text(encoding="utf-8").splitlines()[0])
-preview = JevAdapter(dry_run=True).judge(bundle)
-print(json.dumps(preview, ensure_ascii=False, indent=2))
+```bash
+export MODELGO_API_KEY="<your-api-key>"
+python3 scripts/run_recommendation_workflow.py \
+  --input examples/harness_recommendations.json \
+  --output-dir /tmp/rec-agent-jev-live \
+  --ai-disclosure visible \
+  --live
 ```
 
-真实调用前设置 `MODELGO_API_KEY`，并显式使用 `dry_run=False`。真实调用会消耗接口额度。
+只有实际展示配置包含所需 AI 披露时才选择 `visible`；也可选择 `missing`。默认 `unknown` 不推测披露已存在。
 
-## 6. 安全要求
+结果中的 `evidence_source` 说明证据来源。官方 Choice 不生成自由文本证据，默认 `workflow_fact_snapshot` 由工作流呈现已提供事实及命中的安全门禁；它不声称是模型逐句引用。新真实请求仅接受完整标量协议，旧三问只在离线兼容入口解析。
 
-- 不在命令历史、代码、配置样例、日志和结果文件中打印密钥；
-- 不把完整 Authorization Header 写入 `tool_trace`；
-- 请求日志只记录 endpoint、模型名、状态码、耗时和请求哈希；
-- 真实接口调用先使用单条脱敏事实包；
-- 不关闭 TLS 证书校验；本项目在 Python CA 路径缺失时使用 `certifi` 证书链；
-- 若密钥已在公开聊天、截图或日志中出现，应及时轮换。
+环境变量只在当前终端设置。密钥不写入仓库；Adapter 保持 TLS 证书校验。产物与异常不含 Authorization header。完整产物说明见 [独立工作流](docs/STANDALONE_WORKFLOW.md)。

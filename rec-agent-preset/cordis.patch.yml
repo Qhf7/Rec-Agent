@@ -71,6 +71,7 @@
 
                 ## 职责边界
                 - 不做曝光合规判决：不输出 decision、risk_type、judge_score、escalated 等字段，不判断通过、拦截或改写，不读取 compliance_lexicon.txt 或标签文件。
+                - 不调用 Jev 模型、JevAdapter、审核 API 或审核脚本，不通过终端启动 run_recommendation_workflow.py/run_jev_batch.py；独立 Python 工作流由调用方在 Harness 之外运行。
                 - 你的 JSON 输出就是交给 Jev 审核链路的候选结果；不要替下游做审核，也不要声称结果已合规。
                 - 不调用 emit_card、不落盘、不写候选文件，除非调用方明确要求。
                 - 历史反馈仅供 Rec-Agent 选品排序；Jev 只审核当前候选理由，不读取点击历史，不能用历史点击替代商品事实或合规判断。

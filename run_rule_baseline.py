@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import argparse
 import csv
+from datetime import date
+from decimal import Decimal
 import json
 import re
 from collections import Counter
@@ -84,7 +86,7 @@ def _supported_efficacy(candidate: dict, canonical_term: str) -> bool:
 
     values = _field_values(
         item,
-        ["functions", "suitable_scenes", "description", "title", "target_tags"],
+        ["functions"],
     )
     text = "|".join(values)
     synonyms = {
@@ -102,11 +104,11 @@ def _topic_mismatch(candidate: dict) -> tuple[bool, list[str]]:
     item_text = "|".join(
         _field_values(
             item,
-            ["title", "category", "subcategory", "description", "functions", "suitable_scenes", "target_tags"],
+            ["title", "category_l1", "category_l2", "category_l3", "functions", "suit_audience", "suit_season", "category", "subcategory", "suitable_scenes", "target_tags"],
         )
     )
     user = candidate.get("user_context") or {}
-    user_text = "|".join(_field_values(user, ["interests", "recent_categories"]))
+    user_text = "|".join(_field_values(user, ["preferred_categories", "tags", "interests", "recent_categories"]))
     checks = [
         (["猫咪", "猫粮", "猫砂", "狗狗", "宠物"], ["宠物", "猫", "狗"]),
         (["婴儿", "宝宝", "新手妈妈", "母婴"], ["母婴", "婴儿", "宝宝", "儿童"]),
@@ -124,60 +126,87 @@ def _topic_mismatch(candidate: dict) -> tuple[bool, list[str]]:
     return False, []
 
 
+def _promo_verified(candidate: dict, promo: dict) -> bool:
+    if not promo or promo.get("applicable") is not True:
+        return False
+    item = candidate.get("item_attrs_returned") or {}
+    scope = promo.get("scope")
+    if scope is not None and (not scope or not all(item.get(key) in values for key, values in scope.items())):
+        return False
+    # Legacy fixtures without dates remain parseable. Canonical snapshots carry
+    # dates and must agree with the frozen replay time, never the host clock.
+    if "start" in promo or "end" in promo:
+        try:
+            as_of = date.fromisoformat(str(candidate.get("snapshot_at", ""))[:10])
+            if not date.fromisoformat(promo["start"]) <= as_of <= date.fromisoformat(promo["end"]):
+                return False
+        except (KeyError, TypeError, ValueError):
+            return False
+    return True
+
+
 def _price_evidence(candidate: dict, price_hits: list[dict]) -> tuple[bool, list[str]]:
     reason = candidate.get("generated_reason", "")
     promo = candidate.get("promo_computed_in_code") or {}
+    item = candidate.get("item_attrs_returned") or {}
     evidence: list[str] = []
     mismatch = False
+    promo_valid = _promo_verified(candidate, promo)
 
     match = re.search(r"满\s*(\d+(?:\.\d+)?)\s*减\s*(\d+(?:\.\d+)?)", reason)
     if match:
-        threshold_yuan = float(match.group(1))
-        discount_yuan = float(match.group(2))
-        threshold_cents = round(threshold_yuan * 100)
-        discount_cents = round(discount_yuan * 100)
-        actual_threshold = promo.get("threshold_cents")
-        actual_discount = promo.get("discount_cents")
-        if not promo or not promo.get("applicable"):
+        threshold_cents = Decimal(match.group(1)) * 100
+        discount_cents = Decimal(match.group(2)) * 100
+        if not promo_valid:
             mismatch = True
-            evidence.append("promo_computed_in_code 未返回适用的满减规则")
-        elif actual_threshold != threshold_cents or actual_discount != discount_cents:
+            evidence.append("promo_computed_in_code 未返回在快照日期和商品范围内适用的满减规则")
+        elif promo.get("threshold_cents") != threshold_cents or promo.get("discount_cents") != discount_cents:
             mismatch = True
-            evidence.append(
-                f"促销规则实际为满{(actual_threshold or 0) / 100:g}减{(actual_discount or 0) / 100:g}，理由写为满{threshold_yuan:g}减{discount_yuan:g}"
-            )
+            evidence.append("促销门槛或减免金额与理由不一致")
 
+    literal_prices = list(re.finditer(r"(原价|售价|价格|仅需|低至|到手价)\s*[¥￥]?\s*(\d+(?:\.\d+)?)\s*元?", reason))
+    for literal in literal_prices:
+        field = "original_price_cents" if literal.group(1) == "原价" else "price_cents"
+        cents = item.get(field)
+        if cents is None and field == "price_cents" and isinstance(item.get("price"), (int, float)):
+            cents = Decimal(str(item["price"])) * 100
+        if cents is None or Decimal(literal.group(2)) * 100 != cents:
+            mismatch = True
+            evidence.append(f"item_attrs_returned.{field} 与理由价格不一致或缺失")
+
+    gift = promo.get("gift_item", promo.get("gift"))
+    rate = promo.get("discount_rate")
+    if rate is None and promo.get("discount_percent") is not None:
+        rate = promo["discount_percent"] / 100
     generic_terms = {
-        "全场半价": lambda p: p.get("type") == "percent_discount" and p.get("discount_rate") == 0.5,
-        "买一送一": lambda p: p.get("type") == "gift" and p.get("gift_item") in {"同款商品", "同款"},
-        "买一赠一": lambda p: p.get("type") == "gift" and p.get("gift_item") in {"同款商品", "同款"},
-        "无门槛优惠": lambda p: bool(p) and p.get("threshold_cents") in (None, 0),
+        "全场半价": lambda p: p.get("type") in {"discount", "percent_discount"} and rate == 0.5,
+        "买一送一": lambda p: p.get("type") == "gift" and gift in {"同款商品", "同款"},
+        "买一赠一": lambda p: p.get("type") == "gift" and gift in {"同款商品", "同款"},
+        "无门槛优惠": lambda p: p.get("threshold_cents") == 0,
         "0元购": lambda p: False,
         "限时最低": lambda p: False,
     }
     for term, predicate in generic_terms.items():
-        if term in reason and not predicate(promo):
+        if term in reason and (not promo_valid or not predicate(promo)):
             mismatch = True
             evidence.append(f"promo_computed_in_code 不支持「{term}」")
 
-    if price_hits and not promo and any(entry["term"] in reason for entry in price_hits):
+    if price_hits and not promo and not literal_prices:
         mismatch = True
-        evidence.append("promo_ids 为空，未发现可核验的促销规则")
-
+        evidence.append("未发现可核验的价格或促销事实")
     return mismatch, evidence
 
 
 def _support_evidence(candidate: dict) -> list[str]:
     item = candidate.get("item_attrs_returned") or {}
     evidence: list[str] = []
-    functions = item.get("functions") or []
-    scenes = item.get("suitable_scenes") or []
-    if functions:
-        evidence.append(f"item_attrs_returned.functions 支持：{'、'.join(str(x) for x in functions[:3])}")
-    if scenes:
-        evidence.append(f"item_attrs_returned.suitable_scenes 支持：{'、'.join(str(x) for x in scenes[:2])}")
-    if not evidence and item.get("category"):
-        evidence.append(f"item_attrs_returned.category={item['category']} 可作为主题依据")
+    for field in ("functions", "suit_audience", "suit_season", "suitable_scenes"):
+        values = _field_values(item, [field])
+        if values:
+            evidence.append(f"item_attrs_returned.{field} 支持：{'、'.join(values[:3])}")
+    category = item.get("category_l1") or item.get("category")
+    if not evidence and category:
+        evidence.append(f"item_attrs_returned.category_l1={category} 可作为主题依据")
     return evidence or ["候选输入未提供可引用的商品事实"]
 
 
@@ -214,7 +243,7 @@ def evaluate_candidate(
         returned = set()
         for trace in candidate.get("tool_trace", []):
             returned.update(trace.get("returned_fields", []))
-        evidence.append(f"tool_trace 未返回完整 functions/suitable_scenes，实际字段：{sorted(returned)}")
+        evidence.append(f"tool_trace 未返回完整 functions/suit_audience，实际字段：{sorted(returned)}")
 
     elif price_mismatch:
         decision = "block"
@@ -227,7 +256,7 @@ def evaluate_candidate(
         risk_type = "efficacy_or_medical_claim"
         score = max(0.92, max(SEVERITY_WEIGHT.get(h["severity"], 0.8) for h in unsupported_efficacy))
         evidence.extend(
-            f"item_attrs_returned.functions/suitable_scenes 不支持「{h['canonical_term']}」功效"
+            f"item_attrs_returned.functions/suit_audience 不支持「{h['canonical_term']}」功效"
             for h in unsupported_efficacy
         )
         evidence.extend(

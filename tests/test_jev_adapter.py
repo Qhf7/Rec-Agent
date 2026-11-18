@@ -34,7 +34,8 @@ def test_build_payload_uses_systemone_contract():
 
     assert payload["model"] == "jev-1.14.0"
     assert "r1" in payload["state"]
-    assert payload["question_schema_version"] == "jev-questions-v1"
+    assert set(payload) == {"model", "state", "questions"}
+    assert json.loads(payload["state"])["question_schema_version"] == "jev-questions-v1"
     assert set(payload["questions"]) == {
         "q1_identity",
         "q2_fact_support",
@@ -43,6 +44,8 @@ def test_build_payload_uses_systemone_contract():
         "q5_context_relevance",
         "q6_safety_gate",
         "q7_final_decision",
+        "risk_type",
+        "judge_score",
     }
     assert payload["questions"]["q1_identity"]["type"] == "choice"
 
@@ -187,7 +190,7 @@ def test_unverifiable_state_takes_precedence_over_missing_disclosure():
     assert result["escalated"] is True
 
 
-def test_absolute_claim_block_is_downgraded_to_rewrite_when_mechanically_fixable():
+def test_absolute_claim_model_block_is_preserved():
     adapter = JevAdapter(api_key="test-key", dry_run=False)
     body = {
         "model": "jev-1.14.0",
@@ -209,11 +212,11 @@ def test_absolute_claim_block_is_downgraded_to_rewrite_when_mechanically_fixable
 
     result = adapter.parse_response(body, bundle)
 
-    assert result["decision"] == "rewrite"
+    assert result["decision"] == "block"
     assert result["risk_type"] == "absolute_claim"
 
 
-def test_off_topic_block_is_downgraded_to_rewrite_when_verified():
+def test_off_topic_model_block_is_preserved():
     adapter = JevAdapter(api_key="test-key", dry_run=False)
     body = {
         "model": "jev-1.14.0",
@@ -235,7 +238,7 @@ def test_off_topic_block_is_downgraded_to_rewrite_when_verified():
 
     result = adapter.parse_response(body, bundle)
 
-    assert result["decision"] == "rewrite"
+    assert result["decision"] == "block"
     assert result["risk_type"] == "off_topic"
 
 
@@ -265,7 +268,7 @@ def test_unsupported_efficacy_takes_risk_type_priority_over_absolute_claim():
     assert result["risk_type"] == "efficacy_or_medical_claim"
 
 
-def test_supported_efficacy_prevents_false_positive_blocking():
+def test_supported_efficacy_does_not_override_model_rewrite():
     adapter = JevAdapter(api_key="test-key", dry_run=False)
     body = {
         "model": "jev-1.14.0",
@@ -287,11 +290,11 @@ def test_supported_efficacy_prevents_false_positive_blocking():
 
     result = adapter.parse_response(body, bundle)
 
-    assert result["decision"] == "expose"
-    assert result["risk_type"] == "compliant"
+    assert result["decision"] == "rewrite"
+    assert result["risk_type"] == "efficacy_or_medical_claim"
 
 
-def test_verified_candidate_without_rule_signals_is_forced_to_expose():
+def test_verified_candidate_without_rule_signals_preserves_model_block():
     adapter = JevAdapter(api_key="test-key", dry_run=False)
     body = {
         "model": "jev-1.14.0",
@@ -319,5 +322,51 @@ def test_verified_candidate_without_rule_signals_is_forced_to_expose():
 
     result = adapter.parse_response(body, bundle)
 
-    assert result["decision"] == "expose"
+    assert result["decision"] == "block"
     assert result["risk_type"] == "compliant"
+
+def _response(decision='expose', confidence=.95):
+    return {'answers': {'decision': {'choice': decision, 'confidence': confidence}, 'risk_type': {'choice': 'compliant', 'confidence': confidence}, 'judge_score': {'score': 0}}}
+
+def test_low_confidence_can_never_expose():
+    bundle = _payload_bundle()
+    result = JevAdapter().parse_response(_response(confidence=.4), bundle)
+    assert result['decision'] == 'human_review'
+    assert result['escalated'] is True
+
+def test_clean_rules_do_not_override_model_block():
+    bundle = _payload_bundle()
+    bundle['rule_features'] = {'absolute_claim_terms': [], 'price_mismatch': False, 'topic_mismatch': False, 'unsupported_efficacy_terms': []}
+    assert JevAdapter().parse_response(_response('block'), bundle)['decision'] == 'block'
+
+def test_raw_object_cannot_bypass_verification_gate():
+    bundle = _payload_bundle()
+    bundle['verification_state'] = 'unverifiable'
+    body = {'reason_id':'r1','decision':'expose','risk_type':'compliant','judge_score':0,'evidence':['items.functions'],'escalated':False}
+    assert JevAdapter().parse_response(body, bundle)['decision'] == 'human_review'
+
+def test_legacy_score_is_normalized_from_probabilities_scale():
+    body = _response()
+    body['answers']['judge_score'] = {'score':1, 'probabilities': {'0':0,'1':1,'2':0}}
+    assert JevAdapter().parse_response(body, _payload_bundle())['judge_score'] == .5
+
+def test_nonfinite_score_rejected():
+    from jev_adapter import JevResponseError
+    body = _response()
+    body['answers']['judge_score']['score'] = float('nan')
+    with pytest.raises(JevResponseError):
+        JevAdapter().parse_response(body, _payload_bundle())
+
+def test_q6_human_gate_cannot_be_overruled_by_q7_expose():
+    from jev_protocol import build_jev_questions
+    answers = {key:{'choice':next(iter(q['criteria'])), 'confidence':.96}
+               for key,q in build_jev_questions().items() if q['type']=='choice'}
+    answers['q6_safety_gate']['choice']='human_review'
+    answers['judge_score']={'score':0,'confidence':.96,'probabilities':{'0':1,'1':0,'2':0}}
+    result=JevAdapter().parse_response({'answers':answers},_payload_bundle())
+    assert result['decision']=='human_review'
+    assert result['safety_gate_choice']=='human_review'
+
+def test_model_version_is_consistent_across_request():
+    payload=JevAdapter(model='custom-jev').build_payload(_payload_bundle())
+    assert json.loads(payload['state'])['trace']['model_version']==payload['model']

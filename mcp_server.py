@@ -270,7 +270,12 @@ def get_item(item_id: str) -> dict[str, Any]:
     item = _items().get(item_id)
     if item is None:
         return _not_found("item_id", item_id)
-    return {"found": True, **item}
+    return {
+        "found": True,
+        **item,
+        "schema_version": CANONICAL_SCHEMA_VERSION,
+        "data_version": CANONICAL_SCHEMA_VERSION,
+    }
 
 
 @mcp.tool()

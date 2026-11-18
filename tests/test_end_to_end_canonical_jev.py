@@ -18,7 +18,7 @@ def test_canonical_candidate_fact_bundle_and_jev_request_keep_identity_and_block
     assert bundle["item_id"].startswith("i_")
     assert state["candidate"]["item_id"] == bundle["item_id"]
     assert state["trace"]["data_version"] == "canonical-2026-06-15-v1"
-    assert request["question_schema_version"] == "jev-questions-v1"
+    assert state["question_schema_version"] == "jev-questions-v1"
     for forbidden in ("history", "ctr", "click", "order", "refund", "complaint", "sorting", "search", "cart"):
         assert forbidden not in json.dumps(state, ensure_ascii=False).lower()
 
@@ -66,7 +66,7 @@ def test_hard_risk_unverifiable_and_rewriteable_routes_are_distinct():
         _bundle(state="unverifiable", reason="梅雨季防潮推荐"),
     )
     rewriteable = adapter.parse_response(
-        _old_response("block", "absolute_claim"),
+        _old_response("rewrite", "absolute_claim"),
         _bundle(reason="最好用的收纳盒"),
     )
 
