@@ -24,6 +24,8 @@ def _bucket(score: float) -> int:
 
 
 def generate_exposure_records(candidates: list[dict], results: list[dict], seed: int = 20261116):
+    if any("attractiveness_score" in row and "judge_score" not in row for row in results):
+        raise ValueError("Exposure simulation requires a risk-severity judge_score from the nine-question protocol")
     rng = random.Random(seed)
     result_by_id = {row["reason_id"]: row for row in results}
     latent_records = []

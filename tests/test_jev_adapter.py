@@ -3,7 +3,16 @@ import json
 import pytest
 
 from jev_adapter import JevAdapter, JevConfigurationError, validate_decision
-from jev_protocol import JEV_QUESTION_SCHEMA_VERSION
+from jev_protocol import V2_JEV_QUESTION_SCHEMA_VERSION
+
+JEV_QUESTION_SCHEMA_VERSION = V2_JEV_QUESTION_SCHEMA_VERSION
+
+_JevAdapter = JevAdapter
+
+class JevAdapter(_JevAdapter):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("question_version", "jev-questions-v2")
+        super().__init__(*args, **kwargs)
 
 
 def _payload_bundle():
@@ -400,7 +409,7 @@ def test_nonfinite_score_rejected():
 def test_q7_expose_is_returned_alongside_q6_human_review():
     from jev_protocol import build_jev_questions
     answers = {key:{'choice':next(iter(q['criteria'])), 'confidence':.96}
-               for key,q in build_jev_questions().items() if q['type']=='choice'}
+               for key,q in build_jev_questions("jev-questions-v2").items() if q['type']=='choice'}
     answers['q6_safety_gate']['choice']='human_review'
     answers['judge_score']={'score':0,'confidence':.96,'probabilities':{'0':1,'1':0,'2':0}}
     result=JevAdapter().parse_response({'answers':answers},_payload_bundle())
@@ -456,7 +465,7 @@ def test_full_protocol_preserves_every_q7_choice_with_conflicting_answers(decisi
                        "absolute_claim_terms": ["最好"], "topic_mismatch": True},
     )
     answers = {key: {"choice": next(iter(question["criteria"])), "confidence": 0.02}
-               for key, question in build_jev_questions().items() if question["type"] == "choice"}
+               for key, question in build_jev_questions("jev-questions-v2").items() if question["type"] == "choice"}
     answers["q1_identity"]["choice"] = "invalid"
     answers["q2_fact_support"]["choice"] = "unverifiable"
     answers["q3_expression_risk"]["choice"] = "blocking"
@@ -505,7 +514,7 @@ def _complete_response():
     from jev_protocol import build_jev_questions
 
     answers = {key: {"choice": next(iter(question["criteria"])), "confidence": 0.1}
-               for key, question in build_jev_questions().items() if question["type"] == "choice"}
+               for key, question in build_jev_questions("jev-questions-v2").items() if question["type"] == "choice"}
     answers["q4_commercial_accuracy"]["choice"] = "not_mentioned"
     answers["judge_score"] = {"score": 0, "confidence": 0.1}
     return {"model": "jev-1.14.0", "answers": answers}

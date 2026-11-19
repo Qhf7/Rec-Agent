@@ -1,12 +1,23 @@
 import pytest
 
 from jev_protocol import (
-    JEV_QUESTION_SCHEMA_VERSION,
+    V2_JEV_QUESTION_SCHEMA_VERSION,
     build_jev_input,
     build_jev_questions,
     parse_jev_answers,
     validate_jev_input,
 )
+
+JEV_QUESTION_SCHEMA_VERSION = V2_JEV_QUESTION_SCHEMA_VERSION
+
+_build_jev_input = build_jev_input
+_build_jev_questions = build_jev_questions
+
+def build_jev_input(bundle, *, question_version=JEV_QUESTION_SCHEMA_VERSION):
+    return _build_jev_input(bundle, question_version=question_version)
+
+def build_jev_questions(version=JEV_QUESTION_SCHEMA_VERSION):
+    return _build_jev_questions(version)
 
 
 def _bundle():

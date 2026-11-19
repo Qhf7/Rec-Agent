@@ -8,14 +8,21 @@ from copy import deepcopy
 from typing import Any, Mapping
 
 from canonical_data import CANONICAL_SCHEMA_VERSION, load_canonical_items
+from jev_five_question import (
+    FIVE_QUESTION_PREVIOUS_SCHEMA_VERSION, FIVE_QUESTION_SCHEMA_VERSION,
+    build_five_question_questions, parse_five_question_answers,
+)
 
 
 LEGACY_JEV_QUESTION_SCHEMA_VERSION = "jev-questions-v1"
-JEV_QUESTION_SCHEMA_VERSION = "jev-questions-v2"
+V2_JEV_QUESTION_SCHEMA_VERSION = "jev-questions-v2"
+JEV_QUESTION_SCHEMA_VERSION = FIVE_QUESTION_SCHEMA_VERSION
 Q2_LEGACY_QUESTION_SCHEMA_VERSION = "jev-questions-v2-q2-legacy"
 SUPPORTED_JEV_QUESTION_VERSIONS = frozenset({
     LEGACY_JEV_QUESTION_SCHEMA_VERSION,
+    FIVE_QUESTION_PREVIOUS_SCHEMA_VERSION,
     JEV_QUESTION_SCHEMA_VERSION,
+    V2_JEV_QUESTION_SCHEMA_VERSION,
     Q2_LEGACY_QUESTION_SCHEMA_VERSION,
 })
 JEV_INPUT_SCHEMA_VERSION = "jev-input-v1"
@@ -157,7 +164,7 @@ def _question_version(version: str | None) -> str:
 
 
 def build_jev_questions(version: str | None = None) -> dict[str, dict[str, Any]]:
-    """Build frozen v1 or the current rubric; A/B varies exactly Q2."""
+    """Build versioned five-question output or a frozen nine-question rubric."""
     version = _question_version(version)
     questions = _legacy_jev_questions()
     if version == LEGACY_JEV_QUESTION_SCHEMA_VERSION:
@@ -217,6 +224,10 @@ def build_jev_questions(version: str | None = None) -> dict[str, dict[str, Any]]
         "评估内容风险严重度；AI披露unknown仅为配置待确认，不应单独提高严重度。"
         "分数为有序等级的期望值，不是校准违规概率。"
     )
+    if version in {FIVE_QUESTION_PREVIOUS_SCHEMA_VERSION, FIVE_QUESTION_SCHEMA_VERSION}:
+        return build_five_question_questions(
+            questions, display_guard=version == FIVE_QUESTION_SCHEMA_VERSION,
+        )
     return questions
 
 
@@ -427,7 +438,7 @@ def validate_jev_input(payload: dict[str, Any]) -> dict[str, Any]:
         raise ValueError("evidence_fields is required")
     expected_questions = build_jev_questions(question_version)
     if payload["questions"] != expected_questions:
-        raise ValueError("questions schema mismatch; expected fixed q1-q7 definition")
+        raise ValueError("questions schema mismatch; expected the requested version definition")
     for field in list(candidate.get("evidence_fields") or []):
         sources = {"item": facts["item"], "user_context": facts["scene"], "promo": facts["promo"],
                    "city_climate": facts["city_climate"], "time_context": facts["time_context"]}
@@ -486,7 +497,15 @@ def parse_jev_answers(payload: Mapping[str, Any], fact_bundle: Mapping[str, Any]
     answers = payload.get("answers") if isinstance(payload, Mapping) else None
     if not isinstance(answers, Mapping):
         raise ValueError("Jev response answers are required")
-    question_version = _question_version(expected_protocol)
+    if expected_protocol in {FIVE_QUESTION_PREVIOUS_SCHEMA_VERSION, FIVE_QUESTION_SCHEMA_VERSION} or "attractiveness_score" in answers:
+        if expected_protocol not in (None, FIVE_QUESTION_PREVIOUS_SCHEMA_VERSION, FIVE_QUESTION_SCHEMA_VERSION):
+            raise ValueError("response format does not match requested protocol")
+        version = expected_protocol or FIVE_QUESTION_SCHEMA_VERSION
+        return parse_five_question_answers(
+            answers, fact_bundle, build_jev_questions(version), _evidence_path_present,
+            protocol_version=version,
+        )
+    question_version = _question_version(expected_protocol or V2_JEV_QUESTION_SCHEMA_VERSION)
     questions = build_jev_questions(question_version)
     full = "q7_final_decision" in answers
     archived = full and isinstance(answers["q7_final_decision"], Mapping) and "score" in answers["q7_final_decision"]

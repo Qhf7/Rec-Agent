@@ -1,4 +1,4 @@
-"""Jev SystemOne HTTP adapter that preserves the model disposition."""
+"""Jev SystemOne HTTP adapter for current and historical review protocols."""
 
 from __future__ import annotations
 
@@ -17,11 +17,14 @@ from jev_protocol import (
     build_jev_questions,
     parse_jev_answers,
 )
+from jev_five_question import FIVE_QUESTION_PREVIOUS_SCHEMA_VERSION, FIVE_QUESTION_SCHEMA_VERSION, aggregate_five_question_answers
 
 
 DEFAULT_ENDPOINT = "https://api.modelgo.ai/v1/systemone"
 DEFAULT_MODEL = "jev-1.14.0"
 DEFAULT_SCORE_NAME = "jev-compliance-v1"
+ATTRACTIVENESS_SCORE_NAME = "jev-attractiveness-v1"
+FIVE_QUESTION_PROTOCOLS = {FIVE_QUESTION_PREVIOUS_SCHEMA_VERSION, FIVE_QUESTION_SCHEMA_VERSION}
 DECISIONS = {"expose", "rewrite", "human_review", "block"}
 RISK_TYPES = {
     "compliant",
@@ -30,6 +33,8 @@ RISK_TYPES = {
     "price_misleading",
     "missing_ai_disclosure",
     "off_topic",
+    "unsupported_fact",
+    "missing_evidence",
 }
 REQUIRED_FIELDS = {
     "reason_id",
@@ -77,7 +82,9 @@ def build_ssl_context() -> ssl.SSLContext:
 
 
 def validate_decision(result: dict) -> dict:
-    missing = REQUIRED_FIELDS - set(result)
+    five_question = result.get("protocol_completeness") in FIVE_QUESTION_PROTOCOLS
+    required = REQUIRED_FIELDS - {"judge_score"} if five_question else REQUIRED_FIELDS
+    missing = required - set(result)
     if missing:
         raise ValueError(f"decision missing fields: {sorted(missing)}")
     if result["decision"] not in DECISIONS:
@@ -86,9 +93,27 @@ def validate_decision(result: dict) -> dict:
         raise ValueError(f"unsupported risk_type: {result['risk_type']}")
     if not isinstance(result["evidence"], list) or not result["evidence"]:
         raise ValueError("evidence must be a non-empty list")
-    score = result["judge_score"]
-    if isinstance(score, bool) or not isinstance(score, (int, float)) or not math.isfinite(score) or not 0 <= float(score) <= 1:
-        raise ValueError("judge_score must be in [0, 1]")
+    if five_question:
+        inputs = result.get("decision_inputs")
+        if not isinstance(inputs, dict) or type(inputs.get("required_ai_disclosure_missing")) is not bool:
+            raise ValueError("five-question decision_inputs requires a disclosure flag")
+        if result["score_name"] != ATTRACTIVENESS_SCORE_NAME:
+            raise ValueError("five-question score_name mismatch")
+        expected = aggregate_five_question_answers(
+            result.get("question_choices") or {}, result.get("attractiveness_score"),
+            {"required": True, "flag": False} if inputs.get("required_ai_disclosure_missing") else {},
+        )
+        for field, value in expected.items():
+            if result.get(field) != value:
+                raise ValueError(f"five-question aggregation mismatch: {field}")
+        if result.get("risk_type") != result["question_choices"]["risk_type"]:
+            raise ValueError("five-question risk_type mismatch")
+        if "judge_score" in result:
+            raise ValueError("five-question output has no severity judge_score")
+    else:
+        score = result["judge_score"]
+        if isinstance(score, bool) or not isinstance(score, (int, float)) or not math.isfinite(score) or not 0 <= float(score) <= 1:
+            raise ValueError("judge_score must be in [0, 1]")
     if not isinstance(result["escalated"], bool):
         raise ValueError("escalated must be boolean")
     return result
@@ -235,11 +260,12 @@ class JevAdapter:
         except (KeyError, TypeError, ValueError) as exc:
             raise JevResponseError("SystemOne response missing a valid Jev question answer") from exc
 
+        protocol = parsed_answers["protocol_completeness"]
         result = {
             **parsed_answers,
             "reason_id": fact_bundle.get("reason_id"),
             "model_version": payload.get("model", self.model),
-            "score_name": self.score_name,
+            "score_name": ATTRACTIVENESS_SCORE_NAME if protocol in FIVE_QUESTION_PROTOCOLS else self.score_name,
         }
         result["evidence"] = list(result.get("evidence") or []) or build_evidence_from_fact_bundle(fact_bundle)
         result["evidence_source"] = "model_field_selection" if parsed_answers.get("evidence") else "workflow_fact_snapshot"
@@ -262,8 +288,12 @@ class JevAdapter:
             raise JevResponseError("escalated must be boolean")
         # Compatibility field describes the returned label; it does not dispatch work.
         result["escalated"] = result.get("decision") == "human_review"
-        result["decision_source"] = "jev_model"
-        result["decision_question"] = decision_question
+        if result.get("protocol_completeness") in FIVE_QUESTION_PROTOCOLS:
+            result["decision_source"] = "jev_answers_policy"
+            result["decision_question"] = None
+        else:
+            result["decision_source"] = "jev_model"
+            result["decision_question"] = decision_question
         disclosure = fact_bundle.get("disclosure") or {}
         flag = disclosure.get("flag")
         disclosure_status = "visible" if flag is True else "missing" if flag is False else "unknown"

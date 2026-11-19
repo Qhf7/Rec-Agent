@@ -7,8 +7,18 @@ from pathlib import Path
 import pytest
 
 from canonical_data import CANONICAL_SCHEMA_VERSION, load_canonical_items, load_canonical_users
-from jev_adapter import JevAdapter
+from jev_adapter import JevAdapter as _JevAdapter
 from scripts.run_recommendation_workflow import build_workflow_results, parse_recommendation_input, run_workflow
+
+class JevAdapter(_JevAdapter):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("question_version", "jev-questions-v2")
+        super().__init__(*args, **kwargs)
+
+_run_workflow = run_workflow
+def run_workflow(*args, **kwargs):
+    kwargs.setdefault("question_version", "jev-questions-v2")
+    return _run_workflow(*args, **kwargs)
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -39,7 +49,7 @@ def write_input(tmp_path, payload=None):
 
 
 def test_prepare_rebuilds_canonical_facts_and_never_calls_judge(tmp_path, monkeypatch):
-    monkeypatch.setattr(JevAdapter, "judge", lambda *_: pytest.fail("prepare called judge"))
+    monkeypatch.setattr(_JevAdapter, "judge", lambda *_: pytest.fail("prepare called judge"))
     report = run_workflow(write_input(tmp_path), tmp_path / "output")
     candidate = read_jsonl(report["artifacts"]["candidates"])[0]
     bundle = read_jsonl(report["artifacts"]["fact_bundles"])[0]
@@ -273,7 +283,7 @@ def test_live_joins_recommendation_with_original_jev_decision(tmp_path, monkeypa
     monkeypatch.setenv("MODELGO_API_KEY", "private-test-key-never-persist")
     answers = {
         key: {"type": "choice", "choice": next(iter(question["criteria"])), "confidence": 0.99}
-        for key, question in build_jev_questions().items() if question["type"] == "choice"
+        for key, question in build_jev_questions("jev-questions-v2").items() if question["type"] == "choice"
     }
     answers["q4_commercial_accuracy"]["choice"] = "not_mentioned"
     answers["judge_score"] = {"type": "score", "score": 0, "confidence": 0.99, "probabilities": {"0": 1, "1": 0, "2": 0}}
@@ -303,6 +313,29 @@ def test_live_joins_recommendation_with_original_jev_decision(tmp_path, monkeypa
     for file in (tmp_path / "output").iterdir():
         assert "private-test-key-never-persist" not in file.read_text()
         assert "Authorization" not in file.read_text()
+
+
+@pytest.mark.parametrize("level, expected", [(2.5, "rewrite"), (3, "expose")])
+def test_default_workflow_decides_from_five_answers(tmp_path, monkeypatch, level, expected):
+    monkeypatch.setenv("MODELGO_API_KEY", "test-only-key")
+    answers = {
+        "q2_fact_support": {"choice": "supported", "confidence": 0.9},
+        "q3_expression_risk": {"choice": "clean", "confidence": 0.9},
+        "q5_context_relevance": {"choice": "relevant", "confidence": 0.9},
+        "risk_type": {"choice": "compliant", "confidence": 0.9},
+        "attractiveness_score": {"score": level, "confidence": 0.9},
+    }
+    mock_http_response(monkeypatch, json.dumps({"model": "jev-1.14.0", "answers": answers}))
+    report = _run_workflow(write_input(tmp_path), tmp_path / "output", live=True)
+    assert (report["decision_count"], report["error_count"]) == (1, 0)
+    request = read_jsonl(report["artifacts"]["jev_requests"])[0]["request"]
+    assert set(request["questions"]) == set(answers)
+    combined = json.loads(Path(report["artifacts"]["workflow_results"]).read_text())
+    assert combined["decision_source"] == "jev_answers_policy"
+    audit = combined["recommendations"][0]["jev_audit"]
+    assert (audit["compliance"], audit["attractiveness_score"], audit["decision"]) == ("Y", level * 20, expected)
+    assert audit["decision_question"] is None
+    assert "judge_score" not in audit
 
 
 def test_live_keeps_malformed_response_and_records_parse_error(tmp_path, monkeypatch):
@@ -368,7 +401,7 @@ def test_workflow_preserves_every_jev_disposition_at_zero_confidence(tmp_path, m
 
     monkeypatch.setenv("MODELGO_API_KEY", "test-only-key")
     answers = {key: {"choice": next(iter(q["criteria"])), "confidence": 0.0}
-               for key, q in build_jev_questions().items() if q["type"] == "choice"}
+               for key, q in build_jev_questions("jev-questions-v2").items() if q["type"] == "choice"}
     answers["q7_final_decision"]["choice"] = choice
     answers["q6_safety_gate"]["choice"] = "human_review"
     answers["q2_fact_support"]["choice"] = "unsupported"
@@ -399,7 +432,7 @@ def test_join_rejects_unmatched_or_modified_model_results(tmp_path):
     report = run_workflow(write_input(tmp_path), tmp_path / "prepare")
     candidates = read_jsonl(report["artifacts"]["candidates"])
     answers = {key: {"choice": next(iter(q["criteria"])), "confidence": 0.99}
-               for key, q in build_jev_questions().items() if q["type"] == "choice"}
+               for key, q in build_jev_questions("jev-questions-v2").items() if q["type"] == "choice"}
     answers["judge_score"] = {"score": 0, "confidence": 0.99}
     bundle = read_jsonl(report["artifacts"]["fact_bundles"])[0]
     decision = JevAdapter().parse_response({"answers": answers}, bundle)

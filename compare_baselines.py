@@ -36,12 +36,13 @@ def compare_results(rule_results: list[dict], jev_results: list[dict], labels: l
                     "jev_decision": jev["decision"],
                     "jev_risk_type": jev["risk_type"],
                     "rule_score": rule["judge_score"],
-                    "jev_score": jev["judge_score"],
+                    "jev_score": jev.get("judge_score"),
+                    **({"attractiveness_score": jev["attractiveness_score"]} if "attractiveness_score" in jev else {}),
                 }
             )
 
     rule_eval = evaluate_report(rule_results, labels, model_version="rule-baseline-v1", score_name="rule-compliance-v1")
-    jev_eval = evaluate_report(jev_results, labels, model_version="jev-1.14.0", score_name="jev-compliance-v1")
+    jev_eval = evaluate_report(jev_results, labels)
     return {
         "sample_count": len(ids),
         "decision_disagreements": sum(

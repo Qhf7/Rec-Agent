@@ -23,13 +23,13 @@ if __package__ in {None, ""}:
 
 from fact_bundle import build_fact_bundle
 from jev_adapter import DEFAULT_MODEL, JevAdapter, JevConfigurationError
-from jev_protocol import JEV_QUESTION_SCHEMA_VERSION, Q2_LEGACY_QUESTION_SCHEMA_VERSION
+from jev_protocol import Q2_LEGACY_QUESTION_SCHEMA_VERSION, V2_JEV_QUESTION_SCHEMA_VERSION
 from run_rule_baseline import load_lexicon
 from scripts.build_jev_review_evaluation import FIXTURE_PATH, candidate_from_case, load_review_cases
 from scripts.run_recommendation_workflow import canonicalize_recommendations, parse_recommendation_input
 
 COMPARISON_SCHEMA = "jev-review-comparison-v2"
-VERSIONS = (Q2_LEGACY_QUESTION_SCHEMA_VERSION, JEV_QUESTION_SCHEMA_VERSION)
+VERSIONS = (Q2_LEGACY_QUESTION_SCHEMA_VERSION, V2_JEV_QUESTION_SCHEMA_VERSION)
 OUTPUT_NAMES = ("manifest.json", "requests.jsonl", "responses.jsonl", "decisions.jsonl", "errors.jsonl", "summary.json")
 IDENTITY_KEYS = ("run_id", "case_id", "group", "question_version", "repeat", "ai_disclosure", "reason_id")
 
@@ -124,7 +124,7 @@ def prepare_tasks(*, fixture_path: str | Path = FIXTURE_PATH, repeats: int = 2,
             for candidate in canonicalize_recommendations(rows, input_format=input_format, ai_disclosure="unknown"):
                 bundle = build_fact_bundle(candidate, lexicon)
                 identifier = f"desktop_{user_id}_{candidate['item_id']}"
-                add(_new_task(identifier, "original_six", JEV_QUESTION_SCHEMA_VERSION, 1, "unknown", bundle,
+                add(_new_task(identifier, "original_six", V2_JEV_QUESTION_SCHEMA_VERSION, 1, "unknown", bundle,
                               {"source": "previous_desktop_final_answer", "source_sha256": hashlib.sha256(source.read_bytes()).hexdigest()}))
                 count += 1
         if count != 6:
@@ -141,7 +141,7 @@ def prepare_tasks(*, fixture_path: str | Path = FIXTURE_PATH, repeats: int = 2,
     for case in controls[:disclosure_controls]:
         for disclosure in ("visible", "missing"):
             bundle = build_fact_bundle(candidate_from_case(case, ai_disclosure=disclosure), lexicon)
-            add(_new_task(case["case_id"], "disclosure_control", JEV_QUESTION_SCHEMA_VERSION, 1, disclosure, bundle,
+            add(_new_task(case["case_id"], "disclosure_control", V2_JEV_QUESTION_SCHEMA_VERSION, 1, disclosure, bundle,
                           {"split": case["split"], "category": case["category"], "group_id": case["group_id"],
                            "unknown_control": "same case in evaluation group"}))
     if len({task["run_id"] for task in tasks}) != len(tasks):

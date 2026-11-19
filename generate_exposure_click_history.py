@@ -113,6 +113,8 @@ def generate_history(
 
     if days <= 0:
         raise ValueError("days must be positive")
+    if any("attractiveness_score" in row and "judge_score" not in row for row in results):
+        raise ValueError("Exposure history requires a risk-severity judge_score from the nine-question protocol")
     candidates_by_id = {row["reason_id"]: row for row in candidates}
     results_by_id = {row["reason_id"]: row for row in results}
     dates = _date_range(start_date, days)

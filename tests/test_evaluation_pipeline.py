@@ -55,3 +55,14 @@ def test_calibration_summary_has_score_buckets():
 
     assert report["bucket_count"] == 10
     assert len(report["buckets"]) == 10
+
+
+def test_risk_severity_calibration_rejects_attractiveness_score():
+    import pytest
+
+    with pytest.raises(ValueError, match="risk-severity judge_score"):
+        generate_exposure_records(
+            [{"reason_id": "r1"}],
+            [{"reason_id": "r1", "decision": "rewrite", "risk_type": "compliant",
+              "compliance": "Y", "attractiveness_score": 0}],
+        )

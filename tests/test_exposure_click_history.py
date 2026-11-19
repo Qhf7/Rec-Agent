@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from generate_exposure_click_history import generate_history
 
 
@@ -46,4 +48,16 @@ def test_blocked_reason_has_no_exposure_or_clicks():
     assert len(rows) == 2
     assert all(row["exposed"] is False for row in rows)
     assert all(row["exposure_count"] == row["click_count"] == 0 for row in rows)
+
+
+def test_exposure_history_does_not_use_attractiveness_as_risk_severity():
+    with pytest.raises(ValueError, match="risk-severity judge_score"):
+        generate_history(
+            [{"reason_id": "r1", "user_id": "u_0001", "item_id": "i_0001"}],
+            [{"reason_id": "r1", "decision": "expose", "risk_type": "compliant",
+              "compliance": "Y", "attractiveness_score": 90}],
+            [{"reason_id": "r1", "exposed": True, "exposure_count": 100,
+              "click_count": 10, "add_cart_count": 1, "order_count": 1,
+              "refund_count": 0, "complaint_count": 0}],
+        )
 

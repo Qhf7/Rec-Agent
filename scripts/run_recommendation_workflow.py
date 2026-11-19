@@ -20,14 +20,19 @@ from canonical_data import CANONICAL_SCHEMA_VERSION, load_canonical_items, load_
 from fact_bundle import build_fact_bundle
 from generate_full_candidates import promo_snapshot, user_snapshot
 from jev_adapter import JevAdapter, JevConfigurationError, validate_decision
+from jev_five_question import FIVE_QUESTION_PREVIOUS_SCHEMA_VERSION, FIVE_QUESTION_SCHEMA_VERSION, FIVE_QUESTION_POLICY_VERSION
 from jev_protocol import JEV_QUESTION_SCHEMA_VERSION, SUPPORTED_JEV_QUESTION_VERSIONS
 from run_rule_baseline import load_lexicon
 from scripts.migrate_legacy_candidates import CANDIDATE_SCHEMA_VERSION, validate_candidate_contract
 
 
+FIVE_QUESTION_PROTOCOLS = {FIVE_QUESTION_PREVIOUS_SCHEMA_VERSION, FIVE_QUESTION_SCHEMA_VERSION}
 SCENARIO_DATE = "2026-06-15"
 SNAPSHOT_AT = f"{SCENARIO_DATE}T12:00:00+08:00"
-AUDIT_FIELDS = {"decision", "risk_type", "judge_score", "escalated", "evidence"}
+AUDIT_FIELDS = {
+    "decision", "risk_type", "judge_score", "attractiveness_score", "compliance",
+    "escalated", "evidence", "jev_audit",
+}
 ARTIFACT_NAMES = {
     "candidates": "candidates.jsonl", "fact_bundles": "fact_bundles.jsonl",
     "jev_requests": "jev_requests.jsonl", "decisions": "jev_decisions.jsonl",
@@ -256,9 +261,11 @@ def build_workflow_results(candidates: list[dict], decisions: list[dict], errors
             "audit_status": "completed" if reason_id in by_id else "error" if reason_id in errors_by_id else "prepared",
             "jev_audit": by_id.get(reason_id),
         })
+    sources = {row.get("decision_source", "jev_model") for row in decisions}
+    source = next(iter(sources)) if len(sources) == 1 else "mixed" if sources else "jev_answers_policy"
     return {
         "schema_version": "recommendation-jev-workflow-v1", "mode": mode,
-        "decision_source": "jev_model", "recommendations": recommendations,
+        "decision_source": source, "recommendations": recommendations,
         "errors": deepcopy(errors),
     }
 
@@ -312,6 +319,12 @@ def run_workflow(
                 decision = validate_decision(adapter.judge(bundle))
                 if decision["reason_id"] != bundle["reason_id"]:
                     raise ValueError("Jev response reason_id does not match request")
+                if question_version in FIVE_QUESTION_PROTOCOLS:
+                    if decision.get("protocol_completeness") != question_version:
+                        raise ValueError("workflow requires a five-question Jev result")
+                    required_missing = bundle["disclosure"]["required"] and bundle["disclosure"]["flag"] is False
+                    if decision["decision_inputs"]["required_ai_disclosure_missing"] != required_missing:
+                        raise ValueError("workflow disclosure does not match the frozen fact bundle")
                 choices = decision.get("question_choices") or {}
                 if "q7_final_decision" in choices and decision["decision"] != choices["q7_final_decision"]:
                     raise ValueError("workflow decision differs from Jev Q7")
@@ -327,16 +340,21 @@ def run_workflow(
             artifacts["responses"] = str(response_path)
     artifacts["workflow_results"] = str(output_dir / ARTIFACT_NAMES["workflow_results"])
     combined = build_workflow_results(candidates, decisions, errors, mode="live" if live else "prepare")
+    combined["decision_source"] = "jev_answers_policy" if question_version in FIVE_QUESTION_PROTOCOLS else "jev_model"
+    combined["question_schema_version"] = question_version
+    if question_version in FIVE_QUESTION_PROTOCOLS:
+        combined["policy_version"] = FIVE_QUESTION_POLICY_VERSION
     Path(artifacts["workflow_results"]).write_text(
         json.dumps(combined, ensure_ascii=False, allow_nan=False, indent=2) + "\n", encoding="utf-8",
     )
     report = {
-        "workflow_version": "standalone-recommendation-v2", "mode": "live" if live else "prepare",
+        "workflow_version": "standalone-recommendation-v3", "mode": "live" if live else "prepare",
         "status": "completed_with_errors" if errors else "prepared" if not live else "completed",
         "input_format": actual_format, "scenario_date": SCENARIO_DATE,
         "data_version": CANONICAL_SCHEMA_VERSION, "ai_disclosure": ai_disclosure,
         "question_schema_version": question_version,
-        "decision_source": "jev_model",
+        "decision_source": combined["decision_source"],
+        **({"policy_version": FIVE_QUESTION_POLICY_VERSION} if question_version in FIVE_QUESTION_PROTOCOLS else {}),
         "candidate_count": len(candidates), "fact_bundle_count": len(bundles),
         "request_count": len(requests), "decision_count": len(decisions),
         "error_count": len(errors), "network_calls": calls,

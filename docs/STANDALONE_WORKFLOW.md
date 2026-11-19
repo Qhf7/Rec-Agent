@@ -1,17 +1,18 @@
 # 推荐生成与独立 Jev 判断工作流
 
-工作流通过严格JSON连接两个阶段：DeepSeek Harness/Rec-Agent根据用户输入生成推荐商品和曝光理由；独立Python程序接收该结果、构建事实包并调用Jev。Jev输出各题判断及四档处置，程序按商品关联保存，最终 `decision` 原样来自模型Q7。
+DeepSeek Harness/Rec-Agent 生成推荐商品和曝光理由。独立 Python 工作流读取推荐 JSON，构建事实包，调用 Jev 回答五题，再按固定规则生成处置。
 
 ```mermaid
 flowchart LR
     A[输入用户 ID] --> B[DeepSeek Harness / Rec-Agent]
     B --> C[导出推荐 JSON]
     C --> D[独立程序构建 Fact Bundle]
-    D --> E[独立 Jev 九题判断]
-    E --> F[推荐与 Jev 判断组合 JSON]
+    D --> E[独立 Jev 五题判断]
+    E --> P[合规与吸引力汇总规则]
+    P --> F[推荐与 Jev 判断组合 JSON]
 ```
 
-`human_review`是Jev可选择的处置标签；当前流程到结果输出为止，不执行实际人工复核、派单或复核回填。`rewrite`同样是处置结论，不会自动重新生成文案。真实页面展示和点击事件采集属于后续业务接入。
+`human_review` 表示关键资料需核验，流程在保存处置后结束。`rewrite`同样是处置结论，不会自动重新生成文案。真实页面展示和点击事件采集属于后续业务接入。
 
 ## 1. 导出 Harness 推荐
 
@@ -23,13 +24,13 @@ flowchart LR
   "recommendations": [
     {
       "item_id": "i_0001",
-      "exposure_reason": "折叠收纳，35L大容量更省心",
-      "generated_reason": "折叠收纳，35L大容量更省心",
+      "exposure_reason": "折叠收纳，换季衣物随手收",
+      "generated_reason": "折叠收纳，换季衣物随手收",
       "evidence_fields": [
-        "items.spec",
+        "items.category_l3",
         "items.functions"
       ],
-      "context_summary": "使用商品规格与折叠收纳功能"
+      "context_summary": "使用商品类目与折叠收纳功能"
     }
   ],
   "agent_version": "rec-agent-v2"
@@ -76,9 +77,9 @@ python3 scripts/run_recommendation_workflow.py \
   --live
 ```
 
-每条候选对应一次Jev请求，九题并行作答：Q1–Q6、Q7、风险分类和严重度。Q7根据同一份输入事实直接作出处置，不能假定它先读取了其他题答案。工作流的最终 `decision` 原样采用Q7；置信度、严重度、事实状态与披露配置用于结果展示和后续分析。
+每条候选对应一次 Jev 请求，模型并行判断事实、表达、场景和主要风险，并为文案评估吸引力。工作流从四道单选计算合规状态，只有合规且吸引力严格大于 50 分才输出 `expose`。详细条件见 [五题标准](JEV_QUESTIONS.md)。
 
-默认协议为 `jev-questions-v2`。显式传入 `--question-version jev-questions-v2-q2-legacy`可运行仅Q2不同的对照题；`jev-questions-v1`保留历史题目。
+默认协议为 `jev-questions-v3-five-r1`。首轮五题 `jev-questions-v3-five` 保留用于原请求回放；历史九题可通过 `--question-version jev-questions-v2` 显式运行，处置仍取 Q7。其余历史版本用于旧请求复现。
 
 密钥未配置会在发出请求前报错。响应格式、身份或模型版本错误单独记录；有失败项时命令退出码为1，不将接口或解析错误包装为模型的 `human_review`结论。
 
@@ -90,23 +91,24 @@ python3 scripts/run_recommendation_workflow.py \
 {
   "schema_version": "recommendation-jev-workflow-v1",
   "mode": "live",
-  "decision_source": "jev_model",
+  "decision_source": "jev_answers_policy",
   "recommendations": [
     {
       "reason_id": "r_example",
       "user_id": "u_0001",
       "item_id": "i_0001",
       "title": "规范商品标题",
-      "exposure_reason": "折叠收纳，35L大容量更省心",
-      "generated_reason": "折叠收纳，35L大容量更省心",
-      "evidence_fields": ["items.spec", "items.functions"],
-      "context_summary": "使用商品规格与折叠收纳功能",
+      "exposure_reason": "折叠收纳，换季衣物随手收",
+      "generated_reason": "折叠收纳，换季衣物随手收",
+      "evidence_fields": ["items.category_l3", "items.functions"],
+      "context_summary": "使用商品类目与折叠收纳功能",
       "audit_status": "completed",
       "jev_audit": {
         "decision": "expose",
-        "decision_source": "jev_model",
-        "decision_question": "q7_final_decision",
-        "decision_confidence": 0.91
+        "decision_source": "jev_answers_policy",
+        "compliance": "Y",
+        "attractiveness_score": 72.4,
+        "decision_reasons": ["compliant_and_attractiveness_above_50"]
       }
     }
   ],
@@ -114,7 +116,7 @@ python3 scripts/run_recommendation_workflow.py \
 }
 ```
 
-示例省略了 `jev_audit`其余字段；实际文件保存完整结论、逐题选择和置信度、风险分类、严重度、事实引用及配置注记。`title`来自规范商品数据，原推荐理由保持不变。
+示例省略了 `jev_audit`其余字段；实际文件保存完整结论、逐题选择和置信度、风险分类、吸引力、处置依据、事实引用及配置注记。`title`来自规范商品数据，原推荐理由保持不变。
 
 | 状态 | `audit_status` | `jev_audit` |
 | --- | --- | --- |
@@ -122,7 +124,7 @@ python3 scripts/run_recommendation_workflow.py \
 | 模型成功返回有效结果 | completed | 完整Jev结果 |
 | 请求或解析失败 | error | null；原因见errors |
 
-`human_review`结论对应的状态仍是 `completed`，表示模型已完成判断，而非有一项人工任务待执行。
+`human_review`结论对应的状态仍是 `completed`，表示程序已得到有效结果。
 
 ## 5. 独立追溯产物
 
@@ -133,13 +135,13 @@ python3 scripts/run_recommendation_workflow.py \
 | `fact_bundles.jsonl` | 冻结商品/场景事实、规则线索和披露状态 |
 | `jev_requests.jsonl` | 按理由保存的请求预览 |
 | `jev_responses.jsonl` | HTTP成功响应的原始正文，保留逐题选择、置信度和概率 |
-| `jev_decisions.jsonl` | 解析后的模型结论，每条decision对应Jev Q7 |
+| `jev_decisions.jsonl` | 解析后的 Jev 答卷及处置 |
 | `jev_errors.jsonl` | 有审核失败时保存错误类型和信息 |
 | `workflow_report.json` | 模式、数量、版本、调用次数与产物路径 |
 
 输出目录包含同名产物时拒绝覆盖，每次运行使用新目录。响应在解析前落盘；无效JSON或协议错误保留原文并记录错误，不生成成功结论。HTTP失败、仅准备请求、没有候选，或自定义适配器未提供原始正文时，不生成响应正文记录。
 
-`evidence_source: workflow_fact_snapshot`表示引用来自本地事实快照，不是Jev生成的逐句解释。`decision_confidence`为Q7置信度，`confidence`保留全部问题最低置信度用于诊断。`escalated`是兼容标记，表示decision是否为human_review，不触发额外工作流。
+`evidence_source: workflow_fact_snapshot`表示引用来自本地事实快照，不是Jev生成的逐句解释。`confidence` 保留全部问题最低置信度用于诊断。五题协议的 `decision_confidence` 为 `null`。`escalated`是兼容标记，表示decision是否为human_review，不触发额外工作流。
 
 ## 6. 事实与版本边界
 
@@ -149,9 +151,21 @@ python3 scripts/run_recommendation_workflow.py \
 
 已有候选JSONL先校验快照与版本，漂移时报错；部分快照继续保留缺字段、原始时间和原查询轨迹。例如2026-06-12的候选按原时间回放，空轨迹仍为空。
 
-Jev请求使用独立字段白名单。CTR、曝光点击、搜索词、购物车和反馈供Rec-Agent使用，不进入Jev输入。规范化输入与解析响应是程序职责，内容处置是模型职责。
+Jev请求使用独立字段白名单。CTR、曝光点击、搜索词、购物车和反馈供Rec-Agent使用，不进入Jev输入。模型答卷和固定汇总规则共同决定处置。
 
-## 7. 对照与冻结响应回放
+## 7. 测试与回放
+
+```bash
+# 准备五题评估请求
+python3 scripts/run_jev_five_question_evaluation.py \
+  --output-dir runs/jev-five-prepare
+
+# 终端配置模型凭据后运行同一套评估
+python3 scripts/run_jev_five_question_evaluation.py \
+  --output-dir runs/jev-five-live --live
+```
+
+历史九题的 Q2 对照和冻结响应仍可按原协议运行。
 
 ```bash
 # 默认40条×2版本×2重复，仅准备请求，网络调用0次
@@ -170,4 +184,4 @@ python3 scripts/replay_jev_model_decisions.py \
 
 A/B固定商品、文案、事实、模型及其他八题，仅改变Q2。可加 `--include-original-six --disclosure-controls 3`运行原六条回归和披露控制，总计172次；原六条参数依赖此前保存的本地桌面端推荐文件。
 
-[人工标注模板](JEV_EVALUATION_LABELING.md)可用于独立离线模型评估，当前回放无需人工标签。详细结果见 [当前工作流验证报告](TEST_REPORT_JEV_MODEL_WORKFLOW_2026-11-18.md)。历史调用和旧结果保留在各次运行目录，回放不声称重新调用了模型。
+[人工标注模板](JEV_EVALUATION_LABELING.md)可用于独立离线模型评估，当前回放无需人工标签。详细结果见 [历史九题验证报告](TEST_REPORT_JEV_MODEL_WORKFLOW_2026-11-18.md)。历史调用和旧结果保留在各次运行目录，回放不声称重新调用了模型。

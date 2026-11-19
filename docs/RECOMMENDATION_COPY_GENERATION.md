@@ -87,4 +87,4 @@ python3 scripts/run_recommendation_workflow.py \
   --output-dir runs/copy-review-prepare
 ```
 
-默认构建事实与请求预览，Jev 调用次数为零。显式增加 `--live` 才运行 Jev；处置仍原样采用 Jev Q7。文案生成端不作曝光判决。
+默认仅准备事实与请求。使用 `--live` 调用 Jev 后，独立工作流汇总五题答案，并在合规且吸引力严格大于 50 分时输出 `expose`。见 [题目及处置标准](JEV_QUESTIONS.md)。

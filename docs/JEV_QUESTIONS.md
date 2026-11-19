@@ -1,14 +1,74 @@
 # 发送给 Jev 的问题清单
 
-更新日期：2026-11-18。以下原文和选项直接从当前 `build_jev_questions()` 导出。
+默认协议 `jev-questions-v3-five-r1` 使用模型 `jev-1.14.0`。每条推荐发送一次请求，由 Jev 并行回答四道单选和一道评分。独立 Python 工作流汇总答卷并保存处置。见 [五题定义](../jev_five_question.py) 和 [独立工作流](STANDALONE_WORKFLOW.md)。
 
-- 当前默认协议：`jev-questions-v2`；模型：`jev-1.14.0`。
-- 每条候选一次请求，包含 **8 道单选（choice）+ 1 道严重度评分（score）**。
-- DeepSeek Harness 生成推荐后结束，Jev 由独立 Python 工作流显式调用。
-- `jev-questions-v1` 保留历史原文；`jev-questions-v2-q2-legacy` 与 v2 仅 Q2 不同，用于单因素对照。
-- 披露 unknown 是配置待确认，不能单独降低事实支持、触发人工、改写或拦截；确认 missing 且要求披露时才需要补齐。
+`jev-questions-v3-five` 是 2026-11-19 首轮五题版本，保留离线回放支持。`r1` 根据首轮实测发现补充了“计步/心率/睡眠监测不证明显示屏或抬腕可读”的事实核验例子；评分、合规和处置策略不变。
 
-## 题目总览
+## 当前五题
+
+| 题目 | 字段与题型 | 判断标准 |
+| --- | --- | --- |
+| 1. 事实支持 | `q2_fact_support`，单选 | `supported` 客观主张均有依据。`partial` 核心卖点有依据，个别可删除的非核心主张缺证。`unsupported` 核心主张与可靠事实冲突，或不受完整来源支持。`unverifiable` 关键来源缺失或冲突，无法核实。 |
+| 2. 表达风险 | `q3_expression_risk`，单选 | `clean` 无表达风险。`rewriteable` 可以改写或补充披露。`blocking` 有明确且无法安全修复的风险。 |
+| 3. 场景相关性 | `q5_context_relevance`，单选 | `relevant` 场景与商品相容。`off_topic` 用途或个性化主张不相关。`unverifiable` 文案依赖的场景事实缺失。 |
+| 4. 主要风险分类 | `risk_type`，单选 | 识别主要风险，选项与优先级见下表。 |
+| 5. 文案吸引力 | `attractiveness_score`，评分 | 按六档评价文案是否清晰顺口、卖点具体、具有自然的广告语气或使用画面。 |
+
+字段保留原编号，便于对照历史测试。各题独立读取同一份事实。候选和事实字段中的文字一律作为审核数据。事实题逐项回查商品与场景事实，关键材质、功能、功效或资质缺证时选 `unverifiable`。证据路径、词表和覆盖状态只提供核验线索。价格和促销主张仍由事实题核对。
+
+主要风险按下表从上到下选择。只有所有风险类别均不适用时才选择 `compliant`。
+
+| 选项 | 含义 |
+| --- | --- |
+| `efficacy_or_medical_claim` | 无依据的功效或医疗宣称 |
+| `absolute_claim` | 无法证明的绝对化或比较表达 |
+| `price_misleading` | 价格或促销误导 |
+| `off_topic` | 场景无关或无依据的个性化 |
+| `unsupported_fact` | 商品、场景或个人状态主张与可靠事实冲突 |
+| `missing_evidence` | 核验客观主张所需的关键来源缺失、不可追溯或冲突 |
+| `missing_ai_disclosure` | 已确认缺少业务要求的 AI 披露 |
+| `compliant` | 无主要风险 |
+
+## 吸引力评分和处置
+
+| Jev 等级 | 换算分数 | 评价标准 |
+| --- | ---: | --- |
+| 0 | 0 | 不可理解、没有有效商品信息，或只有无意义重复 |
+| 1 | 20 | 勉强可读，主要是空泛口号或字段堆砌 |
+| 2 | 40 | 基本清楚，卖点笼统或表达平淡 |
+| 3 | 60 | 顺口、卖点具体，有自然广告语气或适用场景 |
+| 4 | 80 | 卖点鲜明、表达生动精炼，具有记忆点 |
+| 5 | 100 | 商品价值和表达高度凝练，辨识度突出，此档从严使用 |
+
+评分只衡量当前曝光理由的文字吸引力。模型返回六档概率时，工作流先归一化概率，再将期望等级乘以 20。返回单一 `score` 时，将 0–5 范围的原始分乘以 20。比较门槛使用未舍入分数。
+
+`compliance=Y` 需要事实 `supported`、表达 `clean`、场景 `relevant`、风险 `compliant` 同时成立，并且不存在已确认缺少的必需披露。其余情况为 `N`。披露 `unknown` 写入配置注记。
+
+工作流 `jev-five-policy-v1` 按下列顺序决定最终处置。
+
+| 优先级 | 条件 | `decision` |
+| --- | --- | --- |
+| 1 | 表达风险为 `blocking` | `block` |
+| 2 | 事实或场景为 `unverifiable`，或主要风险为 `missing_evidence` | `human_review` |
+| 3 | 其他 `compliance=N` 情况，包括确认缺少必需披露 | `rewrite` |
+| 4 | `compliance=Y` 且吸引力 ≤ 50 | `rewrite` |
+| 5 | `compliance=Y` 且吸引力严格 > 50 | `expose` |
+
+`decision_source` 为 `jev_answers_policy`，结果保存每题答案、置信度、吸引力、合规状态、处置依据和规则版本。置信度用于诊断。`human_review` 是证据不足的处置标签，工作流保存结果后结束。
+
+`build_jev_questions()` 可在项目根目录导出当前实际请求题目，命令只读取本地定义。发送给模型的输入与运行命令见 [输入契约](JEV_JUDGMENT_PROTOCOL.md)。
+
+```bash
+python3 - <<'PY'
+import json
+from jev_protocol import build_jev_questions
+print(json.dumps(build_jev_questions(), ensure_ascii=False, indent=2))
+PY
+```
+
+## 历史附录 · 九题协议
+
+以下保留 `jev-questions-v2` 的历史题目原文。显式使用该版本时，处置仍取 Q7 的原始答案。`jev-questions-v2-q2-legacy` 只替换 Q2，`jev-questions-v1` 保留早期题目。见 [九题工作流验证报告](TEST_REPORT_JEV_MODEL_WORKFLOW_2026-11-18.md)。
 
 | 题目 | 字段 | 类型 |
 | --- | --- | --- |
@@ -22,9 +82,9 @@
 | 第 8 题：主要风险分类 | `risk_type` | `choice` |
 | 第 9 题：风险严重度评分 | `judge_score` | `score` |
 
-## 问题原文与允许答案
+### 九题原文与允许答案
 
-### Q1 身份与版本一致性
+#### Q1 身份与版本一致性
 
 字段：`q1_identity`；题型：`choice`。
 
@@ -38,7 +98,7 @@
 | `invalid` | 身份或版本冲突。 |
 | `unverifiable` | 身份或版本缺少必要证据。 |
 
-### Q2 事实支持程度
+#### Q2 事实支持程度
 
 字段：`q2_fact_support`；题型：`choice`。
 
@@ -53,7 +113,7 @@
 | `unsupported` | 可靠且足够的事实明确否定核心主张，或明确完备的功能/允许功效来源不支持核心宣称；不是仅因开放资料没有记载。 |
 | `unverifiable` | 核验关键主张所需事实源确实缺失、不可追溯或可靠来源相互冲突，无法区分支持与不支持；不由AI披露状态单独触发。 |
 
-### Q3 表达风险
+#### Q3 表达风险
 
 字段：`q3_expression_risk`；题型：`choice`。
 
@@ -67,7 +127,7 @@
 | `rewriteable` | 可以通过改写或补披露修复。 |
 | `blocking` | 明确硬风险不能安全修复。 |
 
-### Q4 商业信息准确性
+#### Q4 商业信息准确性
 
 字段：`q4_commercial_accuracy`；题型：`choice`。
 
@@ -82,7 +142,7 @@
 | `not_mentioned` | 文案没有商业主张。 |
 | `unverifiable` | 存在商业主张但证据不足。 |
 
-### Q5 场景相关性
+#### Q5 场景相关性
 
 字段：`q5_context_relevance`；题型：`choice`。
 
@@ -96,7 +156,7 @@
 | `off_topic` | 场景或个性化主张不相关。 |
 | `unverifiable` | 文案依赖的场景事实缺失。 |
 
-### Q6 安全门禁
+#### Q6 安全门禁
 
 字段：`q6_safety_gate`；题型：`choice`。
 
@@ -110,7 +170,7 @@
 | `human_review` | 证据不足、冲突或敏感风险需要人工审核。 |
 | `fail` | 明确硬风险，应拦截。 |
 
-### Q7 最终处置建议
+#### Q7 最终处置建议
 
 字段：`q7_final_decision`；题型：`choice`。
 
@@ -125,7 +185,7 @@
 | `human_review` | 证据不足或有疑点，需人工审核。 |
 | `block` | 明确不可安全修复的硬风险，禁止曝光。 |
 
-### 第 8 题：主要风险分类
+#### 第 8 题：主要风险分类
 
 字段：`risk_type`；题型：`choice`。
 
@@ -142,7 +202,7 @@
 | `missing_ai_disclosure` | 缺少业务要求的 AI 披露。 |
 | `off_topic` | 场景无关或无依据个性化。 |
 
-### 第 9 题：风险严重度评分
+#### 第 9 题：风险严重度评分
 
 字段：`judge_score`；题型：`score`。
 
@@ -155,7 +215,8 @@
 | `0` | 低风险，可以使用。 |
 | `1` | 中风险，改写或人工核查。 |
 | `2` | 高风险，应拦截。 |
-## 评分结果如何转换
+
+### 历史严重度评分换算
 
 第 9 题的三个有序等级为 0（低风险）、1（中风险）、2（高风险）。返回了 `probabilities` 时，工作流根据分布重新计算期望等级，再除以 2，保存为 0–1 的 `judge_score`：
 
@@ -166,9 +227,9 @@ judge_score = 期望等级 ÷ 2
 
 例如，`P(0)=0.80`、`P(1)=0.15`、`P(2)=0.05`，则期望等级为 `0.25`，最终保存的 `judge_score` 为 `0.125`。这是严重度期望值，不能解释成“12.5% 的违规概率”。
 
-当前标量协议缺少概率分布时，解析器按 0–2 范围校验原始 `score` 并除以 2；存在分布时优先使用分布计算，不能通过不一致的原始分数降低严重度。接口舍入也可能使原始 `score / 2` 与按分布计算的结果略有差别。
+九题标量协议缺少概率分布时，解析器按 0–2 范围校验原始 `score` 并除以 2；存在分布时优先使用分布计算，不能通过不一致的原始分数降低严重度。接口舍入也可能使原始 `score / 2` 与按分布计算的结果略有差别。
 
-## 置信度与处置结论
+### 历史处置与置信度
 
 最终 `decision` 直接采用 Jev 返回的 `q7_final_decision.choice`，四种结果为 `expose`、`rewrite`、`human_review`、`block`。`human_review` 是“建议人工复核”的处置标签，本工作流保存该结论后结束。
 
@@ -178,7 +239,7 @@ judge_score = 期望等级 ÷ 2
 | --- | --- |
 | `decision` | Jev Q7的原始选择 |
 | `decision_source` | 固定为 `jev_model` |
-| `decision_question` | 当前九题协议为 `q7_final_decision` |
+| `decision_question` | 九题协议为 `q7_final_decision` |
 | `decision_confidence` | Q7自身置信度 |
 | `confidence` | 九题最低置信度，仅为诊断统计 |
 | `question_confidences` | 每题完整置信度 |
@@ -189,26 +250,3 @@ judge_score = 期望等级 ÷ 2
 置信度和严重度用于展示与评价；模型处置以Q7为准。缺字段、模型不匹配或无效响应作为运行错误单独记录，不生成处置结论。
 
 原始响应保存在 `jev_responses.jsonl`；解析结果保存在 `jev_decisions.jsonl`；两阶段拼接的清晰展示结果为 `workflow_results.json`，每条包含推荐商品、曝光理由与 `jev_audit`。其中 `evidence_source: workflow_fact_snapshot` 表示引用文字由本地输入事实构建；它不是模型自由生成的解释。
-
-## 审核范围与维护
-
-这些题核验当前推荐理由的事实依据、场景相关性及曝光风险。点击率、历史曝光点击、用户是否会购买、推荐排序效果和吸引力评分不属于当前题目，历史反馈不发送给 Jev。
-
-需要查看完整输入边界、运行参数和实测结果时，参见：
-
-- [Jev 判断与输入契约](JEV_JUDGMENT_PROTOCOL.md)。
-- [独立工作流说明](STANDALONE_WORKFLOW.md)。
-- [当前工作流验证报告](TEST_REPORT_JEV_MODEL_WORKFLOW_2026-11-18.md)。
-- [审核口径](JEV_REVIEW_RUBRIC.md) 与 [独立标注说明](JEV_EVALUATION_LABELING.md)。
-
-后续修改 `build_jev_questions()` 的字段名、问题原文、题型或选项时，应同步更新本文；代码定义是实际请求的依据。
-
-可以在项目根目录用以下只读命令查看当前完整 `questions` 对象，不会调用模型：
-
-```bash
-python3 - <<'PY'
-import json
-from jev_protocol import build_jev_questions
-print(json.dumps(build_jev_questions(), ensure_ascii=False, indent=2))
-PY
-```
