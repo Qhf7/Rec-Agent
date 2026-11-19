@@ -1,16 +1,17 @@
-"""ModelGo DeepSeek fallback agent for structured recommendation-card generation."""
+"""Generate structured, fact-grounded recommendation copy with DeepSeek."""
 
 from __future__ import annotations
 
 import json
 import os
-import re
-import ssl
 import urllib.error
 import urllib.request
+from collections.abc import Iterable, Mapping
 from typing import Any
 
 from jev_adapter import build_ssl_context
+from recommendation_copy import build_copy_brief, copy_generation_instructions, validate_reason_text
+from scripts.strict_json_output import strict_json_loads
 
 DEFAULT_ENDPOINT = "https://api.modelgo.ai/v1/chat/completions"
 DEFAULT_MODEL = "deepseek-v4-flash"
@@ -27,23 +28,31 @@ class AgentResponseError(RuntimeError):
 def _extract_json(value: str | dict) -> Any:
     if isinstance(value, dict):
         return value
-    text = value.strip()
-    fenced = re.search(r"```(?:json)?\s*(\{.*?\}|\[.*?\])\s*```", text, flags=re.S)
-    text = fenced.group(1) if fenced else text
+    if not isinstance(value, str):
+        raise AgentResponseError("Agent response must be strict JSON text or an object")
     try:
-        return json.loads(text)
-    except json.JSONDecodeError as exc:
-        start = min([p for p in (text.find("{"), text.find("[")) if p >= 0], default=-1)
-        end = max(text.rfind("}"), text.rfind("]"))
-        if start >= 0 and end > start:
-            try:
-                return json.loads(text[start : end + 1])
-            except json.JSONDecodeError:
-                pass
-        raise AgentResponseError("Agent response is not valid JSON") from exc
+        return strict_json_loads(value)
+    except ValueError as exc:
+        raise AgentResponseError("Agent response is not one complete strict JSON document") from exc
 
 
-def parse_agent_cards(raw: str | dict, expected: dict[str, str]) -> list[dict]:
+def _expected_pairs(expected: Mapping[str, str] | Iterable[tuple[str, str]]) -> set[tuple[str, str]]:
+    """Accept the legacy one-item map while retaining every requested pair."""
+    pairs = list(expected.items() if isinstance(expected, Mapping) else expected)
+    if any(not isinstance(pair, (list, tuple)) or len(pair) != 2 for pair in pairs):
+        raise AgentResponseError("expected pairs must contain user_id and item_id")
+    if any(not isinstance(value, str) or not value.strip() for pair in pairs for value in pair):
+        raise AgentResponseError("expected user_id and item_id must be non-empty strings")
+    normalized = {tuple(pair) for pair in pairs}
+    if len(normalized) != len(pairs):
+        raise AgentResponseError("duplicate requested user/item pair")
+    return normalized
+
+
+def parse_agent_cards(
+    raw: str | dict, expected: Mapping[str, str] | Iterable[tuple[str, str]]
+) -> list[dict]:
+    expected_pairs = _expected_pairs(expected)
     payload = _extract_json(raw)
     cards = payload.get("cards") if isinstance(payload, dict) else payload
     if not isinstance(cards, list):
@@ -56,36 +65,40 @@ def parse_agent_cards(raw: str | dict, expected: dict[str, str]) -> list[dict]:
         for field in ("user_id", "item_id", "evidence_fields"):
             if field not in card:
                 raise AgentResponseError(f"Agent card missing {field}")
-        user_id = str(card["user_id"])
-        item_id = str(card["item_id"])
-        if user_id not in expected:
-            raise AgentResponseError(f"unexpected user_id: {user_id}")
-        if expected[user_id] != item_id:
-            raise AgentResponseError(f"item mismatch for {user_id}: {item_id}")
-        if user_id in seen:
-            raise AgentResponseError(f"duplicate user_id: {user_id}")
-        exposure_reason = str(card.get("exposure_reason", card.get("generated_reason", ""))).strip()
-        generated_reason = str(card.get("generated_reason", exposure_reason)).strip()
-        if not exposure_reason:
-            raise AgentResponseError(f"exposure_reason must be non-empty: {user_id}")
+        user_id, item_id = card["user_id"], card["item_id"]
+        if not isinstance(user_id, str) or not isinstance(item_id, str):
+            raise AgentResponseError("user_id and item_id must be strings")
+        pair = (user_id, item_id)
+        if pair not in expected_pairs:
+            raise AgentResponseError(f"unexpected user/item pair: {user_id}/{item_id}")
+        if pair in seen:
+            raise AgentResponseError(f"duplicate user/item pair: {user_id}/{item_id}")
+        try:
+            exposure_reason = validate_reason_text(card.get("exposure_reason", card.get("generated_reason", "")))
+        except ValueError as exc:
+            raise AgentResponseError(f"invalid exposure_reason for {user_id}/{item_id}: {exc}") from exc
+        generated_reason = card.get("generated_reason", exposure_reason)
         if generated_reason != exposure_reason:
             raise AgentResponseError(f"generated_reason must equal exposure_reason: {user_id}")
         reason = exposure_reason
-        if not reason or len(reason) > 24:
-            raise AgentResponseError(f"exposure_reason must be 1-24 characters: {user_id}")
         evidence_fields = card["evidence_fields"]
-        if not isinstance(evidence_fields, list) or not evidence_fields:
-            raise AgentResponseError(f"evidence_fields must be non-empty: {user_id}")
+        if (
+            not isinstance(evidence_fields, list)
+            or not 2 <= len(evidence_fields) <= 6
+            or any(not isinstance(field, str) or not field.strip() for field in evidence_fields)
+            or len(set(evidence_fields)) != len(evidence_fields)
+        ):
+            raise AgentResponseError(f"evidence_fields must contain 2-6 distinct field names: {user_id}")
         parsed.append({
             "user_id": user_id,
             "item_id": item_id,
             "exposure_reason": reason,
             "generated_reason": reason,
-            "evidence_fields": [str(x) for x in evidence_fields],
+            "evidence_fields": list(evidence_fields),
         })
-        seen.add(user_id)
-    if set(expected) != seen:
-        raise AgentResponseError(f"Agent returned {len(seen)} cards, expected {len(expected)}")
+        seen.add(pair)
+    if expected_pairs != seen:
+        raise AgentResponseError(f"Agent returned {len(seen)} cards, expected {len(expected_pairs)}")
     return parsed
 
 
@@ -106,38 +119,43 @@ class ModelGoAgent:
         self.dry_run = dry_run
 
     def build_payload(self, contexts: list[dict]) -> dict:
-        expected = {row["user_id"]: row["item_id"] for row in contexts}
+        _expected_pairs((row["user_id"], row["item_id"]) for row in contexts)
         instructions = {
-            "task": "为每个用户生成一张商品推荐卡片",
+            **copy_generation_instructions(),
+            "task": "根据每个 copy_brief 的商品关键信息，由大模型创作一条自然生动的广告曝光理由",
             "output_schema": {
                 "cards": [
                     {
                         "user_id": "string",
                         "item_id": "string",
-                        "exposure_reason": "给用户展示的一句话，不超过24个汉字",
-                        "generated_reason": "不超过24个汉字",
-                        "evidence_fields": ["实际使用的字段名"]
+                        "exposure_reason": "商品卖点单行广告，目标8–18个Unicode字符，总长度不超过20字符，不含商品数量或规格参数",
+                        "generated_reason": "与 exposure_reason 完全相同",
+                        "evidence_fields": ["实际用于文案的2–6个规范字段路径，至少一个items.字段"]
                     }
                 ]
             },
-            "constraints": [
+            "output_constraints": [
                 "只输出 JSON，不要 Markdown 或解释",
-                "必须为每个 user_id 返回一张卡片，不能新增或遗漏用户",
-                "exposure_reason 是给用户看的单句文案，不超过24个汉字，必须基于给定商品事实",
+                "整段回复必须是一个严格JSON根对象；不允许前后文字、代码围栏、重复键、NaN、Infinity或多个根值",
+                "必须为每个 user_id/item_id 组合返回一张卡片，不能新增、遗漏或合并；同一用户可能有多个商品",
                 "generated_reason 必须与 exposure_reason 完全相同，仅用于兼容旧字段",
-                "不得编造给定上下文中不存在的功能、优惠或功效",
-                "evidence_fields 只能填写实际使用的上下文字段名",
+                "evidence_fields 只能填写 copy_brief 实际给出且文案使用的事实字段路径",
             ],
-            "expected_user_item_pairs": expected,
-            "contexts": contexts,
+            "expected_user_item_pairs": [
+                {"user_id": row["user_id"], "item_id": row["item_id"]} for row in contexts
+            ],
+            "contexts": [
+                {"user_id": row["user_id"], "item_id": row["item_id"], "copy_brief": build_copy_brief(row)}
+                for row in contexts
+            ],
         }
         return {
             "model": self.model,
             "messages": [
-                {"role": "system", "content": "你是电商推荐卡片生成 Agent。严格遵守 JSON 输出约束。"},
+                {"role": "system", "content": "你是电商广告文案创作 Agent。围绕给定商品事实写自然易读的曝光理由，严格遵守 JSON 输出约束。"},
                 {"role": "user", "content": json.dumps(instructions, ensure_ascii=False)},
             ],
-            "temperature": 0.2,
+            "temperature": 0.7,
         }
 
     def generate_batch(self, contexts: list[dict]) -> dict | list[dict]:
@@ -167,5 +185,5 @@ class ModelGoAgent:
             content = body["choices"][0]["message"]["content"]
         except (KeyError, IndexError, TypeError) as exc:
             raise AgentResponseError("ModelGo response missing choices[0].message.content") from exc
-        expected = {row["user_id"]: row["item_id"] for row in contexts}
+        expected = [(row["user_id"], row["item_id"]) for row in contexts]
         return parse_agent_cards(content, expected)

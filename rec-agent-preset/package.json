@@ -8,5 +8,8 @@
     "bundle": {
       "patch": "./cordis.patch.yml"
     }
+  },
+  "exports": {
+    ".": "./strict-output.js"
   }
 }

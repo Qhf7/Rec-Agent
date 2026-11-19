@@ -1,0 +1,929 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" role="img" aria-label="Rec-Agent and Jev Pipeline Architecture Diagram">
+  <defs>
+    <!-- Background & Canvas Gradients -->
+    <radialGradient id="canvasBg" cx="50%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#0c1222"/>
+      <stop offset="50%" stop-color="#070a14"/>
+      <stop offset="100%" stop-color="#04060a"/>
+    </radialGradient>
+
+    <!-- Lane Gradients -->
+    <linearGradient id="lane1Grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f172a" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#090d16" stop-opacity="0.98"/>
+    </linearGradient>
+
+    <linearGradient id="lane2Grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f1f38" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#0a1224" stop-opacity="0.98"/>
+    </linearGradient>
+
+    <linearGradient id="lane3Grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0e232b" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#09151c" stop-opacity="0.98"/>
+    </linearGradient>
+
+    <linearGradient id="lane4Grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#210f26" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#14091a" stop-opacity="0.98"/>
+    </linearGradient>
+
+    <linearGradient id="lane5Grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f2420" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#091412" stop-opacity="0.98"/>
+    </linearGradient>
+
+    <!-- Accent Highlights -->
+    <linearGradient id="recAgentLogoRim" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+
+    <linearGradient id="jevLogoRim" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f472b6"/>
+      <stop offset="50%" stop-color="#e849b7"/>
+      <stop offset="100%" stop-color="#db2777"/>
+    </linearGradient>
+
+    <linearGradient id="recRBackbone" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="recRLoop" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#00f2fe"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="recRLeg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+
+    <!-- Card Backgrounds -->
+    <linearGradient id="innerCardBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e293b" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.8"/>
+    </linearGradient>
+
+    <!-- Filters -->
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+
+    <filter id="dropShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+
+    <!-- Arrow Markers -->
+    <marker id="arrowCyan" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <polygon points="0 0, 9 4.5, 0 9" fill="#00f2fe"/>
+    </marker>
+    <marker id="arrowBlue" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <polygon points="0 0, 9 4.5, 0 9" fill="#38bdf8"/>
+    </marker>
+    <marker id="arrowAmber" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <polygon points="0 0, 9 4.5, 0 9" fill="#f59e0b"/>
+    </marker>
+    <marker id="arrowPink" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <polygon points="0 0, 9 4.5, 0 9" fill="#e849b7"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <polygon points="0 0, 9 4.5, 0 9" fill="#10b981"/>
+    </marker>
+  </defs>
+
+  <!-- Base Canvas -->
+  <rect width="1920" height="1080" fill="url(#canvasBg)"/>
+
+  <!-- High-Tech Background Grid & Geometric Guides -->
+  <g opacity="0.05" stroke="#38bdf8" stroke-width="1">
+    <pattern id="gridPattern" width="40" height="40" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="40" y2="0"/>
+      <line x1="0" y1="0" x2="0" y2="40"/>
+    </pattern>
+    <rect width="1920" height="1080" fill="url(#gridPattern)"/>
+  </g>
+
+  <!-- ========================================== -->
+  <!-- TOP BANNER & HEADER BAR                   -->
+  <!-- ========================================== -->
+  <g transform="translate(40, 24)">
+    <!-- Header Background Pill -->
+    <rect width="1840" height="78" rx="16" fill="#0f172a" fill-opacity="0.8" stroke="#1e293b" stroke-width="1.5" filter="url(#dropShadow)"/>
+
+    <!-- Left Brand Badge / Pulsing Status -->
+    <circle cx="28" cy="39" r="6" fill="#10b981" filter="url(#softGlow)"/>
+
+    <!-- Title and Subtitle -->
+    <text x="48" y="34" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC', sans-serif" font-size="22" font-weight="800" fill="#f8fafc" letter-spacing="0.5">
+      Rec-Agent × Jev · 电商生成式推荐与曝光前合规审核链路图
+    </text>
+    <text x="48" y="58" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', sans-serif" font-size="12.5" font-weight="400" fill="#94a3b8">
+      端到端双阶段解耦架构：从多源上下文感知、生成式个性化推荐、事实追溯冻结，到 Jev 曝光前合规门禁与闭环校准
+    </text>
+
+    <!-- Right Header Badges -->
+    <g transform="translate(1180, 22)">
+      <!-- Badge 1: Resolution -->
+      <rect x="0" y="0" width="138" height="34" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+      <text x="69" y="21" text-anchor="middle" font-family="'SF Mono', Menlo, monospace" font-size="11.5" font-weight="600" fill="#38bdf8">1080P · 1920×1080</text>
+
+      <!-- Badge 2: Redline -->
+      <rect x="150" y="0" width="160" height="34" rx="8" fill="#450a0a" stroke="#b91c1c" stroke-width="1"/>
+      <text x="230" y="21" text-anchor="middle" font-family="-apple-system, PingFang SC, sans-serif" font-size="11.5" font-weight="700" fill="#f87171">红线：违规漏放率 = 0</text>
+
+      <!-- Badge 3: Protocol -->
+      <rect x="322" y="0" width="168" height="34" rx="8" fill="#1e1b4b" stroke="#4338ca" stroke-width="1"/>
+      <text x="406" y="21" text-anchor="middle" font-family="'SF Mono', Menlo, monospace" font-size="11.5" font-weight="600" fill="#a5b4fc">Jev-1.14.0 SystemOne</text>
+
+      <!-- Badge 4: Test Status -->
+      <rect x="502" y="0" width="146" height="34" rx="8" fill="#064e3b" stroke="#059669" stroke-width="1"/>
+      <text x="575" y="21" text-anchor="middle" font-family="'SF Mono', Menlo, monospace" font-size="11.5" font-weight="600" fill="#34d399">✓ 48 Tests Passed</text>
+    </g>
+  </g>
+
+  <!-- ========================================== -->
+  <!-- 5 MAJOR LANES / ARCHITECTURAL SWIMLANES    -->
+  <!-- ========================================== -->
+
+  <!-- ======================================================== -->
+  <!-- LANE 1: 上下文感知与数据底座 (Context & Data Plane)      -->
+  <!-- ======================================================== -->
+  <g transform="translate(40, 118)">
+    <rect width="345" height="832" rx="16" fill="url(#lane1Grad)" stroke="#0284c7" stroke-width="1.8" filter="url(#dropShadow)"/>
+
+    <!-- Lane Header -->
+    <rect x="16" y="16" width="313" height="42" rx="8" fill="#0369a1" fill-opacity="0.3" stroke="#0284c7" stroke-width="1"/>
+    <text x="30" y="42" font-family="-apple-system, PingFang SC, sans-serif" font-size="15" font-weight="700" fill="#38bdf8">
+      01 · 多源上下文与数据底座
+    </text>
+
+    <!-- Card 1A: Canonical Mock Data -->
+    <g transform="translate(16, 72)">
+      <rect width="313" height="236" rx="10" fill="url(#innerCardBg)" stroke="#1e293b" stroke-width="1.2"/>
+      <text x="14" y="26" font-family="-apple-system, PingFang SC, sans-serif" font-size="13" font-weight="700" fill="#93c5fd">
+        核心标准数据源 (data/raw/)
+      </text>
+
+      <!-- Data item 1 -->
+      <rect x="14" y="40" width="285" height="38" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+      <text x="24" y="58" font-family="'SF Mono', Menlo, monospace" font-size="11.5" font-weight="600" fill="#38bdf8">users.csv</text>
+      <text x="96" y="58" font-family="-apple-system, PingFang SC, sans-serif" font-size="11" fill="#cbd5e1">200 条用户画像 / 活跃时段 / 购物车</text>
+      <text x="24" y="72" font-family="-apple-system, PingFang SC, sans-serif" font-size="9.5" fill="#64748b">city, climate_zone, life_stage, interests, 90d purchases</text>
+
+      <!-- Data item 2 -->
+      <rect x="14" y="86" width="285" height="38" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+      <text x="24" y="104" font-family="'SF Mono', Menlo, monospace" font-size="11.5" font-weight="600" fill="#38bdf8">items.csv</text>
+      <text x="96" y="104" font-family="-apple-system, PingFang SC, sans-serif" font-size="11" fill="#cbd5e1">200 条商品结构化属性与规格库</text>
+      <text x="24" y="118" font-family="-apple-system, PingFang SC, sans-serif" font-size="9.5" fill="#64748b">category, functions, suitable_scenes, price, risk_tags</text>
+
+      <!-- Data item 3 -->
+      <rect x="14" y="132" width="285" height="42" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+      <text x="24" y="150" font-family="'SF Mono', Menlo, monospace" font-size="11.5" font-weight="600" fill="#38bdf8">promo_rules.json</text>
+      <text x="145" y="150" font-family="-apple-system, PingFang SC, sans-serif" font-size="11" fill="#cbd5e1">30 组促销计算规则</text>
+      <text x="24" y="165" font-family="-apple-system, PingFang SC, sans-serif" font-size="9.5" fill="#64748b">满减门槛、限时折扣、适用商品集合与有效时间戳</text>
+
+      <!-- Data item 4 -->
+      <rect x="14" y="182" width="285" height="40" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+      <text x="24" y="200" font-family="'SF Mono', Menlo, monospace" font-size="11.5" font-weight="600" fill="#38bdf8">city_climate.json</text>
+      <text x="145" y="200" font-family="-apple-system, PingFang SC, sans-serif" font-size="11" fill="#cbd5e1">城市气候与时令映射</text>
+      <text x="24" y="215" font-family="-apple-system, PingFang SC, sans-serif" font-size="9.5" fill="#64748b">杭州梅雨季防潮、成都盛夏消暑、北方冬日干燥等</text>
+    </g>
+
+    <!-- Card 1B: Read-only MCP Server -->
+    <g transform="translate(16, 322)">
+      <rect width="313" height="236" rx="10" fill="url(#innerCardBg)" stroke="#0284c7" stroke-width="1.2"/>
+      <text x="14" y="26" font-family="-apple-system, PingFang SC, sans-serif" font-size="13" font-weight="700" fill="#67e8f9">
+        FastMCP 只读协议层 (mcp_server.py)
+      </text>
+
+      <text x="14" y="46" font-family="-apple-system, PingFang SC, sans-serif" font-size="11" fill="#94a3b8">
+        Harness stdio 统一注册，保障数据访问确定性与防篡改：
+      </text>
+
+      <!-- MCP tool list -->
+      <g transform="translate(14, 56)">
+        <rect x="0" y="0" width="285" height="26" rx="4" fill="#082f49" stroke="#0369a1" stroke-width="0.8"/>
+        <text x="8" y="18" font-family="'SF Mono', Menlo, monospace" font-size="10.5" fill="#38bdf8">get_user_profile(user_id)</text>
+
+        <rect x="0" y="32" width="285" height="26" rx="4" fill="#082f49" stroke="#0369a1" stroke-width="0.8"/>
+        <text x="8" y="50" font-family="'SF Mono', Menlo, monospace" font-size="10.5" fill="#38bdf8">get_user_behavior(user_id)</text>
+
+        <rect x="0" y="64" width="285" height="26" rx="4" fill="#082f49" stroke="#0369a1" stroke-width="0.8"/>
+        <text x="8" y="82" font-family="'SF Mono', Menlo, monospace" font-size="10.5" fill="#38bdf8">search_items(category, query, limit)</text>
+
+        <rect x="0" y="96" width="285" height="26" rx="4" fill="#082f49" stroke="#0369a1" stroke-width="0.8"/>
+        <text x="8" y="114" font-family="'SF Mono', Menlo, monospace" font-size="10.5" fill="#38bdf8">get_item(item_id) / get_promo(promo_id)</text>
+
+        <rect x="0" y="128" width="285" height="26" rx="4" fill="#082f49" stroke="#0369a1" stroke-width="0.8"/>
+        <text x="8" y="146" font-family="'SF Mono', Menlo, monospace" font-size="10.5" fill="#38bdf8">get_user_recommendation_history()</text>
+      </g>
+
+      <rect x="14" y="200" width="285" height="24" rx="4" fill="#042f2e" stroke="#0f766e" stroke-width="0.8"/>
+      <text x="142" y="216" text-anchor="middle" font-family="-apple-system, PingFang SC, sans-serif" font-size="10" font-weight="600" fill="#2dd4bf">
+        🔒 只读授权：严禁写文件 · 严禁调用 Jev 接口
+      </text>
+    </g>
+
+    <!-- Card 1C: Anti-Leakage Wall (Isolation Guard #1) -->
+    <g transform="translate(16, 572)">
+      <rect width="313" height="240" rx="10" fill="#1e131d" stroke="#e11d48" stroke-width="1.5"/>
+      <rect x="14" y="14" width="285" height="28" rx="6" fill="#881337" stroke="#e11d48" stroke-width="1"/>
+      <text x="156" y="33" text-anchor="middle" font-family="-apple-system, PingFang SC, sans-serif" font-size="12" font-weight="700" fill="#fecdd3">
+        🛡️ 防泄漏隔离墙 #1 (Anti-Leakage Guard)
+      </text>
+
+      <text x="14" y="64" font-family="-apple-system, PingFang SC, sans-serif" font-size="11.5" font-weight="600" fill="#fda4af">
+        严禁违规词表/安全红线直接下发给推荐 Agent：
+      </text>
+      <text x="14" y="84" font-family="-apple-system, PingFang SC, sans-serif" font-size="10.5" fill="#f43f5e">
+        • compliance_lexicon.txt 仅供下游事实规则与 Jev 使用
+      </text>
+      <text x="14" y="102" font-family="-apple-system, PingFang SC, sans-serif" font-size="10.5" fill="#f43f5e">
+        • 防止 Agent 通过对抗性 prompt 试探规避词表检测
+      </text>
+
+      <line x1="14" y1="118" x2="299" y2="118" stroke="#4c0519" stroke-width="1"/>
+
+      <text x="14" y="136" font-family="-apple-system, PingFang SC, sans-serif" font-size="11.5" font-weight="600" fill="#67e8f9">
+        曝光后点击反馈单向授权：
+      </text>
+      <text x="14" y="156" font-family="-apple-system, PingFang SC, sans-serif" font-size="10.5" fill="#cbd5e1">
+        • 仅回流 Jev 审核通过且已展示的推荐卡片点击日志
+      </text>
+      <text x="14" y="174" font-family="-apple-system, PingFang SC, sans-serif" font-size="10.5" fill="#cbd5e1">
+        • 仅作为 Rec-Agent 软排序与探索位弱偏好 (soft prior)
+      </text>
+      <text x="14" y="192" font-family="-apple-system, PingFang SC, sans-serif" font-size="10.5" fill="#cbd5e1">
+        • 绝不写入用户可见文案，绝不作为事实证据
+      </text>
+
+      <rect x="14" y="206" width="285" height="22" rx="4" fill="#4c0519"/>
+      <text x="156" y="221" text-anchor="middle" font-family="'SF Mono', Menlo, monospace" font-size="9.5" fill="#fda4af">
+        ISOLATION ENFORCED: NO TARGET LEAKAGE
+      </text>
+    </g>
+  </g>
+
+  <!-- Flow Connector: Lane 1 -> Lane 2 -->
+  <g>
+    <path d="M 385 440 L 415 440" fill="none" stroke="#00f2fe" stroke-width="2.5" marker-end="url(#arrowCyan)"/>
+    <text x="400" y="430" text-anchor="middle" font-family="'SF Mono', Menlo, monospace" font-size="9" fill="#00f2fe">MCP stdio</text>
+  </g>
+
+  <!-- ======================================================== -->
+  <!-- LANE 2: Rec-Agent 生成式推荐引擎 (Rec-Agent Generation)   -->
+  <!-- ======================================================== -->
+  <g transform="translate(415, 118)">
+    <rect width="350" height="832" rx="16" fill="url(#lane2Grad)" stroke="#2563eb" stroke-width="2" filter="url(#dropShadow)"/>
+
+    <!-- Lane Header + EMBEDDED BRAND NEW REC-AGENT LOGO -->
+    <g transform="translate(16, 16)">
+      <rect width="318" height="74" rx="12" fill="#1e293b" fill-opacity="0.9" stroke="url(#recAgentLogoRim)" stroke-width="1.8"/>
+
+      <!-- Mini Rec-Agent Logo Emblem -->
+      <g transform="translate(12, 10)">
+        <rect width="54" height="54" rx="14" fill="#0d1428" stroke="url(#recAgentLogoRim)" stroke-width="1.2"/>
+        <!-- R Backbone -->
+        <path d="M 14 12 L 20 12 C 21 12, 22 13, 22 14 L 22 40 C 22 41, 21 42, 20 42 L 14 42 C 13 42, 12 41, 12 40 L 12 14 C 12 13, 13 12, 14 12 Z" fill="url(#recRBackbone)"/>
+        <!-- R Loop -->
+        <path d="M 22 12 L 34 12 C 40 12, 44 16, 44 23 C 44 30, 40 34, 34 34 L 22 34 Z" fill="url(#recRLoop)"/>
+        <path d="M 22 18 L 32 18 C 35 18, 38 20, 38 23 C 38 26, 35 28, 32 28 L 22 28 Z" fill="#0d1428"/>
+        <!-- Sparkle in loop -->
+        <circle cx="30" cy="23" r="2.5" fill="#ffffff" filter="url(#softGlow)"/>
+        <!-- R Leg -->
+        <path d="M 28 32 L 36 32 C 37 32, 38 33, 39 34 L 43 42 L 36 42 L 31 35 Z" fill="url(#recRLeg)"/>
+      </g>
+
+      <!-- Logo Typography & Details -->
+      <text x="76" y="34" font-family="-apple-system, PingFang SC, sans-serif" font-size="18" font-weight="900" letter-spacing="-0.5">
+        <tspan fill="#ffffff">Rec-</tspan><tspan fill="#38bdf8">Agent</tspan>
+      </text>
+      <text x="76" y="52" font-family="'SF Mono', Menlo, monospace" font-size="9.5" font-weight="700" fill="#94a3b8" letter-spacing="1.2">
+        AIGR RECOMMENDATION ENGINE
+      </text>
+      <text x="76" y="66" font-family="-apple-system, PingFang SC, sans-serif" font-size="9" fill="#38bdf8">
+        rec-agent-preset · modelgo_agent.py
+      </text>
+    </g>
+
+    <!-- Card 2A: Generation Execution Flow -->
+    <g transform="translate(16, 102)">
+      <rect width="318" height="240" rx="10" fill="url(#innerCardBg)" stroke="#1e293b" stroke-width="1.2"/>
+      <text x="14" y="24" font-family="-apple-system, PingFang SC, sans-serif" font-size="13" font-weight="700" fill="#60a5fa">
+        生成执行流 (DeepSeek Harness)
+      </text>
+
+      <!-- Step 1 -->
+      <g transform="translate(14, 38)">
+        <circle cx="10" cy="10" r="10" fill="#1d4ed8"/>
+        <text x="10" y="14" text-anchor="middle" font-family="'SF Mono', Menlo, monospace" font-size="11" font-weight="700" fill="#ffffff">1</text>
+        <text x="28" y="14" font-family="-apple-system, PingFang SC, sans-serif" font-size="11.5" font-weight="600" fill="#e2e8f0">用户上下文融合与意图激活</text>
+        <text x="28" y="28" font-family="-apple-system, PingFang SC, sans-serif" font-size="10" fill="#94a3b8">结合画像、常住城市气候、活跃时段与近期浏览足迹</text>
+      </g>
+
+      <!-- Step 2 -->
+      <g transform="translate(14, 82)">
+        <circle cx="10" cy="10" r="10" fill="#1d4ed8"/>
+        <text x="10" y="14" text-anchor="middle" font-family="'SF Mono', Menlo, monospace" font-size="11" font-weight="700" fill="#ffffff">2</text>
+        <text x="28" y="14" font-family="-apple-system, PingFang SC, sans-serif" font-size="11.5" font-weight="600" fill="#e2e8f0">多维属性匹配与 Top-3 候选选品</text>
+        <text x="28" y="28" font-family="-apple-system, PingFang SC, sans-serif" font-size="10" fill="#94a3b8">基于品类关联、场景适用性、库存与优惠规则筛选</text>
+      </g>
+
+      <!-- Step 3 -->
+      <g transform="translate(14, 126)">
+        <circle cx="10" cy="10" r="10" fill="#1d4ed8"/>
+        <text x="10" y="14" text-anchor="middle" font-family="'SF Mono', Menlo, monospace" font-size="11" font-weight="700" fill="#ffffff">3</text>
+        <text x="28" y="14" font-family="-apple-system, PingFang SC, sans-serif" font-size="11.5" font-weight="600" fill="#e2e8f0">个性化曝光理由生成 (exposure_reason)</text>
+        <text x="28" y="28" font-family="-apple-system, PingFang SC, sans-serif" font-size="10" fill="#94a3b8">聚焦场景、时令与痛点，生成高吸引力单句理由</text>
+      </g>
+
+      <!-- Example Box -->
+      <rect x="14" y="172" width="290" height="56" rx="6" fill="#0a1224" stroke="#2563eb" stroke-width="1"/>
+      <text x="24" y="190" font-family="-apple-system, PingFang SC, sans-serif" font-size="10" font-weight="600" fill="#38bdf8">真实生成样例：</text>
+      <text x="24" y="208" font-family="-apple-system, PingFang SC, sans-serif" font-size="11" font-weight="700" fill="#f8fafc">
+        「成都通勤日常，20条冷萃美式随时来一杯」
+      </text>
+      <text x="24" y="221" font-family="'SF Mono', Menlo, monospace" font-size="9" fill="#64748b">
+        item: i_0057 (素造冷萃咖啡液) · user: u_0007 (成都/职场)
+      </text>
+    </g>
+
+    <!-- Card 2B: Strict Agent Constraints Contract -->
+    <g transform="translate(16, 354)">
+      <rect width="318" height="248" rx="10" fill="url(#innerCardBg)" stroke="#2563eb" stroke-width="1.2"/>
+      <text x="14" y="24" font-family="-apple-system, PingFang SC, sans-serif" font-size="13" font-weight="700" fill="#93c5fd">
+        Agent 硬性约束契约 (Strict Guardrails)
+      </text>
+
+      <!-- Constraint 1 -->
+      <rect x="14" y="38" width="290" height="46" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+      <text x="24" y="56" font-family="-apple-system, PingFang SC, sans-serif" font-size="11" font-weight="700" fill="#f87171">① 严禁在文案中编写优惠价格与折扣</text>
+      <text x="24" y="74" font-family="-apple-system, PingFang SC, sans-serif" font-size="9.5" fill="#94a3b8">
+        促销字段仅供内部排序，不得写入文案，防「大字吸睛小字免责」
+      </text>
+
+      <!-- Constraint 2 -->
+      <rect x="14" y="92" width="290" height="46" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+      <text x="24" y="110" font-family="-apple-system, PingFang SC, sans-serif" font-size="11" font-weight="700" fill="#fbbf24">② 强制锚定证据字段 (evidence_fields)</text>
+      <text x="24" y="128" font-family="-apple-system, PingFang SC, sans-serif" font-size="9.5" fill="#94a3b8">
+        必须返回 2~6 个真实存在的字段路径，严禁无事实支撑的自由发挥
+      </text>
+
+      <!-- Constraint 3 -->
+      <rect x="14" y="146" width="290" height="46" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+      <text x="24" y="164" font-family="-apple-system, PingFang SC, sans-serif" font-size="11" font-weight="700" fill="#60a5fa">③ 职责解耦：严禁输出 Jev 判决字段</text>
+      <text x="24" y="182" font-family="-apple-system, PingFang SC, sans-serif" font-size="9.5" fill="#94a3b8">
+        Rec-Agent 不得输出 decision / judge_score，避免生成模型自审自判
+      </text>
+
+      <!-- Constraint 4 -->
+      <rect x="14" y="200" width="290" height="38" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+      <text x="24" y="216" font-family="-apple-system, PingFang SC, sans-serif" font-size="11" font-weight="700" fill="#34d399">④ 输出结构化 JSON 契约</text>
+      <text x="24" y="230" font-family="-apple-system, PingFang SC, sans-serif" font-size="9.5" fill="#94a3b8">
+        必须包含 exposure_reason, context_summary, agent_version
+      </text>
+    </g>
+
+    <!-- Card 2C: Output JSON Artifact -->
+    <g transform="translate(16, 614)">
+      <rect width="318" height="202" rx="10" fill="#090d16" stroke="#1d4ed8" stroke-width="1.2"/>
+      <rect x="14" y="14" width="290" height="24" rx="4" fill="#1e293b"/>
+      <text x="24" y="30" font-family="'SF Mono', Menlo, monospace" font-size="10.5" font-weight="600" fill="#38bdf8">
+        OUTPUT: reason_candidates.jsonl
+      </text>
+
+      <g transform="translate(14, 46)" font-family="'SF Mono', Menlo, monospace" font-size="9.2" fill="#cbd5e1">
+        <text y="14"><tspan fill="#f43f5e">"user_id"</tspan>: <tspan fill="#a5f3fc">"u_0007"</tspan>,</text>
+        <text y="28"><tspan fill="#f43f5e">"item_id"</tspan>: <tspan fill="#a5f3fc">"i_0057"</tspan>,</text>
+        <text y="42"><tspan fill="#f43f5e">"exposure_reason"</tspan>: <tspan fill="#fef08a">"成都通勤日常，20条冷萃..."</tspan>,</text>
+        <text y="56"><tspan fill="#f43f5e">"evidence_fields"</tspan>: [</text>
+        <text y="70" x="14"><tspan fill="#a5f3fc">"users.city"</tspan>, <tspan fill="#a5f3fc">"users.tags"</tspan>, <tspan fill="#a5f3fc">"items.spec"</tspan></text>
+        <text y="84">],</text>
+        <text y="98"><tspan fill="#f43f5e">"context_summary"</tspan>: <tspan fill="#94a3b8">"成都夏季；单身通勤；食品偏好"</tspan>,</text>
+        <text y="112"><tspan fill="#f43f5e">"agent_version"</tspan>: <tspan fill="#34d399">"rec-agent-v2"</tspan></text>
+      </g>
+
+      <rect x="14" y="168" width="290" height="22" rx="4" fill="#172554"/>
+      <text x="159" y="183" text-anchor="middle" font-family="-apple-system, PingFang SC, sans-serif" font-size="9.5" fill="#93c5fd">
+        ✓ 传递至下游事实包冻结层 · 杜绝运行时文案漂移
+      </text>
+    </g>
+  </g>
+
+  <!-- Flow Connector: Lane 2 -> Lane 3 -->
+  <g>
+    <path d="M 765 440 L 795 440" fill="none" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arrowBlue)"/>
+    <text x="780" y="430" text-anchor="middle" font-family="'SF Mono', Menlo, monospace" font-size="9" fill="#38bdf8">Candidates</text>
+  </g>
+
+  <!-- ======================================================== -->
+  <!-- LANE 3: 事实包冻结与确定性规则 (Fact Bundle & Pre-Rules)  -->
+  <!-- ======================================================== -->
+  <g transform="translate(795, 118)">
+    <rect width="345" height="832" rx="16" fill="url(#lane3Grad)" stroke="#0d9488" stroke-width="1.8" filter="url(#dropShadow)"/>
+
+    <!-- Lane Header -->
+    <rect x="16" y="16" width="313" height="42" rx="8" fill="#115e59" fill-opacity="0.3" stroke="#0d9488" stroke-width="1"/>
+    <text x="30" y="42" font-family="-apple-system, PingFang SC, sans-serif" font-size="15" font-weight="700" fill="#2dd4bf">
+      03 · 事实包冻结与确定性规则
+    </text>
+
+    <!-- Card 3A: Fact Bundle Construction -->
+    <g transform="translate(16, 72)">
+      <rect width="313" height="236" rx="10" fill="url(#innerCardBg)" stroke="#1e293b" stroke-width="1.2"/>
+      <text x="14" y="24" font-family="-apple-system, PingFang SC, sans-serif" font-size="13" font-weight="700" fill="#5eead4">
+        事实包可信追溯 (fact_bundle.py)
+      </text>
+
+      <text x="14" y="44" font-family="-apple-system, PingFang SC, sans-serif" font-size="10.5" fill="#94a3b8">
+        将候选冻结为不可篡改的契约对象，杜绝模型幻觉：
+      </text>
+
+      <rect x="14" y="56" width="285" height="44" rx="6" fill="#042f2e" stroke="#0f766e" stroke-width="0.8"/>
+      <text x="24" y="74" font-family="-apple-system, PingFang SC, sans-serif" font-size="11" font-weight="600" fill="#99f6e4">
+        全链路溯源映射 (provenance)
+      </text>
+      <text x="24" y="90" font-family="'SF Mono', Menlo, monospace" font-size="9" fill="#5eead4">
+        items.csv:item_id=i_0057:functions / users.csv:city
+      </text>
+
+      <rect x="14" y="108" width="285" height="44" rx="6" fill="#042f2e" stroke="#0f766e" stroke-width="0.8"/>
+      <text x="24" y="126" font-family="-apple-system, PingFang SC, sans-serif" font-size="11" font-weight="600" fill="#99f6e4">
+        属性覆盖度与完整性校验 (coverage)
+      </text>
+      <text x="24" y="142" font-family="'SF Mono', Menlo, monospace" font-size="9" fill="#5eead4">
+        coverage.complete=true · 检核 category, spec, scenes
+      </text>
+
+      <rect x="14" y="160" width="285" height="44" rx="6" fill="#042f2e" stroke="#0f766e" stroke-width="0.8"/>
+      <text x="24" y="178" font-family="-apple-system, PingFang SC, sans-serif" font-size="11" font-weight="600" fill="#99f6e4">
+        快照时间戳与数据版本固化
+      </text>
+      <text x="24" y="194" font-family="'SF Mono', Menlo, monospace" font-size="9" fill="#5eead4">
+        schema: fact-bundle-v1 · snapshot_at: 2026-06-15
+      </text>
+
+      <rect x="14" y="210" width="285" height="18" rx="4" fill="#134e4a"/>
+      <text x="156" y="223" text-anchor="middle" font-family="'SF Mono', Menlo, monospace" font-size="9" fill="#ccfbf1">
+        CANONICAL INPUT: fact_bundle_full.jsonl
+      </text>
+    </g>
+
+    <!-- Card 3B: Hard Rules & Lexicon Scanner -->
+    <g transform="translate(16, 322)">
+      <rect width="313" height="280" rx="10" fill="url(#innerCardBg)" stroke="#1e293b" stroke-width="1.2"/>
+      <text x="14" y="24" font-family="-apple-system, PingFang SC, sans-serif" font-size="13" font-weight="700" fill="#fcd34d">
+        确定性硬规则与词表检测 (Pre-Rules)
+      </text>
+
+      <text x="14" y="44" font-family="-apple-system, PingFang SC, sans-serif" font-size="10.5" fill="#94a3b8">
+        前置硬规则层计算特征并提供可解释的基准对照：
+      </text>
+
+      <!-- Rule 1 -->
+      <g transform="translate(14, 56)">
+        <rect width="285" height="38" rx="6" fill="#1c1917" stroke="#44403c" stroke-width="0.8"/>
+        <text x="10" y="16" font-family="-apple-system, PingFang SC, sans-serif" font-size="10.5" font-weight="700" fill="#f87171">
+          绝对化广告词过滤 (compliance_lexicon.txt, 72条)
+        </text>
+        <text x="10" y="30" font-family="'SF Mono', Menlo, monospace" font-size="9" fill="#a8a29e">
+          正则精准匹配：「最 / 第一 / 独家 / 顶流 / 首创」
+        </text>
+      </g>
+
+      <!-- Rule 2 -->
+      <g transform="translate(14, 100)">
+        <rect width="285" height="38" rx="6" fill="#1c1917" stroke="#44403c" stroke-width="0.8"/>
+        <text x="10" y="16" font-family="-apple-system, PingFang SC, sans-serif" font-size="10.5" font-weight="700" fill="#fb923c">
+          功效 / 医疗夸大宣称检测
+        </text>
+        <text x="10" y="30" font-family="'SF Mono', Menlo, monospace" font-size="9" fill="#a8a29e">
+          核对 functions 是否支持「除湿 / 防潮 / 降糖 / 治愈」
+        </text>
+      </g>
+
+      <!-- Rule 3 -->
+      <g transform="translate(14, 144)">
+        <rect width="285" height="38" rx="6" fill="#1c1917" stroke="#44403c" stroke-width="0.8"/>
+        <text x="10" y="16" font-family="-apple-system, PingFang SC, sans-serif" font-size="10.5" font-weight="700" fill="#facc15">
+          价格促销条件一致性校验
+        </text>
+        <text x="10" y="30" font-family="'SF Mono', Menlo, monospace" font-size="9" fill="#a8a29e">
+          校验促销门槛 (promo_rules) 与文案中暗示利益点
+        </text>
+      </g>
+
+      <!-- Rule 4 -->
+      <g transform="translate(14, 188)">
+        <rect width="285" height="38" rx="6" fill="#1c1917" stroke="#44403c" stroke-width="0.8"/>
+        <text x="10" y="16" font-family="-apple-system, PingFang SC, sans-serif" font-size="10.5" font-weight="700" fill="#38bdf8">
+          AI 生成披露标记检核 (ai_disclosure)
+        </text>
+        <text x="10" y="30" font-family="'SF Mono', Menlo, monospace" font-size="9" fill="#a8a29e">
+          检测 ai_disclosure_flag_from_code 是否有效赋值
+        </text>
+      </g>
+
+      <rect x="14" y="234" width="285" height="34" rx="6" fill="#292524" stroke="#78716c" stroke-width="0.8"/>
+      <text x="156" y="249" text-anchor="middle" font-family="-apple-system, PingFang SC, sans-serif" font-size="10" font-weight="600" fill="#fed7aa">
+        对照基线：run_rule_baseline.py (40 pilot + 300 full)
+      </text>
+      <text x="156" y="261" text-anchor="middle" font-family="'SF Mono', Menlo, monospace" font-size="9" fill="#a8a29e">
+        输出：result_rule_baseline_full.jsonl
+      </text>
+    </g>
+
+    <!-- Card 3C: Deterministic Safety Routing -->
+    <g transform="translate(16, 616)">
+      <rect width="313" height="196" rx="10" fill="#1e1b2e" stroke="#8b5cf6" stroke-width="1.2"/>
+      <rect x="14" y="14" width="285" height="26" rx="4" fill="#3b0764"/>
+      <text x="156" y="31" text-anchor="middle" font-family="-apple-system, PingFang SC, sans-serif" font-size="11" font-weight="700" fill="#e9d5ff">
+        ⚡ 确定性安全熔断器 (Safety Gate Override)
+      </text>
+
+      <text x="14" y="58" font-family="-apple-system, PingFang SC, sans-serif" font-size="10.5" fill="#c4b5fd">
+        若发现以下异常，直接执行安全升级或阻断，不依赖模型概率：
+      </text>
+      <text x="14" y="78" font-family="-apple-system, PingFang SC, sans-serif" font-size="10" fill="#cbd5e1">
+        • 关键商品属性缺失或不可验证 (unverifiable)
+      </text>
+      <text x="14" y="96" font-family="-apple-system, PingFang SC, sans-serif" font-size="10" fill="#cbd5e1">
+        • 缺失 AI 生成标识 (missing_ai_disclosure)
+      </text>
+      <text x="14" y="114" font-family="-apple-system, PingFang SC, sans-serif" font-size="10" fill="#cbd5e1">
+        • 用户画像与推荐商品类目发生严重冲突 (conflict)
+      </text>
+
+      <rect x="14" y="132" width="285" height="50" rx="6" fill="#2e1065" stroke="#7c3aed" stroke-width="1"/>
+      <text x="24" y="152" font-family="'SF Mono', Menlo, monospace" font-size="10" font-weight="700" fill="#f472b6">
+        TRIGGER: escalated = true
+      </text>
+      <text x="24" y="170" font-family="-apple-system, PingFang SC, sans-serif" font-size="9.5" fill="#e9d5ff">
+        安全兜底路由至 human_review 或 block 队列
+      </text>
+    </g>
+  </g>
+
+  <!-- Flow Connector: Lane 3 -> Lane 4 -->
+  <g>
+    <path d="M 1140 440 L 1170 440" fill="none" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrowAmber)"/>
+    <text x="1155" y="430" text-anchor="middle" font-family="'SF Mono', Menlo, monospace" font-size="9" fill="#f59e0b">Fact Bundle</text>
+  </g>
+
+  <!-- ======================================================== -->
+  <!-- LANE 4: Jev 曝光前合规判决门禁 (Jev SystemOne Gate)        -->
+  <!-- ======================================================== -->
+  <g transform="translate(1170, 118)">
+    <rect width="350" height="832" rx="16" fill="url(#lane4Grad)" stroke="#e849b7" stroke-width="2" filter="url(#dropShadow)"/>
+
+    <!-- Lane Header + OFFICIAL JEV MODEL LOGO -->
+    <g transform="translate(16, 16)">
+      <rect width="318" height="74" rx="12" fill="#2a0827" fill-opacity="0.9" stroke="url(#jevLogoRim)" stroke-width="1.8"/>
+
+      <!-- Official Jev SystemOne Polygon Logo -->
+      <g transform="translate(12, 10)">
+        <rect width="54" height="54" rx="14" fill="#e849b7" stroke="#ffffff" stroke-width="1.8"/>
+        <!-- Official Faceted Hexagonal Shield Polygon Wireframe -->
+        <g transform="translate(27, 27) scale(0.65)" fill="none" stroke="#141414" stroke-width="4.2" stroke-linejoin="round" stroke-linecap="round">
+          <polygon points="0,-26 18,-15 18,6 0,-5 -9,1 -18,-5 -18,-15" fill="#e849b7"/>
+          <polyline points="-18,-15 0,-5 18,-15"/>
+          <line x1="0" y1="-26" x2="0" y2="-5"/>
+          <polygon points="0,26 -18,15 -18,-6 0,5 9,-1 18,5 18,15" fill="#e849b7"/>
+          <polyline points="-18,15 0,5 18,15"/>
+          <line x1="0" y1="5" x2="0" y2="26"/>
+          <polyline points="-9,-10 -9,10 9,20"/>
+          <polyline points="9,10 9,-10 -9,-20"/>
+        </g>
+      </g>
+
+      <!-- Jev Header Typography -->
+      <text x="76" y="34" font-family="-apple-system, PingFang SC, sans-serif" font-size="18" font-weight="900" fill="#f472b6" letter-spacing="-0.5">
+        Jev 曝光前合规判决门禁
+      </text>
+      <text x="76" y="52" font-family="'SF Mono', Menlo, monospace" font-size="9.5" font-weight="700" fill="#fbcfe8" letter-spacing="1">
+        TypeSafe AI · SystemOne (jev-1.14.0)
+      </text>
+      <text x="76" y="66" font-family="-apple-system, PingFang SC, sans-serif" font-size="9" fill="#f9a8d4">
+        jev_adapter.py · run_jev_batch.py
+      </text>
+    </g>
+
+    <!-- Card 4A: SystemOne Structured Protocol -->
+    <g transform="translate(16, 102)">
+      <rect width="318" height="280" rx="10" fill="url(#innerCardBg)" stroke="#e849b7" stroke-width="1.2"/>
+      <text x="14" y="24" font-family="-apple-system, PingFang SC, sans-serif" font-size="13" font-weight="700" fill="#f472b6">
+        SystemOne 结构化判决协议
+      </text>
+
+      <text x="14" y="44" font-family="'SF Mono', Menlo, monospace" font-size="10.5" fill="#fbcfe8">
+        POST https://api.modelgo.ai/v1/systemone
+      </text>
+
+      <!-- Protocol Payload Details -->
+      <g transform="translate(14, 56)">
+        <rect width="290" height="36" rx="6" fill="#3b072a" stroke="#831843" stroke-width="0.8"/>
+        <text x="10" y="16" font-family="'SF Mono', Menlo, monospace" font-size="10" font-weight="700" fill="#f472b6">state (结构化事实状态)</text>
+        <text x="10" y="28" font-family="-apple-system, PingFang SC, sans-serif" font-size="9.5" fill="#fbcfe8">
+          直接传入序列化 Fact Bundle，不生成自由文本，杜绝格式幻觉
+        </text>
+      </g>
+
+      <text x="14" y="112" font-family="-apple-system, PingFang SC, sans-serif" font-size="11" font-weight="700" fill="#cbd5e1">
+        并行多问题概率判决 (questions 并行打分):
+      </text>
+
+      <!-- Question 1 -->
+      <g transform="translate(14, 122)">
+        <rect width="290" height="42" rx="6" fill="#1f1124" stroke="#701a75" stroke-width="0.8"/>
+        <text x="10" y="16" font-family="'SF Mono', Menlo, monospace" font-size="10" font-weight="700" fill="#e879f9">Q1 · decision (choice)</text>
+        <text x="10" y="32" font-family="-apple-system, PingFang SC, sans-serif" font-size="9" fill="#f5d0fe">
+          四档概率输出：expose / rewrite / human_review / block
+        </text>
+      </g>
+
+      <!-- Question 2 -->
+      <g transform="translate(14, 170)">
+        <rect width="290" height="42" rx="6" fill="#1f1124" stroke="#701a75" stroke-width="0.8"/>
+        <text x="10" y="16" font-family="'SF Mono', Menlo, monospace" font-size="10" font-weight="700" fill="#e879f9">Q2 · risk_type (choice)</text>
+        <text x="10" y="32" font-family="-apple-system, PingFang SC, sans-serif" font-size="9" fill="#f5d0fe">
+          六类细分风险分型归因（绝对化、功效夸大、价格误导等）
+        </text>
+      </g>
+
+      <!-- Question 3 -->
+      <g transform="translate(14, 218)">
+        <rect width="290" height="42" rx="6" fill="#1f1124" stroke="#701a75" stroke-width="0.8"/>
+        <text x="10" y="16" font-family="'SF Mono', Menlo, monospace" font-size="10" font-weight="700" fill="#e879f9">Q3 · judge_score (score)</text>
+        <text x="10" y="32" font-family="-apple-system, PingFang SC, sans-serif" font-size="9" fill="#f5d0fe">
+          归一化风险概率分 P(unsafe) ∈ [0, 1]，作为曝光后校准核心基准
+        </text>
+      </g>
+    </g>
+
+    <!-- Card 4B: 6-Class Fine-Grained Risk Types -->
+    <g transform="translate(16, 394)">
+      <rect width="318" height="206" rx="10" fill="url(#innerCardBg)" stroke="#1e293b" stroke-width="1.2"/>
+      <text x="14" y="24" font-family="-apple-system, PingFang SC, sans-serif" font-size="13" font-weight="700" fill="#fbcfe8">
+        六类合规风险分型 (risk_type)
+      </text>
+
+      <g transform="translate(14, 38)">
+        <!-- R1 -->
+        <rect x="0" y="0" width="140" height="34" rx="4" fill="#064e3b" stroke="#059669" stroke-width="0.8"/>
+        <text x="8" y="15" font-family="'SF Mono', Menlo, monospace" font-size="9.5" font-weight="700" fill="#6ee7b7">compliant</text>
+        <text x="8" y="27" font-family="-apple-system, PingFang SC, sans-serif" font-size="8.5" fill="#a7f3d0">合规安全，允许曝光</text>
+
+        <!-- R2 -->
+        <rect x="150" y="0" width="140" height="34" rx="4" fill="#450a0a" stroke="#dc2626" stroke-width="0.8"/>
+        <text x="158" y="15" font-family="'SF Mono', Menlo, monospace" font-size="9.5" font-weight="700" fill="#fca5a5">absolute_claim</text>
+        <text x="158" y="27" font-family="-apple-system, PingFang SC, sans-serif" font-size="8.5" fill="#fecaca">绝对化用语 (广告法§9)</text>
+
+        <!-- R3 -->
+        <rect x="0" y="40" width="140" height="34" rx="4" fill="#450a0a" stroke="#dc2626" stroke-width="0.8"/>
+        <text x="8" y="55" font-family="'SF Mono', Menlo, monospace" font-size="9.5" font-weight="700" fill="#fca5a5">efficacy_claim</text>
+        <text x="8" y="67" font-family="-apple-system, PingFang SC, sans-serif" font-size="8.5" fill="#fecaca">虚假功效/医疗宣称(§28)</text>
+
+        <!-- R4 -->
+        <rect x="150" y="40" width="140" height="34" rx="4" fill="#451a03" stroke="#d97706" stroke-width="0.8"/>
+        <text x="158" y="55" font-family="'SF Mono', Menlo, monospace" font-size="9.5" font-weight="700" fill="#fde68a">price_misleading</text>
+        <text x="158" y="67" font-family="-apple-system, PingFang SC, sans-serif" font-size="8.5" fill="#fef3c7">促销前置条件误导</text>
+
+        <!-- R5 -->
+        <rect x="0" y="80" width="140" height="34" rx="4" fill="#311042" stroke="#a21caf" stroke-width="0.8"/>
+        <text x="8" y="95" font-family="'SF Mono', Menlo, monospace" font-size="9.5" font-weight="700" fill="#f0abfc">missing_disclosure</text>
+        <text x="8" y="107" font-family="-apple-system, PingFang SC, sans-serif" font-size="8.5" fill="#fae8ff">缺失 AI 生成标识</text>
+
+        <!-- R6 -->
+        <rect x="150" y="80" width="140" height="34" rx="4" fill="#1e1b4b" stroke="#4f46e5" stroke-width="0.8"/>
+        <text x="158" y="95" font-family="'SF Mono', Menlo, monospace" font-size="9.5" font-weight="700" fill="#c7d2fe">off_topic</text>
+        <text x="158" y="107" font-family="-apple-system, PingFang SC, sans-serif" font-size="8.5" fill="#e0e7ff">文不对题 / 场景错配</text>
+      </g>
+
+      <line x1="14" y1="164" x2="304" y2="164" stroke="#374151" stroke-width="0.8"/>
+      <text x="14" y="180" font-family="-apple-system, PingFang SC, sans-serif" font-size="10" fill="#94a3b8">
+        依据引用机制 (evidence)：强制绑定真实属性字段或词表
+      </text>
+      <text x="14" y="196" font-family="'SF Mono', Menlo, monospace" font-size="9" fill="#f472b6">
+        evidence: ["item_attrs_returned.functions 不含除湿/防潮"]
+      </text>
+    </g>
+
+    <!-- Card 4C: Full Jev Output Contract -->
+    <g transform="translate(16, 612)">
+      <rect width="318" height="204" rx="10" fill="#090d16" stroke="#db2777" stroke-width="1.2"/>
+      <rect x="14" y="14" width="290" height="24" rx="4" fill="#1e293b"/>
+      <text x="24" y="30" font-family="'SF Mono', Menlo, monospace" font-size="10.5" font-weight="600" fill="#f472b6">
+        OUTPUT: result_jev_full.jsonl
+      </text>
+
+      <g transform="translate(14, 46)" font-family="'SF Mono', Menlo, monospace" font-size="9.2" fill="#cbd5e1">
+        <text y="14"><tspan fill="#f43f5e">"reason_id"</tspan>: <tspan fill="#a5f3fc">"r_00001"</tspan>,</text>
+        <text y="28"><tspan fill="#f43f5e">"decision"</tspan>: <tspan fill="#f87171">"block"</tspan>,</text>
+        <text y="42"><tspan fill="#f43f5e">"risk_type"</tspan>: <tspan fill="#f87171">"efficacy_or_medical_claim"</tspan>,</text>
+        <text y="56"><tspan fill="#f43f5e">"judge_score"</tspan>: <tspan fill="#facc15">0.94</tspan>, <tspan fill="#f43f5e">"escalated"</tspan>: <tspan fill="#94a3b8">false</tspan>,</text>
+        <text y="70"><tspan fill="#f43f5e">"evidence"</tspan>: [<tspan fill="#a5f3fc">"item.functions 不含防潮"</tspan>],</text>
+        <text y="84"><tspan fill="#f43f5e">"model_version"</tspan>: <tspan fill="#e879f9">"jev-1.14.0"</tspan>,</text>
+        <text y="98"><tspan fill="#f43f5e">"score_name"</tspan>: <tspan fill="#e879f9">"jev-compliance-v1"</tspan></text>
+      </g>
+
+      <rect x="14" y="168" width="290" height="24" rx="4" fill="#3b072a"/>
+      <text x="159" y="184" text-anchor="middle" font-family="-apple-system, PingFang SC, sans-serif" font-size="9.5" font-weight="600" fill="#fbcfe8">
+        全量 300 条实测通过 (jev_batch_full_report.json)
+      </text>
+    </g>
+  </g>
+
+  <!-- Flow Connector: Lane 4 -> Lane 5 -->
+  <g>
+    <path d="M 1520 440 L 1550 440" fill="none" stroke="#e849b7" stroke-width="2.5" marker-end="url(#arrowPink)"/>
+    <text x="1535" y="430" text-anchor="middle" font-family="'SF Mono', Menlo, monospace" font-size="9" fill="#e849b7">Decisions</text>
+  </g>
+
+  <!-- ======================================================== -->
+  <!-- LANE 5: 四档处置路由与校准闭环 (Routing & Closed Loop)     -->
+  <!-- ======================================================== -->
+  <g transform="translate(1550, 118)">
+    <rect width="330" height="832" rx="16" fill="url(#lane5Grad)" stroke="#10b981" stroke-width="1.8" filter="url(#dropShadow)"/>
+
+    <!-- Lane Header -->
+    <rect x="16" y="16" width="298" height="42" rx="8" fill="#065f46" fill-opacity="0.3" stroke="#10b981" stroke-width="1"/>
+    <text x="30" y="42" font-family="-apple-system, PingFang SC, sans-serif" font-size="15" font-weight="700" fill="#34d399">
+      05 · 四档处置与曝光校准闭环
+    </text>
+
+    <!-- Card 5A: 4-Tier Disposition Routing -->
+    <g transform="translate(16, 72)">
+      <rect width="298" height="276" rx="10" fill="url(#innerCardBg)" stroke="#1e293b" stroke-width="1.2"/>
+      <text x="14" y="24" font-family="-apple-system, PingFang SC, sans-serif" font-size="13" font-weight="700" fill="#6ee7b7">
+        四档处置路由 (Disposition Routing)
+      </text>
+
+      <!-- 1. Expose -->
+      <g transform="translate(14, 38)">
+        <rect width="270" height="48" rx="6" fill="#022c22" stroke="#10b981" stroke-width="1.2"/>
+        <circle cx="20" cy="24" r="8" fill="#10b981"/>
+        <text x="20" y="28" text-anchor="middle" font-family="'SF Mono', Menlo, monospace" font-size="10" font-weight="700" fill="#ffffff">✓</text>
+        <text x="36" y="20" font-family="'SF Mono', Menlo, monospace" font-size="12" font-weight="800" fill="#34d399">expose (直接曝光)</text>
+        <text x="36" y="36" font-family="-apple-system, PingFang SC, sans-serif" font-size="9.5" fill="#a7f3d0">
+          合规安全，推送到手淘「猜你喜欢」商品卡
+        </text>
+      </g>
+
+      <!-- 2. Rewrite -->
+      <g transform="translate(14, 94)">
+        <rect width="270" height="48" rx="6" fill="#1c1917" stroke="#f59e0b" stroke-width="1.2"/>
+        <circle cx="20" cy="24" r="8" fill="#f59e0b"/>
+        <text x="20" y="28" text-anchor="middle" font-family="'SF Mono', Menlo, monospace" font-size="10" font-weight="700" fill="#ffffff">✎</text>
+        <text x="36" y="20" font-family="'SF Mono', Menlo, monospace" font-size="12" font-weight="800" fill="#fbbf24">rewrite (文案改写)</text>
+        <text x="36" y="36" font-family="-apple-system, PingFang SC, sans-serif" font-size="9.5" fill="#fde68a">
+          轻度语病或微弱夸大，触发模板改写后复审
+        </text>
+      </g>
+
+      <!-- 3. Human Review -->
+      <g transform="translate(14, 150)">
+        <rect width="270" height="48" rx="6" fill="#1e1b4b" stroke="#8b5cf6" stroke-width="1.2"/>
+        <circle cx="20" cy="24" r="8" fill="#8b5cf6"/>
+        <text x="20" y="28" text-anchor="middle" font-family="'SF Mono', Menlo, monospace" font-size="10" font-weight="700" fill="#ffffff">?</text>
+        <text x="36" y="20" font-family="'SF Mono', Menlo, monospace" font-size="12" font-weight="800" fill="#c084fc">human_review (转人工)</text>
+        <text x="36" y="36" font-family="-apple-system, PingFang SC, sans-serif" font-size="9.5" fill="#e9d5ff">
+          低置信度、高敏感类目或安全熔断触发样本
+        </text>
+      </g>
+
+      <!-- 4. Block -->
+      <g transform="translate(14, 206)">
+        <rect width="270" height="56" rx="6" fill="#450a0a" stroke="#ef4444" stroke-width="1.5"/>
+        <circle cx="20" cy="28" r="8" fill="#ef4444"/>
+        <text x="20" y="32" text-anchor="middle" font-family="'SF Mono', Menlo, monospace" font-size="10" font-weight="700" fill="#ffffff">✕</text>
+        <text x="36" y="22" font-family="'SF Mono', Menlo, monospace" font-size="12" font-weight="800" fill="#f87171">block (严禁曝光)</text>
+        <text x="36" y="38" font-family="-apple-system, PingFang SC, sans-serif" font-size="9.5" font-weight="700" fill="#fca5a5">
+          红线：违规漏放率必须 = 0！
+        </text>
+        <text x="36" y="50" font-family="-apple-system, PingFang SC, sans-serif" font-size="8.5" fill="#fecaca">
+          严重违规或属性捏造直接拦截，杜绝平台行政责任
+        </text>
+      </g>
+    </g>
+
+    <!-- Card 5B: 14-Day Post-Exposure Simulation & Calibration -->
+    <g transform="translate(16, 360)">
+      <rect width="298" height="236" rx="10" fill="url(#innerCardBg)" stroke="#1e293b" stroke-width="1.2"/>
+      <text x="14" y="24" font-family="-apple-system, PingFang SC, sans-serif" font-size="13" font-weight="700" fill="#6ee7b7">
+        曝光后行为仿真与校准 (Calibration)
+      </text>
+
+      <text x="14" y="44" font-family="-apple-system, PingFang SC, sans-serif" font-size="10" fill="#94a3b8">
+        evaluate_exposure.py · 模拟 14 天真实业务漏斗：
+      </text>
+
+      <!-- Funnel Metrics -->
+      <rect x="14" y="56" width="270" height="36" rx="6" fill="#042f2e" stroke="#0f766e" stroke-width="0.8"/>
+      <text x="14" y="72" font-family="'SF Mono', Menlo, monospace" font-size="9.5" fill="#a7f3d0">
+        曝光 ➔ 点击 ➔ 加购 ➔ 下单 ➔ 退款 ➔ 投诉
+      </text>
+      <text x="14" y="86" font-family="-apple-system, PingFang SC, sans-serif" font-size="8.5" fill="#5eead4">
+        exposure_log_full.jsonl (300条全量曝光回放数据)
+      </text>
+
+      <!-- Score Calibration Concept -->
+      <g transform="translate(14, 102)">
+        <rect width="270" height="74" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+        <text x="10" y="18" font-family="-apple-system, PingFang SC, sans-serif" font-size="11" font-weight="700" fill="#fde68a">
+          判决分分桶校准单调性检验：
+        </text>
+        <text x="10" y="34" font-family="-apple-system, PingFang SC, sans-serif" font-size="9.5" fill="#cbd5e1">
+          • 按 judge_score 分桶检验退款率与投诉率
+        </text>
+        <text x="10" y="49" font-family="-apple-system, PingFang SC, sans-serif" font-size="9.5" fill="#cbd5e1">
+          • 高风险理由即使短期 CTR 高，其退款/投诉亦显著偏高
+        </text>
+        <text x="10" y="64" font-family="-apple-system, PingFang SC, sans-serif" font-size="9.5" fill="#cbd5e1">
+          • 验证 Jev 风险评分具备真实的业务校准意义
+        </text>
+      </g>
+
+      <rect x="14" y="188" width="270" height="34" rx="6" fill="#064e3b" stroke="#059669" stroke-width="0.8"/>
+      <text x="149" y="203" text-anchor="middle" font-family="-apple-system, PingFang SC, sans-serif" font-size="10" font-weight="600" fill="#a7f3d0">
+        产物：calibration_full_report.json
+      </text>
+      <text x="149" y="215" text-anchor="middle" font-family="'SF Mono', Menlo, monospace" font-size="8.5" fill="#6ee7b7">
+        分桶退款率、投诉率与成交转化校准曲线
+      </text>
+    </g>
+
+    <!-- Card 5C: Closed Loop Return & Anti-Leakage Wall #2 -->
+    <g transform="translate(16, 610)">
+      <rect width="298" height="206" rx="10" fill="#13231f" stroke="#059669" stroke-width="1.5"/>
+      <rect x="14" y="14" width="270" height="26" rx="4" fill="#064e3b"/>
+      <text x="149" y="31" text-anchor="middle" font-family="-apple-system, PingFang SC, sans-serif" font-size="11" font-weight="700" fill="#a7f3d0">
+        🔄 闭环回流与防泄漏隔离墙 #2
+      </text>
+
+      <text x="14" y="58" font-family="-apple-system, PingFang SC, sans-serif" font-size="10.5" font-weight="600" fill="#6ee7b7">
+        真实点击反馈合规回流：
+      </text>
+      <text x="14" y="74" font-family="-apple-system, PingFang SC, sans-serif" font-size="9.5" fill="#cbd5e1">
+        • 仅已曝光商品卡点击数据沉淀至反馈库
+      </text>
+      <text x="14" y="90" font-family="'SF Mono', Menlo, monospace" font-size="8.5" fill="#a7f3d0">
+        data/recommendation_feedback_history.csv
+      </text>
+
+      <line x1="14" y1="104" x2="284" y2="104" stroke="#047857" stroke-width="0.8"/>
+
+      <text x="14" y="122" font-family="-apple-system, PingFang SC, sans-serif" font-size="10.5" font-weight="700" fill="#f87171">
+        🛡️ 防泄漏隔离墙 #2 (严格禁止靶标泄漏)：
+      </text>
+      <text x="14" y="138" font-family="-apple-system, PingFang SC, sans-serif" font-size="9.5" fill="#fda4af">
+        • 曝光后退款率、投诉日志绝不泄漏给 Jev 输入
+      </text>
+      <text x="14" y="152" font-family="-apple-system, PingFang SC, sans-serif" font-size="9.5" fill="#fda4af">
+        • 防止 Jev 在离线评测中利用未来标签“作弊”
+      </text>
+
+      <rect x="14" y="168" width="270" height="26" rx="4" fill="#042f2e"/>
+      <text x="149" y="185" text-anchor="middle" font-family="'SF Mono', Menlo, monospace" font-size="9.5" fill="#34d399">
+        CLOSED-LOOP AUDITABLE ARCHITECTURE
+      </text>
+    </g>
+  </g>
+
+  <!-- Big Feedback Loop: Lane 5 -> Lane 1 Bottom -->
+  <g>
+    <path d="M 1700 830 C 1700 970, 200 970, 200 830" fill="none" stroke="#10b981" stroke-width="2.5" stroke-dasharray="8,6" marker-end="url(#arrowGreen)"/>
+    <rect x="830" y="948" width="280" height="26" rx="6" fill="#064e3b" stroke="#059669" stroke-width="1"/>
+    <text x="970" y="965" text-anchor="middle" font-family="-apple-system, PingFang SC, sans-serif" font-size="11" font-weight="700" fill="#a7f3d0">
+      已曝光点击事件安全回流 ➔ Rec-Agent 弱偏好
+    </text>
+  </g>
+
+  <!-- ========================================== -->
+  <!-- FOOTER LEGEND & ARCHITECTURAL METRICS BAR   -->
+  <!-- ========================================== -->
+  <g transform="translate(40, 990)">
+    <rect width="1840" height="66" rx="12" fill="#0b1120" stroke="#1e293b" stroke-width="1.2"/>
+
+    <g transform="translate(30, 24)">
+      <circle cx="8" cy="8" r="6" fill="#38bdf8"/>
+      <text x="22" y="12" font-family="-apple-system, PingFang SC, sans-serif" font-size="12" font-weight="700" fill="#f8fafc">
+        解耦核心原则：
+      </text>
+      <text x="110" y="12" font-family="-apple-system, PingFang SC, sans-serif" font-size="12" fill="#94a3b8">
+        Rec-Agent 专注“推什么、怎么写”；Jev 专属“能不能发、怎么处置、凭什么”；曝光日志校验“判得准不准”。两端职责泾渭分明。
+      </text>
+    </g>
+
+    <g transform="translate(1080, 24)">
+      <circle cx="8" cy="8" r="6" fill="#f43f5e"/>
+      <text x="22" y="12" font-family="-apple-system, PingFang SC, sans-serif" font-size="12" font-weight="700" fill="#f8fafc">
+        双向防泄漏防火墙：
+      </text>
+      <text x="135" y="12" font-family="-apple-system, PingFang SC, sans-serif" font-size="12" fill="#94a3b8">
+        合规词表不上送 Agent（防止文案规避）；曝光后指标不下发 Jev（防止判决未来信息泄漏）。
+      </text>
+    </g>
+  </g>
+</svg>

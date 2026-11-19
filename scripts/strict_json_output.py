@@ -10,9 +10,39 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 from pathlib import Path
 from typing import Any, Iterator
+
+
+def strict_json_loads(text: str) -> Any:
+    """Parse one complete JSON value, rejecting ambiguous or nonfinite values."""
+    def unique_object(pairs: list[tuple[str, Any]]) -> dict:
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError(f"重复 JSON 属性：{key}")
+            result[key] = value
+        return result
+
+    def reject_constant(value: str) -> Any:
+        raise ValueError(f"JSON 不允许常量：{value}")
+
+    value = json.loads(text, object_pairs_hook=unique_object, parse_constant=reject_constant)
+
+    def check_numbers(part: Any) -> None:
+        if isinstance(part, float) and not math.isfinite(part):
+            raise ValueError("JSON 数值必须为有限值")
+        if isinstance(part, dict):
+            for child in part.values():
+                check_numbers(child)
+        elif isinstance(part, list):
+            for child in part:
+                check_numbers(child)
+
+    check_numbers(value)
+    return value
 
 
 def _balanced_json_candidates(text: str) -> Iterator[tuple[int, int, str]]:
@@ -52,8 +82,8 @@ def extract_last_json(text: str) -> Any:
     candidates: list[tuple[int, int, Any]] = []
     for start, end, candidate in _balanced_json_candidates(text):
         try:
-            value = json.loads(candidate)
-        except json.JSONDecodeError:
+            value = strict_json_loads(candidate)
+        except ValueError:
             continue
         if isinstance(value, (dict, list)):
             candidates.append((end, start, value))

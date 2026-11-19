@@ -7,6 +7,7 @@ __pycache__/
 # Generated evaluation outputs and local run artifacts
 *.jsonl
 !tests/fixtures/*.jsonl
+!/corpus/exposure_reasons_300.jsonl
 agent_generation_report.json
 agent_quality_report.json
 baseline_comparison*.json

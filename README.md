@@ -4,10 +4,14 @@
 
 [![Agent](https://img.shields.io/badge/Agent-Rec--Agent-2563eb)](rec-agent-preset/)
 [![Review](https://img.shields.io/badge/Review-Jev%20Judgment-7c3aed)](jev_adapter.py)
-[![Tests](https://img.shields.io/badge/tests-287%20passed-16a34a)](tests/)
+[![Tests](https://img.shields.io/badge/tests-366%20passed-16a34a)](tests/)
 [![Data](https://img.shields.io/badge/mock%20data-200%20users%20%2B%20200%20items-0891b2)](data/raw/)
 
 推荐生成与审核通过独立 Python 工作流衔接；DeepSeek Harness 只生成推荐 JSON，独立工作流显式运行 Jev 审核。[运行说明](docs/STANDALONE_WORKFLOW.md)。
+
+曝光理由由大模型提炼真实卖点，创作总长度不超过 20 字符的商品卡广告，聚焦商品特性。[生成逻辑与测试方法](docs/RECOMMENDATION_COPY_GENERATION.md)，[28 条真实模型输出测试](docs/TEST_REPORT_RECOMMENDATION_COPY_2026-11-18.md)。
+
+[桌面 Harness 严格 JSON 与 20 字符真实测试记录](docs/TEST_REPORT_STRICT_JSON_2026-11-19.md)。
 
 [当前工作流验证报告](docs/TEST_REPORT_JEV_MODEL_WORKFLOW_2026-11-18.md)：推荐结果与独立 Jev 判断衔接、模型处置结论回放及协议校验。此前真实调用记录保存在各次测试报告中。
 
@@ -27,6 +31,7 @@
 | **MCP data layer** | 只读查询用户、行为、推荐反馈、商品、促销和会话场景 | [`mcp_server.py`](mcp_server.py) |
 | **Canonical data contract** | 统一 `data/raw/`、`i_####` 商品 ID 和版本元数据 | [`canonical_data.py`](canonical_data.py) |
 | **ModelGo Agent** | 为批量候选生成提供 dry-run / HTTP 客户端 | [`modelgo_agent.py`](modelgo_agent.py) |
+| **文案事实 brief** | 提炼商品关键信息、限定事实来源、提供广告创作指令 | [`recommendation_copy.py`](recommendation_copy.py) |
 | **独立工作流** | 导入推荐 JSON/候选 JSONL，构建事实并显式审核 | [`scripts/run_recommendation_workflow.py`](scripts/run_recommendation_workflow.py) |
 | **Fact Bundle** | 将候选结果转换为可审核、可追溯的事实包 | [`fact_bundle.py`](fact_bundle.py) |
 | **Jev Adapter** | 构建请求预览或显式调用 `jev-1.14.0` | [`jev_adapter.py`](jev_adapter.py) |
@@ -37,31 +42,46 @@
 
 ```json
 {
-  "user_id": "u_0007",
+  "user_id": "u_0199",
   "user_profile": {
-    "city": "成都",
-    "life_stage": "单身职场",
-    "tags": ["通勤", "租房", "熬夜"]
+    "city": "广州",
+    "city_tier": "一线",
+    "climate_zone": "华南",
+    "age": 38,
+    "gender": "女",
+    "life_stage": "学龄家长",
+    "preferred_categories": [
+      "3C数码",
+      "母婴亲子",
+      "家居日用"
+    ],
+    "tags": [
+      "有娃",
+      "家庭采购",
+      "品质党"
+    ],
+    "active_hours": "09:00-23:00",
+    "price_sensitivity": "low"
   },
   "recommendations": [
     {
-      "item_id": "i_0057",
-      "title": "素造 冷萃咖啡液 20条 美式",
-      "exposure_reason": "成都通勤日常，20条冷萃美式随时来一杯",
-      "generated_reason": "成都通勤日常，20条冷萃美式随时来一杯",
+      "item_id": "i_0006",
+      "title": "简序 原生木浆抽纸 3层100抽×24包",
+      "exposure_reason": "原生木浆抽纸，清洁随手抽",
+      "generated_reason": "原生木浆抽纸，清洁随手抽",
       "evidence_fields": [
-        "users.city",
-        "users.tags",
-        "items.spec"
+        "items.material",
+        "items.functions",
+        "items.category_l3"
       ],
-      "context_summary": "成都夏季；单身租房通勤；食品生鲜偏好"
+      "context_summary": "偏好家居日用；家庭采购；日常清洁场景"
     }
   ],
   "agent_version": "rec-agent-v2"
 }
 ```
 
-`exposure_reason` 是商品卡直接展示给用户的一句话；`evidence_fields` 只记录直接支撑这句话的字段；`context_summary` 用于审核和排查。促销字段可以参与内部排序，但不会写入用户可见文案。
+`exposure_reason` 是商品卡直接展示给用户的一句话，总长度不超过 20 个 Unicode 字符（含标点），不含数量、尺寸、容量或技术参数；`evidence_fields` 只记录直接支撑这句话的字段；`context_summary` 用于审核和排查。促销字段可以参与内部排序，但不会写入用户可见文案。
 
 ## Jev 判决协议
 
@@ -147,7 +167,9 @@ Jev 输出四档处置；展示、点击采集和真实反馈写入由后续业�
 
 ## 结果查看器
 
-Harness 的消息区域可能把 JSON 空白压缩成一行。打开 [`rec-agent-viewer.html`](rec-agent-viewer.html)，粘贴整段 Harness 输出，查看器会自动提取 JSON，并显示：
+Rec-Agent 预设已接入原生输出校验插件：工具步骤的前置文字不进入回答，最终结果整段通过严格 JSON、Schema、20 字符及参数词校验后，以两空格缩进输出。插件用 Markdown 硬换行保留界面排版；尾随空格属于 JSON 允许的空白，复制结果仍能直接解析。最多使用同一提供商与模型修复两次，仍不通过则本轮报错。重新加载预设并新建会话后生效。
+
+旧消息或未使用 Rec-Agent 预设的会话可能把 JSON 空白压缩成一行。打开 [`rec-agent-viewer.html`](rec-agent-viewer.html)，粘贴整段 Harness 输出，查看器会自动提取 JSON，并显示：
 
 1. 缩进后的完整 JSON；
 2. 用户画像摘要；
@@ -186,7 +208,7 @@ pbpaste | python3 scripts/strict_json_output.py
 ## 验证状态
 
 ```text
-pytest -q                 287 passed
+pytest -q                 366 passed
 scripts/validate_data.py  PASS: all hard checks passed
 ```
 
