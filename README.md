@@ -15,6 +15,8 @@
 
 [五题协议验证](docs/TEST_REPORT_JEV_FIVE_2026-11-19.md)记录新协议的测试、请求预览和真实调用条件。[九题工作流验证](docs/TEST_REPORT_JEV_MODEL_WORKFLOW_2026-11-18.md)保留历史真实响应回放。
 
+[Harness → Jev 最新全链路实测](docs/TEST_REPORT_HARNESS_JEV_2026-11-20.md)：新建 Rec-Agent 会话生成 3 条推荐，独立工作流实时调用 Jev 评分并汇总处置；记录了低置信度边界案例。
+
 Rec-Agent 根据画像、行为和场景选择商品并生成曝光理由。独立工作流调用 Jev 评估文案，再根据答卷生成 `expose / rewrite / human_review / block` 四档处置结论。
 
 ## 一眼看懂项目链路
