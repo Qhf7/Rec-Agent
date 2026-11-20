@@ -41,19 +41,9 @@ python3 ui_server.py
 
 Rec-Agent 根据画像、行为和场景选择商品并生成曝光理由。独立工作流调用 Jev 回答风险分型和吸引力两题，汇总为 `expose` 或 `rewrite`。
 
-## 一眼看懂项目链路
+## 模型框架图
 
-```mermaid
-flowchart LR
-    U[用户 ID] --> H[DeepSeek Harness / Rec-Agent]
-    C[画像、行为与历史曝光点击] --> H
-    H --> R[推荐商品与曝光理由 JSON]
-    R --> F[独立工作流：规范商品与精简场景事实]
-    F --> J[Jev：风险六选一 + 吸引力评分]
-    J --> D{合规 Y 且吸引力大于 50}
-    D -->|是| E[expose]
-    D -->|否| W[rewrite]
-```
+![Rec-Agent 与 Jev 模型框架图](docs/assets/rec_agent_core_framework_1080p.png)
 
 当前功能边界与运行方式见[独立工作流说明](docs/STANDALONE_WORKFLOW.md)。
 
