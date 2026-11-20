@@ -68,7 +68,9 @@
 
 ## 下一步
 
-追加完成：四模型对同24条冻结轨迹执行96次交错评测；图表显示DeepSeek关闭思考、Sol xhigh、Kimi思考开启，并按官方价格计算共同case成本。详见[模型与成本对照](MODEL_PROVIDER_COMPARISON.md)。
+追加完成：DeepSeek V4.1 Flash（Max）、Jev 1.14.0、ChatGPT 6.1 Sol（xhigh）、Kimi K3.1 Pro、Claude Opus 5.5、Qwen3.8-Max对同24条冻结轨迹执行144次交错评测，并按官方价格计算共同case成本；另完成13案例×6模型的78次风险与吸引力审核，保留3次严格JSON格式失败。详见[模型与成本对照](MODEL_PROVIDER_COMPARISON.md)、[商品理由判断与 Jev 对照](JEV_MODEL_JUDGMENT_COMPARISON.md)。
+
+本轮验证：665项Python测试、18项Node测试通过；冻结轨迹与配对输入哈希一致，四张新图已检查，文档链接及公开文件凭据扫描通过。
 
 - [ ] 完成6对开发输出的人工偏好标注与分歧核验。
 - [ ] 扩充成功与错误恢复轨迹，增加能完整覆盖长任务的训练样本。

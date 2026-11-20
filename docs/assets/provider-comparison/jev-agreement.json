@@ -1,0 +1,584 @@
+{
+  "baseline": "jev",
+  "interpretation": "Jev agreement is not accuracy; executable contract reference is a separate comparator.",
+  "comparisons": {
+    "chatgpt61_sol_xhigh": {
+      "baseline": "jev",
+      "planned_pairs": 24,
+      "valid_pairs": 24,
+      "missing_pairs": [],
+      "all_answers_equal_pairs": 18,
+      "all_answers_equal_rate_valid": 0.75,
+      "per_question": {
+        "fact_coverage": {
+          "equal_pairs": 22,
+          "agreement_rate_valid": 0.9166666666666666,
+          "model_only_matches_reference": 0,
+          "jev_only_matches_reference": 2,
+          "neither_matches_reference": 0
+        },
+        "task_completed": {
+          "equal_pairs": 21,
+          "agreement_rate_valid": 0.875,
+          "model_only_matches_reference": 3,
+          "jev_only_matches_reference": 0,
+          "neither_matches_reference": 0
+        },
+        "tool_parameters": {
+          "equal_pairs": 22,
+          "agreement_rate_valid": 0.9166666666666666,
+          "model_only_matches_reference": 2,
+          "jev_only_matches_reference": 0,
+          "neither_matches_reference": 0
+        }
+      },
+      "disagreements": [
+        {
+          "case_id": "adaptive_holdout_002",
+          "repeat": 1,
+          "differences": {
+            "tool_parameters": {
+              "model": "all_valid",
+              "jev": "has_invalid",
+              "programmatic_reference": "all_valid",
+              "model_matches_reference": true,
+              "jev_matches_reference": false
+            }
+          },
+          "all_answers_equal": false
+        },
+        {
+          "case_id": "adaptive_holdout_004",
+          "repeat": 1,
+          "differences": {
+            "tool_parameters": {
+              "model": "all_valid",
+              "jev": "has_invalid",
+              "programmatic_reference": "all_valid",
+              "model_matches_reference": true,
+              "jev_matches_reference": false
+            }
+          },
+          "all_answers_equal": false
+        },
+        {
+          "case_id": "adaptive_holdout_008",
+          "repeat": 1,
+          "differences": {
+            "fact_coverage": {
+              "model": "partial",
+              "jev": "full",
+              "programmatic_reference": "full",
+              "model_matches_reference": false,
+              "jev_matches_reference": true
+            },
+            "task_completed": {
+              "model": "yes",
+              "jev": "no",
+              "programmatic_reference": "yes",
+              "model_matches_reference": true,
+              "jev_matches_reference": false
+            }
+          },
+          "all_answers_equal": false
+        },
+        {
+          "case_id": "budgeted_holdout_001",
+          "repeat": 1,
+          "differences": {
+            "task_completed": {
+              "model": "yes",
+              "jev": "no",
+              "programmatic_reference": "yes",
+              "model_matches_reference": true,
+              "jev_matches_reference": false
+            }
+          },
+          "all_answers_equal": false
+        },
+        {
+          "case_id": "budgeted_holdout_003",
+          "repeat": 1,
+          "differences": {
+            "task_completed": {
+              "model": "yes",
+              "jev": "no",
+              "programmatic_reference": "yes",
+              "model_matches_reference": true,
+              "jev_matches_reference": false
+            }
+          },
+          "all_answers_equal": false
+        },
+        {
+          "case_id": "budgeted_holdout_004",
+          "repeat": 1,
+          "differences": {
+            "fact_coverage": {
+              "model": "partial",
+              "jev": "full",
+              "programmatic_reference": "full",
+              "model_matches_reference": false,
+              "jev_matches_reference": true
+            }
+          },
+          "all_answers_equal": false
+        }
+      ]
+    },
+    "claude_opus55": {
+      "baseline": "jev",
+      "planned_pairs": 24,
+      "valid_pairs": 24,
+      "missing_pairs": [],
+      "all_answers_equal_pairs": 19,
+      "all_answers_equal_rate_valid": 0.7916666666666666,
+      "per_question": {
+        "fact_coverage": {
+          "equal_pairs": 24,
+          "agreement_rate_valid": 1.0,
+          "model_only_matches_reference": 0,
+          "jev_only_matches_reference": 0,
+          "neither_matches_reference": 0
+        },
+        "task_completed": {
+          "equal_pairs": 21,
+          "agreement_rate_valid": 0.875,
+          "model_only_matches_reference": 3,
+          "jev_only_matches_reference": 0,
+          "neither_matches_reference": 0
+        },
+        "tool_parameters": {
+          "equal_pairs": 22,
+          "agreement_rate_valid": 0.9166666666666666,
+          "model_only_matches_reference": 2,
+          "jev_only_matches_reference": 0,
+          "neither_matches_reference": 0
+        }
+      },
+      "disagreements": [
+        {
+          "case_id": "adaptive_holdout_002",
+          "repeat": 1,
+          "differences": {
+            "tool_parameters": {
+              "model": "all_valid",
+              "jev": "has_invalid",
+              "programmatic_reference": "all_valid",
+              "model_matches_reference": true,
+              "jev_matches_reference": false
+            }
+          },
+          "all_answers_equal": false
+        },
+        {
+          "case_id": "adaptive_holdout_004",
+          "repeat": 1,
+          "differences": {
+            "tool_parameters": {
+              "model": "all_valid",
+              "jev": "has_invalid",
+              "programmatic_reference": "all_valid",
+              "model_matches_reference": true,
+              "jev_matches_reference": false
+            }
+          },
+          "all_answers_equal": false
+        },
+        {
+          "case_id": "adaptive_holdout_008",
+          "repeat": 1,
+          "differences": {
+            "task_completed": {
+              "model": "yes",
+              "jev": "no",
+              "programmatic_reference": "yes",
+              "model_matches_reference": true,
+              "jev_matches_reference": false
+            }
+          },
+          "all_answers_equal": false
+        },
+        {
+          "case_id": "budgeted_holdout_001",
+          "repeat": 1,
+          "differences": {
+            "task_completed": {
+              "model": "yes",
+              "jev": "no",
+              "programmatic_reference": "yes",
+              "model_matches_reference": true,
+              "jev_matches_reference": false
+            }
+          },
+          "all_answers_equal": false
+        },
+        {
+          "case_id": "budgeted_holdout_003",
+          "repeat": 1,
+          "differences": {
+            "task_completed": {
+              "model": "yes",
+              "jev": "no",
+              "programmatic_reference": "yes",
+              "model_matches_reference": true,
+              "jev_matches_reference": false
+            }
+          },
+          "all_answers_equal": false
+        }
+      ]
+    },
+    "deepseek_max": {
+      "baseline": "jev",
+      "planned_pairs": 24,
+      "valid_pairs": 24,
+      "missing_pairs": [],
+      "all_answers_equal_pairs": 18,
+      "all_answers_equal_rate_valid": 0.75,
+      "per_question": {
+        "fact_coverage": {
+          "equal_pairs": 23,
+          "agreement_rate_valid": 0.9583333333333334,
+          "model_only_matches_reference": 0,
+          "jev_only_matches_reference": 1,
+          "neither_matches_reference": 0
+        },
+        "task_completed": {
+          "equal_pairs": 20,
+          "agreement_rate_valid": 0.8333333333333334,
+          "model_only_matches_reference": 3,
+          "jev_only_matches_reference": 1,
+          "neither_matches_reference": 0
+        },
+        "tool_parameters": {
+          "equal_pairs": 22,
+          "agreement_rate_valid": 0.9166666666666666,
+          "model_only_matches_reference": 2,
+          "jev_only_matches_reference": 0,
+          "neither_matches_reference": 0
+        }
+      },
+      "disagreements": [
+        {
+          "case_id": "adaptive_holdout_002",
+          "repeat": 1,
+          "differences": {
+            "tool_parameters": {
+              "model": "all_valid",
+              "jev": "has_invalid",
+              "programmatic_reference": "all_valid",
+              "model_matches_reference": true,
+              "jev_matches_reference": false
+            }
+          },
+          "all_answers_equal": false
+        },
+        {
+          "case_id": "adaptive_holdout_004",
+          "repeat": 1,
+          "differences": {
+            "tool_parameters": {
+              "model": "all_valid",
+              "jev": "has_invalid",
+              "programmatic_reference": "all_valid",
+              "model_matches_reference": true,
+              "jev_matches_reference": false
+            }
+          },
+          "all_answers_equal": false
+        },
+        {
+          "case_id": "adaptive_holdout_008",
+          "repeat": 1,
+          "differences": {
+            "task_completed": {
+              "model": "yes",
+              "jev": "no",
+              "programmatic_reference": "yes",
+              "model_matches_reference": true,
+              "jev_matches_reference": false
+            }
+          },
+          "all_answers_equal": false
+        },
+        {
+          "case_id": "budgeted_holdout_001",
+          "repeat": 1,
+          "differences": {
+            "task_completed": {
+              "model": "yes",
+              "jev": "no",
+              "programmatic_reference": "yes",
+              "model_matches_reference": true,
+              "jev_matches_reference": false
+            }
+          },
+          "all_answers_equal": false
+        },
+        {
+          "case_id": "budgeted_holdout_003",
+          "repeat": 1,
+          "differences": {
+            "task_completed": {
+              "model": "yes",
+              "jev": "no",
+              "programmatic_reference": "yes",
+              "model_matches_reference": true,
+              "jev_matches_reference": false
+            }
+          },
+          "all_answers_equal": false
+        },
+        {
+          "case_id": "fixed_holdout_006",
+          "repeat": 1,
+          "differences": {
+            "fact_coverage": {
+              "model": "partial",
+              "jev": "full",
+              "programmatic_reference": "full",
+              "model_matches_reference": false,
+              "jev_matches_reference": true
+            },
+            "task_completed": {
+              "model": "no",
+              "jev": "yes",
+              "programmatic_reference": "yes",
+              "model_matches_reference": false,
+              "jev_matches_reference": true
+            }
+          },
+          "all_answers_equal": false
+        }
+      ]
+    },
+    "kimi_k31_thinking": {
+      "baseline": "jev",
+      "planned_pairs": 24,
+      "valid_pairs": 24,
+      "missing_pairs": [],
+      "all_answers_equal_pairs": 18,
+      "all_answers_equal_rate_valid": 0.75,
+      "per_question": {
+        "fact_coverage": {
+          "equal_pairs": 23,
+          "agreement_rate_valid": 0.9583333333333334,
+          "model_only_matches_reference": 0,
+          "jev_only_matches_reference": 1,
+          "neither_matches_reference": 0
+        },
+        "task_completed": {
+          "equal_pairs": 20,
+          "agreement_rate_valid": 0.8333333333333334,
+          "model_only_matches_reference": 3,
+          "jev_only_matches_reference": 1,
+          "neither_matches_reference": 0
+        },
+        "tool_parameters": {
+          "equal_pairs": 22,
+          "agreement_rate_valid": 0.9166666666666666,
+          "model_only_matches_reference": 2,
+          "jev_only_matches_reference": 0,
+          "neither_matches_reference": 0
+        }
+      },
+      "disagreements": [
+        {
+          "case_id": "adaptive_holdout_002",
+          "repeat": 1,
+          "differences": {
+            "tool_parameters": {
+              "model": "all_valid",
+              "jev": "has_invalid",
+              "programmatic_reference": "all_valid",
+              "model_matches_reference": true,
+              "jev_matches_reference": false
+            }
+          },
+          "all_answers_equal": false
+        },
+        {
+          "case_id": "adaptive_holdout_004",
+          "repeat": 1,
+          "differences": {
+            "tool_parameters": {
+              "model": "all_valid",
+              "jev": "has_invalid",
+              "programmatic_reference": "all_valid",
+              "model_matches_reference": true,
+              "jev_matches_reference": false
+            }
+          },
+          "all_answers_equal": false
+        },
+        {
+          "case_id": "adaptive_holdout_008",
+          "repeat": 1,
+          "differences": {
+            "task_completed": {
+              "model": "yes",
+              "jev": "no",
+              "programmatic_reference": "yes",
+              "model_matches_reference": true,
+              "jev_matches_reference": false
+            }
+          },
+          "all_answers_equal": false
+        },
+        {
+          "case_id": "budgeted_holdout_001",
+          "repeat": 1,
+          "differences": {
+            "task_completed": {
+              "model": "yes",
+              "jev": "no",
+              "programmatic_reference": "yes",
+              "model_matches_reference": true,
+              "jev_matches_reference": false
+            }
+          },
+          "all_answers_equal": false
+        },
+        {
+          "case_id": "budgeted_holdout_003",
+          "repeat": 1,
+          "differences": {
+            "task_completed": {
+              "model": "yes",
+              "jev": "no",
+              "programmatic_reference": "yes",
+              "model_matches_reference": true,
+              "jev_matches_reference": false
+            }
+          },
+          "all_answers_equal": false
+        },
+        {
+          "case_id": "fixed_holdout_006",
+          "repeat": 1,
+          "differences": {
+            "fact_coverage": {
+              "model": "partial",
+              "jev": "full",
+              "programmatic_reference": "full",
+              "model_matches_reference": false,
+              "jev_matches_reference": true
+            },
+            "task_completed": {
+              "model": "no",
+              "jev": "yes",
+              "programmatic_reference": "yes",
+              "model_matches_reference": false,
+              "jev_matches_reference": true
+            }
+          },
+          "all_answers_equal": false
+        }
+      ]
+    },
+    "qwen38_max": {
+      "baseline": "jev",
+      "planned_pairs": 24,
+      "valid_pairs": 24,
+      "missing_pairs": [],
+      "all_answers_equal_pairs": 19,
+      "all_answers_equal_rate_valid": 0.7916666666666666,
+      "per_question": {
+        "fact_coverage": {
+          "equal_pairs": 24,
+          "agreement_rate_valid": 1.0,
+          "model_only_matches_reference": 0,
+          "jev_only_matches_reference": 0,
+          "neither_matches_reference": 0
+        },
+        "task_completed": {
+          "equal_pairs": 21,
+          "agreement_rate_valid": 0.875,
+          "model_only_matches_reference": 3,
+          "jev_only_matches_reference": 0,
+          "neither_matches_reference": 0
+        },
+        "tool_parameters": {
+          "equal_pairs": 22,
+          "agreement_rate_valid": 0.9166666666666666,
+          "model_only_matches_reference": 2,
+          "jev_only_matches_reference": 0,
+          "neither_matches_reference": 0
+        }
+      },
+      "disagreements": [
+        {
+          "case_id": "adaptive_holdout_002",
+          "repeat": 1,
+          "differences": {
+            "tool_parameters": {
+              "model": "all_valid",
+              "jev": "has_invalid",
+              "programmatic_reference": "all_valid",
+              "model_matches_reference": true,
+              "jev_matches_reference": false
+            }
+          },
+          "all_answers_equal": false
+        },
+        {
+          "case_id": "adaptive_holdout_004",
+          "repeat": 1,
+          "differences": {
+            "tool_parameters": {
+              "model": "all_valid",
+              "jev": "has_invalid",
+              "programmatic_reference": "all_valid",
+              "model_matches_reference": true,
+              "jev_matches_reference": false
+            }
+          },
+          "all_answers_equal": false
+        },
+        {
+          "case_id": "adaptive_holdout_008",
+          "repeat": 1,
+          "differences": {
+            "task_completed": {
+              "model": "yes",
+              "jev": "no",
+              "programmatic_reference": "yes",
+              "model_matches_reference": true,
+              "jev_matches_reference": false
+            }
+          },
+          "all_answers_equal": false
+        },
+        {
+          "case_id": "budgeted_holdout_001",
+          "repeat": 1,
+          "differences": {
+            "task_completed": {
+              "model": "yes",
+              "jev": "no",
+              "programmatic_reference": "yes",
+              "model_matches_reference": true,
+              "jev_matches_reference": false
+            }
+          },
+          "all_answers_equal": false
+        },
+        {
+          "case_id": "budgeted_holdout_003",
+          "repeat": 1,
+          "differences": {
+            "task_completed": {
+              "model": "yes",
+              "jev": "no",
+              "programmatic_reference": "yes",
+              "model_matches_reference": true,
+              "jev_matches_reference": false
+            }
+          },
+          "all_answers_equal": false
+        }
+      ]
+    }
+  }
+}

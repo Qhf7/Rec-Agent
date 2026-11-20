@@ -1,13 +1,13 @@
 [
   {
-    "name": "deepseek_no_thinking",
+    "name": "deepseek_max",
     "base_url": "https://www.suanyouyou.com/v1",
     "api_key_env": "DEEPSEEK_API_KEY",
     "model": "deepseek-v4.1-flash-1017",
     "protocol": "chat_completions",
-    "disable_thinking": true,
-    "max_output_tokens": 500,
-    "temperature": 0
+    "thinking_mode": "enabled",
+    "reasoning_effort": "max",
+    "max_output_tokens": 16384
   },
   {
     "name": "jev",
@@ -17,13 +17,13 @@
     "protocol": "systemone"
   },
   {
-    "name": "highland_sol_requested_ultra",
+    "name": "chatgpt61_sol_xhigh",
     "base_url": "https://www.highland-api.com/v1",
     "api_key_env": "HIGHLAND_API_KEY",
     "model": "gpt-6.1-sol",
     "protocol": "responses",
-    "reasoning_effort": "ultra",
-    "max_output_tokens": 8192
+    "reasoning_effort": "xhigh",
+    "max_output_tokens": 16384
   },
   {
     "name": "kimi_k31_thinking",
@@ -32,6 +32,22 @@
     "model": "kimi-k3.1-pro-zbs",
     "protocol": "chat_completions",
     "reasoning_effort": "max",
-    "max_output_tokens": 8192
+    "max_output_tokens": 16384
+  },
+  {
+    "name": "claude_opus55",
+    "base_url": "https://api.modelgo.ai/v1",
+    "api_key_env": "MODELGO_API_KEY",
+    "model": "claude-opus-5.5",
+    "protocol": "chat_completions",
+    "max_output_tokens": 16384
+  },
+  {
+    "name": "qwen38_max",
+    "base_url": "https://www.suanyouyou.com/v1",
+    "api_key_env": "QWEN_API_KEY",
+    "model": "qwen3.8-max",
+    "protocol": "chat_completions",
+    "max_output_tokens": 16384
   }
 ]

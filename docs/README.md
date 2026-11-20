@@ -15,6 +15,7 @@ Rec-Agent 将商品推荐与 Jev 审核连接为一个可视化工作流。按�
 | 参与开发 | [贡献指南](../CONTRIBUTING.md) |
 | 复现Agent评测与本地训练 | [Agent评测指南](AGENT_BENCHMARK.md) |
 | 查看能力建设状态 | [任务清单与进度](AGENT_ROADMAP.md) |
-| 对比评审模型与思考配置 | [四模型与官方价成本对照](MODEL_PROVIDER_COMPARISON.md) |
+| 对比评审模型与思考配置 | [六模型与官方价成本对照](MODEL_PROVIDER_COMPARISON.md) |
+| 比较各模型的风险、评分与最终处置 | [商品理由判断与 Jev 对照](JEV_MODEL_JUDGMENT_COMPARISON.md) |
 
 [返回项目首页](../README.md)

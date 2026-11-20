@@ -27,7 +27,7 @@ python3 -m agent_benchmark.experiment run --output runs/agent-benchmark-v1/match
 
 ## 评审器对照
 
-跨服务、Responses推理模型和档位回显处理见[四模型评测与官方价成本](MODEL_PROVIDER_COMPARISON.md)。
+跨服务、Responses推理模型和思考设置见[六模型评测与官方价成本](MODEL_PROVIDER_COMPARISON.md)。生产风险与吸引力两题的跨模型对照见[商品理由判断与 Jev 对照](JEV_MODEL_JUDGMENT_COMPARISON.md)。
 
 ```bash
 python3 -m agent_benchmark.judges --output runs/judge-controls --limit 12 --repeats 2 --workers 2

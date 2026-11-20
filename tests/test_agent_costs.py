@@ -25,6 +25,17 @@ def test_cold_normalized_prices_same_logical_input_as_all_misses():
     assert result["assumption"] == "same_logical_input_all_cache_miss_no_cache_creation"
 
 
+def test_conflicting_cache_breakdown_keeps_cold_total_and_bounds_observed():
+    usage = {"input_tokens": 1000, "output_tokens": 100, "cached_tokens": 900, "cache_creation_input_tokens": 900}
+    rates = price(cache_write_5m_per_million=2.5, cache_write_1h_per_million=4)
+    observed = calculate_cost(usage, rates)
+    assert observed["cost_usd"] is None
+    assert "cache_tokens_exceed_input" in observed["reasons"]
+    assert observed["cost_lower_usd"] == pytest.approx(.0011)
+    assert observed["cost_upper_usd"] == pytest.approx(.005)
+    assert calculate_cost(usage, rates, "cold")["cost_usd"] == pytest.approx(.003)
+
+
 def test_unknown_cache_has_interval_but_no_invented_point_estimate():
     result = calculate_cost({"prompt_tokens": 1000, "completion_tokens": 100}, price())
     assert result["cache_status"] == "not_reported"

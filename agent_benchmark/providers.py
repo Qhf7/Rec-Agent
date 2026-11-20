@@ -42,6 +42,7 @@ class EvaluatorConfig:
     disable_thinking: bool = False
     temperature: float | None = None
     completion_token_field: str | None = None
+    thinking_mode: str | None = None
 
     def __post_init__(self):
         if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]*", self.name):
@@ -60,6 +61,10 @@ class EvaluatorConfig:
             raise ValueError("invalid completion token parameter")
         if self.disable_thinking and self.reasoning_effort is not None:
             raise ValueError("reasoning effort conflicts with disabled thinking")
+        if self.thinking_mode not in (None, "enabled", "disabled"):
+            raise ValueError("invalid thinking mode")
+        if self.disable_thinking and self.thinking_mode == "enabled":
+            raise ValueError("conflicting thinking settings")
 
     def public(self) -> dict:
         return asdict(self)
@@ -101,8 +106,8 @@ def build_request(config: EvaluatorConfig, state: dict) -> tuple[str, dict]:
                             {"role": "user", "content": _dump(state)}]}
     if config.reasoning_effort is not None:
         payload["reasoning_effort"] = config.reasoning_effort
-    if config.disable_thinking:
-        payload["thinking"] = {"type": "disabled"}
+    if config.disable_thinking or config.thinking_mode:
+        payload["thinking"] = {"type": "disabled" if config.disable_thinking else config.thinking_mode}
     if config.temperature is not None:
         payload["temperature"] = config.temperature
     return _endpoint(config.base_url, "chat/completions"), payload
@@ -133,8 +138,10 @@ def usage_of(envelope: dict) -> dict:
         # Missing counters remain missing rather than being inferred from reads.
         result["input_tokens_details"] = {k: v for k, v in prompt_details.items()
             if k in {"cached_tokens", "cache_write_tokens", "cache_write_5m_tokens", "cache_write_1h_tokens",
-                     "cache_write_30m_tokens", "cache_write_12h_tokens"} and _nonnegative(v) is not None}
-    for field in ("cache_creation_input_tokens", "cache_read_input_tokens", "cache_write_tokens"):
+                     "cache_write_30m_tokens", "cache_write_12h_tokens", "cache_creation_input_tokens", "cache_read_input_tokens"} and _nonnegative(v) is not None}
+        if isinstance(prompt_details.get("cache_creation"), dict):
+            result["input_tokens_details"]["cache_creation"] = {k: v for k, v in prompt_details["cache_creation"].items() if _nonnegative(v) is not None}
+    for field in ("cache_creation_input_tokens", "cache_read_input_tokens", "cache_write_tokens", "cache_write_5m_tokens", "cache_write_1h_tokens"):
         if _nonnegative(source.get(field)) is not None:
             result[field] = source[field]
     if isinstance(source.get("cache_creation"), dict):
@@ -201,7 +208,7 @@ def _redact_response(value: Any, secret: str | None = None) -> Any:
     if isinstance(value, dict):
         result = {}
         for key, part in value.items():
-            if key in {"reasoning_content", "reasoning_text", "encrypted_content"}:
+            if key in {"reasoning_content", "reasoning_text", "reasoning_details", "encrypted_content"}:
                 continue
             if key == "reasoning" and isinstance(part, str):
                 continue

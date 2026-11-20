@@ -1,12 +1,12 @@
 {
-  "schema_version": "official-model-prices-v1",
-  "verified_date": "2026-11-20",
+  "schema_version": "official-model-prices-v2-six",
+  "verified_date": "2026-11-21",
   "currency": "USD",
   "unit": "per_1000000_tokens",
   "billing_basis": "official_list_price_equivalent_estimate_not_reseller_invoice",
-  "normalization": "Standard non-batch short-context rates. DeepSeek peak used for the common baseline; off-peak shown separately. No-cache scenario excludes cache creation.",
+  "normalization": "Standard realtime short-context USD official-price equivalent; Qwen International Singapore as primary with Global scenario. DeepSeek peak primary and off-peak separate. No-cache normalization excludes cache creation.",
   "evaluators": {
-    "deepseek_no_thinking": {
+    "deepseek_max": {
       "official_model": "DeepSeek-V4.1-Flash-1017",
       "source_url": "https://api-docs.deepseek.com/quick_start/pricing",
       "verified_date": "2026-11-20",
@@ -30,7 +30,7 @@
       "output_per_million": 0.0,
       "rate_note": "Official flat input-token price; no separate cache discount; output free."
     },
-    "highland_sol_requested_ultra": {
+    "chatgpt61_sol_xhigh": {
       "official_model": "gpt-6.1-sol",
       "source_url": "https://developers.openai.com/api/docs/pricing",
       "verified_date": "2026-11-20",
@@ -51,6 +51,36 @@
       "cache_write_5m_per_million": 2.0,
       "cache_write_1h_per_million": 4.0,
       "rate_note": "Standard K3.1 Pro, not highspeed; implicit cache default TTL5m; unreported cache counts remain unknown."
+    },
+    "claude_opus55": {
+      "official_model": "claude-opus-5.5",
+      "source_url": "https://platform.claude.com/docs/en/about-claude/pricing",
+      "verified_date": "2026-11-21",
+      "input_per_million": 4.0,
+      "cached_input_per_million": 0.2,
+      "output_per_million": 20.0,
+      "cache_write_5m_per_million": 5.0,
+      "cache_write_1h_per_million": 8.0,
+      "rate_note": "Standard API short-context, no batch or service-tier discounts; OpenAI-compatible usage assumes prompt total includes separately reported cache tokens."
+    },
+    "qwen38_max": {
+      "official_model": "qwen3.8-max",
+      "source_url": "https://www.alibabacloud.com/help/en/model-studio/model-pricing",
+      "verified_date": "2026-11-21",
+      "input_per_million": 2.0,
+      "cached_input_per_million": 0.4,
+      "output_per_million": 6.0,
+      "rate_note": "Singapore International USD rates; implicit cache read20% input (.4/M), writes100% input. No explicit cache_control requested. Region remains a normalization assumption, not reseller invoice.",
+      "variants": {
+        "global": {
+          "input_per_million": 1.65,
+          "cached_input_per_million": 0.33,
+          "output_per_million": 4.951,
+          "cache_write_per_million": 1.65
+        }
+      },
+      "cache_write_per_million": 2.0,
+      "cache_source_url": "https://www.alibabacloud.com/help/en/model-studio/context-cache"
     }
   }
 }

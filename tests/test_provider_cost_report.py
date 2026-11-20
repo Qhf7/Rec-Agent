@@ -9,9 +9,12 @@ from agent_benchmark.providers import usage_of
 
 
 def test_chart_labels_use_reported_reasoning_settings():
-    assert LABELS["highland_sol_requested_ultra"] == "Sol (xhigh)"
+    assert LABELS["highland_sol_requested_ultra"] == "ChatGPT 6.1 Sol (xhigh)"
     assert "Ultra" not in " ".join(LABELS.values())
     assert "thinking on" in LABELS["kimi_k31_thinking"]
+    assert LABELS["deepseek_max"] == "DeepSeek V4.1 Flash (Max)"
+    assert "Claude Opus 5.5" in LABELS["claude_opus55"]
+    assert "Qwen3.8-Max" in LABELS["qwen38_max"]
 
 
 def test_usage_retains_reported_cache_write_zero():

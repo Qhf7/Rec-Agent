@@ -11,10 +11,14 @@ from agent_benchmark.providers import usage_of
 
 
 LABELS = {
-    "deepseek_no_thinking": "DeepSeek (thinking disabled)",
+    "deepseek_no_thinking": "DeepSeek V4.1 Flash (thinking disabled)",
+    "deepseek_max": "DeepSeek V4.1 Flash (Max)",
     "jev": "Jev 1.14.0",
-    "highland_sol_requested_ultra": "Sol (xhigh)",
+    "highland_sol_requested_ultra": "ChatGPT 6.1 Sol (xhigh)",
+    "chatgpt61_sol_xhigh": "ChatGPT 6.1 Sol (xhigh)",
     "kimi_k31_thinking": "Kimi K3.1 Pro (thinking on)",
+    "claude_opus55": "Claude Opus 5.5 (provider default)",
+    "qwen38_max": "Qwen3.8-Max (thinking on)",
 }
 
 
@@ -145,8 +149,9 @@ def _figures(order: list[str], metrics: dict, output: Path, costing: dict | None
     plt.rcParams.update({"font.size": 9, "axes.spines.top": False, "axes.spines.right": False,
                          "figure.facecolor": "white", "savefig.facecolor": "white"})
     labels = [LABELS.get(name, name).replace(" (", "\n(") for name in order]
-    colors = ["#8d7be8", "#48ae9a", "#dcaa62", "#5d9aca"][:len(order)]
-    figure, axes = plt.subplots(2, 3, figsize=(15, 8), layout="constrained")
+    palette = ["#8d7be8", "#48ae9a", "#dcaa62", "#5d9aca", "#ca83a2", "#78945c"]
+    colors = [palette[i % len(palette)] for i in range(len(order))]
+    figure, axes = plt.subplots(2, 3, figsize=(18 if len(order) > 4 else 15, 9 if len(order) > 4 else 8), layout="constrained")
     specs = [("answer_success_rate", "Valid answers (%)"),
              ("task_completed", "Task agreement with executable checks (%)"),
              ("tool_parameters", "Parameter agreement (%)"),
@@ -177,14 +182,14 @@ def _figures(order: list[str], metrics: dict, output: Path, costing: dict | None
             ax.annotate(label, (bar.get_x() + bar.get_width() / 2, value),
                         xytext=(0, 4), textcoords="offset points", ha="center")
         ax.set_title(title, fontsize=10)
-        ax.tick_params(axis="x", labelsize=8)
+        ax.tick_params(axis="x", labelsize=7 if len(order) > 4 else 8, rotation=18 if len(order) > 4 else 0)
     figure.suptitle(f"{len(order)} evaluators — identical frozen Agent trajectories and questions", fontsize=14, weight="bold")
     if costing:
-        figure.supxlabel("Cost: common measured cases, standard cold-cache list prices; Sol usage estimated; not reseller invoices.", fontsize=9)
+        figure.supxlabel("Cost: common measured cases, standard cold-cache list prices; ChatGPT usage estimated; not reseller invoices.", fontsize=9)
     figure.savefig(output / "comparison.png", dpi=170)
     plt.close(figure)
     if costing:
-        figure, axes = plt.subplots(1, 2, figsize=(13, 4.6), layout="constrained")
+        figure, axes = plt.subplots(1, 2, figsize=(17 if len(order) > 4 else 13, 5.8 if len(order) > 4 else 4.6), layout="constrained")
         for ax, policy, title in zip(axes, ("cold", "observed"),
                                     ("Cold-cache official-price equivalent", "Reported-cache official-price equivalent")):
             for index, name in enumerate(order):
@@ -199,12 +204,12 @@ def _figures(order: list[str], metrics: dict, output: Path, costing: dict | None
                     ax.errorbar(index, lower, yerr=[[0], [upper - lower]], color="#314053", capsize=6, fmt="none")
                 label = f"${lower:.3f}" if lower == upper else f"${lower:.2f}–{upper:.2f}"
                 ax.annotate(label, (index, upper), xytext=(0, 5), textcoords="offset points", ha="center", fontsize=9)
-            ax.set_xticks(range(len(order)), labels, fontsize=8)
+            ax.set_xticks(range(len(order)), labels, fontsize=7 if len(order) > 4 else 8, rotation=18 if len(order) > 4 else 0)
             ax.set_ylabel("USD / 1,000 evaluations")
             ax.set_title(title)
             ax.set_ylim(0, ax.get_ylim()[1] * 1.16)
         figure.suptitle("Cost comparison under two cache assumptions", fontsize=14, weight="bold")
-        figure.supxlabel("Common measured cases; DeepSeek peak baseline; Sol usage estimated; Kimi ranges retain missing cache details.", fontsize=9)
+        figure.supxlabel("Common measured cases; DeepSeek peak baseline; ChatGPT usage estimated; ranges retain missing cache details.", fontsize=9)
         figure.savefig(output / "cost-assumptions.png", dpi=170)
         plt.close(figure)
 

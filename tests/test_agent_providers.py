@@ -77,6 +77,18 @@ def test_chat_ultra_effort_and_completion_budget_are_not_silently_disabled(tmp_p
     assert "max_tokens" not in payload
 
 
+def test_deepseek_max_request_enables_thinking(tmp_path):
+    _, cases = frozen(tmp_path)
+    config = EvaluatorConfig("deepseek_max", "https://ds.example/v1", "DS_TEST_ENV", "deepseek-v4.1-flash-1017",
+                             thinking_mode="enabled", reasoning_effort="max", max_output_tokens=16384)
+    _, payload = build_request(config, cases[0]["state"])
+    assert payload["thinking"] == {"type": "enabled"}
+    assert payload["reasoning_effort"] == "max"
+    assert payload["max_completion_tokens"] == 16384
+    with pytest.raises(ValueError):
+        EvaluatorConfig("bad", "https://ds.example/v1", "DS_TEST_ENV", "model", thinking_mode="enabled", disable_thinking=True)
+
+
 def test_responses_usage_preserves_cache_reasoning_and_estimation():
     envelope = response_envelope(configs()[1])
     usage = usage_of(envelope)

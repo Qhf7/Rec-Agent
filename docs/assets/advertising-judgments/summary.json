@@ -1,0 +1,376 @@
+{
+  "schema_version": "matched-advertising-judgments-v1",
+  "case_count": 13,
+  "requests": 78,
+  "evaluators": {
+    "deepseek_max": {
+      "requests": 13,
+      "valid_answers": 13,
+      "transport_failures": 0,
+      "parse_failures": 0,
+      "p95_latency_seconds": 18.736851599999994,
+      "expose": 6,
+      "rewrite": 7,
+      "mean_attractiveness_valid": 50.07692307692308
+    },
+    "jev": {
+      "requests": 13,
+      "valid_answers": 13,
+      "transport_failures": 0,
+      "parse_failures": 0,
+      "p95_latency_seconds": 0.8056653999999999,
+      "expose": 3,
+      "rewrite": 10,
+      "mean_attractiveness_valid": 40.79461538461539
+    },
+    "chatgpt61_sol_xhigh": {
+      "requests": 13,
+      "valid_answers": 13,
+      "transport_failures": 0,
+      "parse_failures": 0,
+      "p95_latency_seconds": 21.71622619999999,
+      "expose": 6,
+      "rewrite": 7,
+      "mean_attractiveness_valid": 50.07692307692308
+    },
+    "kimi_k31_thinking": {
+      "requests": 13,
+      "valid_answers": 13,
+      "transport_failures": 0,
+      "parse_failures": 0,
+      "p95_latency_seconds": 21.296937199999984,
+      "expose": 6,
+      "rewrite": 7,
+      "mean_attractiveness_valid": 50.07692307692308
+    },
+    "claude_opus55": {
+      "requests": 13,
+      "valid_answers": 10,
+      "transport_failures": 0,
+      "parse_failures": 3,
+      "p95_latency_seconds": 8.641231399999999,
+      "expose": 4,
+      "rewrite": 6,
+      "mean_attractiveness_valid": 45.0
+    },
+    "qwen38_max": {
+      "requests": 13,
+      "valid_answers": 13,
+      "transport_failures": 0,
+      "parse_failures": 0,
+      "p95_latency_seconds": 39.22690799999998,
+      "expose": 6,
+      "rewrite": 7,
+      "mean_attractiveness_valid": 44.15384615384615
+    }
+  },
+  "jev_comparison": {
+    "baseline": "jev",
+    "note": "Jev is a comparison baseline, not human truth. Ordinal expectations and scalar grades differ.",
+    "comparisons": {
+      "chatgpt61_sol_xhigh": {
+        "planned_pairs": 13,
+        "valid_pairs": 13,
+        "missing_pairs": [],
+        "risk_equal": 12,
+        "decision_equal": 10,
+        "risk_agreement_valid": 0.9230769230769231,
+        "decision_agreement_valid": 0.7692307692307693,
+        "appeal_mean_absolute_difference": 10.771538461538462,
+        "appeal_signed_mean_difference": 9.282307692307693,
+        "disagreements": [
+          {
+            "case_id": "c01",
+            "model": {
+              "risk_type": "compliant",
+              "attractiveness_score": 56.0,
+              "decision": "expose"
+            },
+            "jev": {
+              "risk_type": "compliant",
+              "attractiveness_score": 45.11,
+              "decision": "rewrite"
+            }
+          },
+          {
+            "case_id": "d01",
+            "model": {
+              "risk_type": "compliant",
+              "attractiveness_score": 56.0,
+              "decision": "expose"
+            },
+            "jev": {
+              "risk_type": "compliant",
+              "attractiveness_score": 45.44,
+              "decision": "rewrite"
+            }
+          },
+          {
+            "case_id": "d03",
+            "model": {
+              "risk_type": "compliant",
+              "attractiveness_score": 56.0,
+              "decision": "expose"
+            },
+            "jev": {
+              "risk_type": "compliant",
+              "attractiveness_score": 44.12,
+              "decision": "rewrite"
+            }
+          },
+          {
+            "case_id": "s01",
+            "model": {
+              "risk_type": "off_topic",
+              "attractiveness_score": 1.0,
+              "decision": "rewrite"
+            },
+            "jev": {
+              "risk_type": "compliant",
+              "attractiveness_score": 8.59,
+              "decision": "rewrite"
+            }
+          }
+        ]
+      },
+      "claude_opus55": {
+        "planned_pairs": 13,
+        "valid_pairs": 10,
+        "missing_pairs": [
+          "h01",
+          "h03",
+          "s01"
+        ],
+        "risk_equal": 10,
+        "decision_equal": 7,
+        "risk_agreement_valid": 1.0,
+        "decision_agreement_valid": 0.7,
+        "appeal_mean_absolute_difference": 10.406,
+        "appeal_signed_mean_difference": 3.5420000000000007,
+        "disagreements": [
+          {
+            "case_id": "c01",
+            "model": {
+              "risk_type": "compliant",
+              "attractiveness_score": 56.0,
+              "decision": "expose"
+            },
+            "jev": {
+              "risk_type": "compliant",
+              "attractiveness_score": 45.11,
+              "decision": "rewrite"
+            }
+          },
+          {
+            "case_id": "d01",
+            "model": {
+              "risk_type": "compliant",
+              "attractiveness_score": 56.0,
+              "decision": "expose"
+            },
+            "jev": {
+              "risk_type": "compliant",
+              "attractiveness_score": 45.44,
+              "decision": "rewrite"
+            }
+          },
+          {
+            "case_id": "d03",
+            "model": {
+              "risk_type": "compliant",
+              "attractiveness_score": 56.0,
+              "decision": "expose"
+            },
+            "jev": {
+              "risk_type": "compliant",
+              "attractiveness_score": 44.12,
+              "decision": "rewrite"
+            }
+          }
+        ]
+      },
+      "deepseek_max": {
+        "planned_pairs": 13,
+        "valid_pairs": 13,
+        "missing_pairs": [],
+        "risk_equal": 13,
+        "decision_equal": 10,
+        "risk_agreement_valid": 1.0,
+        "decision_agreement_valid": 0.7692307692307693,
+        "appeal_mean_absolute_difference": 10.534615384615384,
+        "appeal_signed_mean_difference": 9.282307692307693,
+        "disagreements": [
+          {
+            "case_id": "c01",
+            "model": {
+              "risk_type": "compliant",
+              "attractiveness_score": 56.0,
+              "decision": "expose"
+            },
+            "jev": {
+              "risk_type": "compliant",
+              "attractiveness_score": 45.11,
+              "decision": "rewrite"
+            }
+          },
+          {
+            "case_id": "d01",
+            "model": {
+              "risk_type": "compliant",
+              "attractiveness_score": 56.0,
+              "decision": "expose"
+            },
+            "jev": {
+              "risk_type": "compliant",
+              "attractiveness_score": 45.44,
+              "decision": "rewrite"
+            }
+          },
+          {
+            "case_id": "d03",
+            "model": {
+              "risk_type": "compliant",
+              "attractiveness_score": 56.0,
+              "decision": "expose"
+            },
+            "jev": {
+              "risk_type": "compliant",
+              "attractiveness_score": 44.12,
+              "decision": "rewrite"
+            }
+          }
+        ]
+      },
+      "kimi_k31_thinking": {
+        "planned_pairs": 13,
+        "valid_pairs": 13,
+        "missing_pairs": [],
+        "risk_equal": 12,
+        "decision_equal": 10,
+        "risk_agreement_valid": 0.9230769230769231,
+        "decision_agreement_valid": 0.7692307692307693,
+        "appeal_mean_absolute_difference": 10.771538461538462,
+        "appeal_signed_mean_difference": 9.282307692307693,
+        "disagreements": [
+          {
+            "case_id": "c01",
+            "model": {
+              "risk_type": "compliant",
+              "attractiveness_score": 56.0,
+              "decision": "expose"
+            },
+            "jev": {
+              "risk_type": "compliant",
+              "attractiveness_score": 45.11,
+              "decision": "rewrite"
+            }
+          },
+          {
+            "case_id": "d01",
+            "model": {
+              "risk_type": "compliant",
+              "attractiveness_score": 56.0,
+              "decision": "expose"
+            },
+            "jev": {
+              "risk_type": "compliant",
+              "attractiveness_score": 45.44,
+              "decision": "rewrite"
+            }
+          },
+          {
+            "case_id": "d03",
+            "model": {
+              "risk_type": "compliant",
+              "attractiveness_score": 56.0,
+              "decision": "expose"
+            },
+            "jev": {
+              "risk_type": "compliant",
+              "attractiveness_score": 44.12,
+              "decision": "rewrite"
+            }
+          },
+          {
+            "case_id": "s01",
+            "model": {
+              "risk_type": "off_topic",
+              "attractiveness_score": 1.0,
+              "decision": "rewrite"
+            },
+            "jev": {
+              "risk_type": "compliant",
+              "attractiveness_score": 8.59,
+              "decision": "rewrite"
+            }
+          }
+        ]
+      },
+      "qwen38_max": {
+        "planned_pairs": 13,
+        "valid_pairs": 13,
+        "missing_pairs": [],
+        "risk_equal": 12,
+        "decision_equal": 10,
+        "risk_agreement_valid": 0.9230769230769231,
+        "decision_agreement_valid": 0.7692307692307693,
+        "appeal_mean_absolute_difference": 8.114615384615385,
+        "appeal_signed_mean_difference": 3.3592307692307695,
+        "disagreements": [
+          {
+            "case_id": "c01",
+            "model": {
+              "risk_type": "compliant",
+              "attractiveness_score": 56.0,
+              "decision": "expose"
+            },
+            "jev": {
+              "risk_type": "compliant",
+              "attractiveness_score": 45.11,
+              "decision": "rewrite"
+            }
+          },
+          {
+            "case_id": "d01",
+            "model": {
+              "risk_type": "compliant",
+              "attractiveness_score": 56.0,
+              "decision": "expose"
+            },
+            "jev": {
+              "risk_type": "compliant",
+              "attractiveness_score": 45.44,
+              "decision": "rewrite"
+            }
+          },
+          {
+            "case_id": "d03",
+            "model": {
+              "risk_type": "compliant",
+              "attractiveness_score": 56.0,
+              "decision": "expose"
+            },
+            "jev": {
+              "risk_type": "compliant",
+              "attractiveness_score": 44.12,
+              "decision": "rewrite"
+            }
+          },
+          {
+            "case_id": "s01",
+            "model": {
+              "risk_type": "off_topic",
+              "attractiveness_score": 1.0,
+              "decision": "rewrite"
+            },
+            "jev": {
+              "risk_type": "compliant",
+              "attractiveness_score": 8.59,
+              "decision": "rewrite"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

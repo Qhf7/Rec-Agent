@@ -136,6 +136,18 @@ def calculate_cost(usage: Mapping[str, Any], price: Price | Mapping, cache_polic
     if input_tokens is None or output_tokens is None:
         return result
     result["measured"] = True
+    if cache_policy == "cold" and selected.input_token_semantics == "includes_cache":
+        # The hypothetical no-cache scenario needs the validated logical input
+        # total, not the provider's potentially contradictory cache breakdown.
+        input_cost = Decimal(input_tokens) * _number(selected.input_per_million) / MILLION
+        output_cost = Decimal(output_tokens) * _number(selected.output_per_million) / MILLION
+        total = input_cost + output_cost
+        result.update(logical_input_tokens=input_tokens,
+            assumption="same_logical_input_all_cache_miss_no_cache_creation",
+            cost_usd=_float(total), cost_lower_usd=_float(total), cost_upper_usd=_float(total),
+            components={"all_cache_miss_input": {"lower_usd": _float(input_cost), "upper_usd": _float(input_cost)},
+                        "output": {"lower_usd": _float(output_cost), "upper_usd": _float(output_cost)}})
+        return result
     details = usage.get("prompt_tokens_details", usage.get("input_tokens_details")) or {}
     details = details if isinstance(details, Mapping) else {}
     cache_usage = dict(details)
@@ -179,6 +191,12 @@ def calculate_cost(usage: Mapping[str, Any], price: Price | Mapping, cache_polic
     if selected.input_token_semantics == "includes_cache":
         if writes > input_tokens or (cached is not None and cached + writes > input_tokens):
             result["reasons"].append("cache_tokens_exceed_input")
+            rates = [getattr(selected, key) for key in RATE_FIELDS
+                     if key != "output_per_million" and getattr(selected, key) is not None]
+            output_cost = Decimal(output_tokens) * _number(selected.output_per_million) / MILLION
+            result.update(cost_lower_usd=_float(Decimal(input_tokens) * _number(min(rates)) / MILLION + output_cost),
+                          cost_upper_usd=_float(Decimal(input_tokens) * _number(max(rates)) / MILLION + output_cost),
+                          assumption="conflicting_cache_counters_bounded_by_published_input_rates")
             return result
         logical_input = input_tokens
     else:

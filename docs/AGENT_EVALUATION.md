@@ -1,6 +1,6 @@
 # Agent 评测、工具决策与训练结果
 
-四模型同期对照及官方价成本见[模型与成本对比](MODEL_PROVIDER_COMPARISON.md)。本页保留Agent执行实验；评审模型展示使用实际观测的思考设置。
+六模型同期对照及官方价成本见[模型与成本对比](MODEL_PROVIDER_COMPARISON.md)。本页保留Agent执行实验；评审模型展示使用实际观测的思考设置。
 
 ## 实验范围
 
