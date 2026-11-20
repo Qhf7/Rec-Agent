@@ -1,0 +1,56 @@
+{
+  "schema_version": "official-model-prices-v1",
+  "verified_date": "2026-11-20",
+  "currency": "USD",
+  "unit": "per_1000000_tokens",
+  "billing_basis": "official_list_price_equivalent_estimate_not_reseller_invoice",
+  "normalization": "Standard non-batch short-context rates. DeepSeek peak used for the common baseline; off-peak shown separately. No-cache scenario excludes cache creation.",
+  "evaluators": {
+    "deepseek_no_thinking": {
+      "official_model": "DeepSeek-V4.1-Flash-1017",
+      "source_url": "https://api-docs.deepseek.com/quick_start/pricing",
+      "verified_date": "2026-11-20",
+      "input_per_million": 0.3,
+      "cached_input_per_million": 0.006,
+      "output_per_million": 1.2,
+      "variants": {
+        "offpeak": {
+          "input_per_million": 0.15,
+          "cached_input_per_million": 0.003,
+          "output_per_million": 0.6
+        }
+      }
+    },
+    "jev": {
+      "official_model": "jev-1.14.0",
+      "source_url": "https://docs.typesafe.ai/models",
+      "verified_date": "2026-11-20",
+      "input_per_million": 0.042,
+      "cached_input_per_million": 0.042,
+      "output_per_million": 0.0,
+      "rate_note": "Official flat input-token price; no separate cache discount; output free."
+    },
+    "highland_sol_requested_ultra": {
+      "official_model": "gpt-6.1-sol",
+      "source_url": "https://developers.openai.com/api/docs/pricing",
+      "verified_date": "2026-11-20",
+      "input_per_million": 2.0,
+      "cached_input_per_million": 0.1,
+      "output_per_million": 10.0,
+      "cache_write_30m_per_million": 2.5,
+      "cache_write_12h_per_million": 5.0,
+      "rate_note": "Standard short-context tier; no Fast/Ultrafast or batch surcharge/discount applied. Reasoning effort and service speed tier are different settings."
+    },
+    "kimi_k31_thinking": {
+      "official_model": "kimi-k3.1-pro",
+      "source_url": "https://platform.kimi.ai/docs/pricing/chat",
+      "verified_date": "2026-11-20",
+      "input_per_million": 2.0,
+      "cached_input_per_million": 0.2,
+      "output_per_million": 10.0,
+      "cache_write_5m_per_million": 2.0,
+      "cache_write_1h_per_million": 4.0,
+      "rate_note": "Standard K3.1 Pro, not highspeed; implicit cache default TTL5m; unreported cache counts remain unknown."
+    }
+  }
+}

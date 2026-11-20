@@ -1,86 +1,95 @@
-# DeepSeek、Jev 与 Sol 推理模型对照
+# 四模型评测与官方价格折算
 
-## 上一轮通用模型与思考强度
+## 模型与思考配置
 
-上一轮通用大模型来自桌面 Harness 当前使用的 OpenAI Chat Completions 兼容服务。评测代码单独构建请求，不继承桌面会话的思考强度。
+| 模型 | API模型标识 | 图表中的思考设置 |
+| --- | --- | --- |
+| DeepSeek V4.1 Flash | `deepseek-v4.1-flash-1017` | 关闭思考，推理token为0 |
+| Jev 1.14.0 | `jev-1.14.0` | 专用判决模型，不设通用推理档位 |
+| Sol | `gpt-6.1-sol` | `xhigh`，依据响应元数据 |
+| Kimi K3.1 Pro | 接入别名 `kimi-k3.1-pro-zbs`，响应 `kimi-k3.1-pro` | 思考开启，依据实际推理token；未回显具体档位 |
 
-| 项目 | 实际配置 |
-| --- | --- |
-| API基础地址 | `https://www.suanyouyou.com/v1` |
-| 请求模型标识 | `deepseek-v4.1-flash-1017` |
-| 响应模型标识 | `deepseek-v4-1-flash-261017` |
-| 思考 | `thinking: {type: disabled}` |
-| 返回推理token | 已保存的23份有效响应均为0 |
-| 其他参数 | temperature=0，单次输出上限500，严格JSON |
+DeepSeek与Kimi使用同一基础地址、独立凭据。Kimi官方支持low/high/max且默认max，本轮显式设置max；展示层只呈现已观测的“思考开启”。请求与响应配置保留在原始审计记录中，图表只显示实际观测设置。
 
-因此，上轮结果应表述为 **DeepSeek关闭思考的评审基线**，不能表述为桌面 Harness 的 Max 强度。原始评测与新结果分别保留。
+## 同口径结果
 
-## 新增模型的服务配置
+四家重跑同一冻结24条Agent轨迹（8个隔离任务标识×3策略），共96次请求。问题、程序参考及可见事实逐case哈希一致；固定种子交错运行，并发2，每case每模型1次，无自动重试。比例以全部24次尝试为分母。
 
-通过用户指定的第三方服务目录查得模型 `gpt-6.1-sol`，支持 Chat Completions 与 Responses。兼容性探测后使用 Responses，配置如下：
+| 指标 | DeepSeek｜关闭思考 | Jev | Sol｜xhigh | Kimi｜思考开启 |
+| --- | ---: | ---: | ---: | ---: |
+| 有效回答 | 23/24 | 24/24 | 24/24 | 24/24 |
+| 任务完成判断一致 | 16/24（66.7%） | 22/24（91.7%） | 24/24（100%） | 23/24（95.8%） |
+| 工具参数判断一致 | 23/24（95.8%） | 23/24（95.8%） | 24/24（100%） | 24/24（100%） |
+| 事实覆盖判断一致 | 22/24（91.7%） | 24/24（100%） | 24/24（100%） | 23/24（95.8%） |
+| P95评审延迟 | 3.75秒 | 1.12秒 | 14.23秒 | 56.05秒 |
+| 平均评审延迟 | 3.10秒 | 0.68秒 | 10.55秒 | 22.56秒 |
+| 每轨迹评审调用 | 1 | 1 | 1 | 1 |
+| 用量可计量请求 | 23/24 | 24/24 | 24/24 | 24/24 |
 
-| 项目 | 请求与观测 |
-| --- | --- |
-| API基础地址 | `https://www.highland-api.com/v1` |
-| 路由 | `/responses` |
-| 模型 | `gpt-6.1-sol` |
-| 请求思考强度 | `reasoning.effort=ultra` |
-| 24次正式响应的强度回显 | 全部为 `reasoning.effort=xhigh` |
-| 单次输出上限 | 8192，包含模型推理与最终回答额度 |
-| 输出 | 严格JSON；未发送关闭思考参数 |
+DeepSeek的1次连接失败保留在分母；有效答复条件下三题一致率分别为16/23（69.6%）、23/23（100%）、22/23（95.7%）。其余三家无传输或解析失败。
 
-`gpt-6.1-sol-ultra` 后缀探测返回404；Chat Completions接受ultra参数但未回显档位。正式测试采用能观察到档位的Responses路线，保留原始Ultra请求；**不能确认本服务执行了Ultra档，准确名称是“Sol，请求Ultra、回显xhigh”**。模型目录和响应标识描述供应商行为，不构成底层模型身份的独立验证。
+![四模型质量、延迟与官方价折算](assets/provider-comparison/comparison.png)
 
-## 实验口径
+Sol本批程序契约判断全部一致；Kimi任务及覆盖各有1处不一致；Jev任务有2处、参数有1处不一致，但响应更快。一致率不是人工审核准确率。参数参考全部为all_valid，覆盖只有full/partial，不能单凭本批验证invalid参数或零覆盖的检出能力。
 
-- 直接复用上一轮冻结的24条真实Agent轨迹（8任务×3策略），不重生成推荐或调整程序参考。
-- 各服务收到相同state、问题、商品事实和模型可见工具观察；每个case的SHA-256与原清单一致。
-- 评测三题：任务是否完成、工具参数是否全部有效、所需事实覆盖是否完整。程序契约参考不发送给评审器。
-- 三服务在同一个固定种子交错队列中执行，并发2、各24次，共72请求；无自动重试，失败不从全请求分母移除。
-- 这是模型、推理配置及服务协议的联合对照：DeepSeek关闭思考；Sol请求Ultra但回显xhigh；Jev不配置通用模型思考等级。不是仅改变模型权重的实验。
-- 没有累计token门槛或token预留。服务所需的单次最大输出参数与真实消耗分别记录；没有因输出上限截断的有效回答。
+## 官方单价
 
-## 结果
+核验日期：2026-11-20。单位均为**美元／百万token**，采用标准实时短上下文费率，不含税、批量折扣或加速服务费。
 
-下表使用全部24次尝试作为比例分母，P95包含传输失败的墙钟时间。
+| 模型 | 未缓存输入 | 缓存命中输入 | 输出 | 缓存写入 | 官方来源 |
+| --- | ---: | ---: | ---: | --- | --- |
+| DeepSeek Flash：峰时基准 | $0.30 | $0.006 | $1.20 | 无单独写入费 | [DeepSeek定价](https://api-docs.deepseek.com/quick_start/pricing) |
+| DeepSeek Flash：谷时情景 | $0.15 | $0.003 | $0.60 | 无单独写入费 | 同上 |
+| Jev 1.14 | $0.042 | $0.042（统一输入费率） | $0 | 无单独缓存档 | [TypeSafe模型与价格](https://docs.typesafe.ai/models) |
+| Sol 标准档 | $2.00 | $0.10 | $10.00 | 30分钟$2.50；12小时$5.00 | [OpenAI定价](https://developers.openai.com/api/docs/pricing) |
+| Kimi K3.1 Pro | $2.00 | $0.20 | $10.00 | 5分钟$2.00；1小时$4.00 | [Kimi定价](https://platform.kimi.ai/docs/pricing/chat) |
 
-| 指标 | DeepSeek关闭思考 | Jev 1.14.0 | Sol：请求Ultra／回显xhigh |
+推理token已包含在输出计量中，不重复收费。缓存命中、写入、未缓存输入分开计价；缺失计量保留区间。配置见[官方费率快照](../examples/official_model_prices.json)。
+
+## 美元成本比较
+
+**以下是按官方价格折算的等效成本，不是中转平台实付账单。** 四家均通过第三方接入，没有账单不能确认实际扣费。Sol全部usage明确为估算，其成本同样为估算。
+
+主表只比较四家都有输入/输出计量的共同23个case。每千次为“共同case平均单次成本×1000”，不以失败次数稀释费用。
+
+| 模型 | 统一冷缓存：USD／千次评审 | 按本次缓存计量：USD／千次评审 | 共同计量case |
 | --- | ---: | ---: | ---: |
-| 有效回答 | 22/24（91.7%） | 24/24（100%） | 24/24（100%） |
-| 任务完成判断与程序参考一致 | 15/24（62.5%） | 21/24（87.5%） | 24/24（100%） |
-| 参数判断与程序参考一致 | 22/24（91.7%） | 22/24（91.7%） | 24/24（100%） |
-| 事实覆盖判断与程序参考一致 | 21/24（87.5%） | 24/24（100%） | 24/24（100%） |
-| 每轨迹评审调用 | 1 | 1 | 1 |
-| 平均评审延迟 | 3.39秒 | 0.70秒 | 10.64秒 |
-| P95评审延迟 | 4.75秒 | 1.06秒 | 14.53秒 |
-| 平均输入token | 5,272.8 | 7,315.9 | 5,142.1（估算） |
-| 平均输出token | 48.0 | 102.0 | 225.4（估算） |
-| 平均总token | 5,320.8 | 7,417.9 | 5,367.5（估算） |
-| 平均推理token | 0 | 未提供 | 179.3（服务报告／估算） |
-| 传输失败／解析失败 | 2／0 | 0／0 | 0／0 |
+| DeepSeek峰时基准 | $1.6203 | $0.1069 | 23/24 |
+| Jev | $0.3111 | $0.3111 | 23/24 |
+| Sol xhigh | $12.9025＊ | $5.1355＊ | 23/24 |
+| Kimi思考开启 | $18.6947 | $14.2998–$16.2148 | 23/24 |
 
-![三模型同口径对照](assets/provider-comparison/comparison.png)
+＊Sol为接口估算usage乘官方单价，不是已核验支出。
 
-Token均值以有计量的响应计算，DeepSeek为22次，其他为24次；DeepSeek2次连接失败的usage记未知，不补零。Jev的总token由其返回的input_tokens与output_tokens相加，非假设其存在原生total字段。Sol全部24次usage明确带 `customer_usage.estimated=true`，来源含client_request/fixed_deduction；不能当作可核验原生账单用量。不同服务tokenizer、计数和缓存方式不同，不按这些数字推导金额或token效率排名。
+![两种缓存假设下的官方价成本](assets/provider-comparison/cost-assumptions.png)
 
-DeepSeek仅有效答复的一致率分别为15/22（68.2%）、22/22（100%）、21/22（95.5%）；另两模型没有缺答，全请求与有效答复口径相同。完整逐条结果见[case-results.json](assets/provider-comparison/case-results.json)，聚合指标见[summary.json](assets/provider-comparison/summary.json)。
+- **冷缓存列**：相同case输入统一按cache miss计价，不计新建缓存，隔离缓存热度。DeepSeek采用峰时标准作比较基准。
+- **本次缓存列**：逐次使用实际报告的命中与写入计量。Kimi4条响应缺少缓存读取量，另4条非零写入未提供TTL，均保留区间，不补成0。
+- **谷时情景**：DeepSeek冷缓存为$0.8102／千次，按已报缓存为$0.0534／千次。本次运行在官方谷时范围，峰时列不是本次实际收费。
+- **缺失费用**：DeepSeek1次失败未提供usage，完整24次总费用未知；有计量小计不把该失败视为免费。
 
-## 如何解释
+| 模型 | 有计量响应 | 冷缓存官方价等效小计 | 小计口径 |
+| --- | ---: | ---: | --- |
+| DeepSeek峰时基准 | 23/24 | $0.037268 | 各自有计量case；非配对主表 |
+| Jev | 24/24 | $0.007374 | 各自有计量case；非配对主表 |
+| Sol xhigh | 24/24 | $0.305538＊ | 各自有计量case；非配对主表 |
+| Kimi思考开启 | 24/24 | $0.486634 | 各自有计量case；非配对主表 |
 
-1. **本批次Sol的程序契约判断最一致。** 三题均24/24；Jev的任务判断有3处、参数判断有2处不一致。不能说Jev在所有质量指标上更优。
-2. **Jev的本批次速度优势明显。** Sol/Jev的P95延迟比约13.74:1，DeepSeek/Jev约4.50:1；这是当前服务配置和并发条件下的结果，不代表所有部署。
-3. **没有验证实际Ultra。** 请求未降级，但服务端回显xhigh；需要供应商明确Ultra路由或提供可验证的Ultra端点后，才能补充真正同名档位实验。
-4. **没有独立人工语义金标。** 参考仅检查结构、观察事实和预算约束，不代表推荐相关性、营销质量或真实点击率。
-5. **样本存在类别覆盖限制。** 24条轨迹仅对应8个隔离任务标识（7个已知用户、1个未知用户控制）；参数参考全部为all_valid，事实覆盖仅full/partial，没有none。因此本批次不能衡量无效参数或零覆盖的检出能力；先前受控错误集另行保存，不能混成更大独立样本。
-6. **Agent自身六项指标不因更换评审器而改变。** 本轮评审的是相同冻结执行结果，不重新运行Agent或宣称其任务完成率被提高。执行策略对照仍见[Agent评测结果](AGENT_EVALUATION.md)。
+冷缓存共同case中Jev的官方价折算最低；按本次高缓存命中量，DeepSeek更低。优势取决于缓存和峰谷档，不能说Jev始终最便宜。Kimi包含较多推理输出，本批质量较高，但延迟与折算成本也更高。
 
-## 复现
-
-使用 [`agent_benchmark/providers.py`](../agent_benchmark/providers.py)。配置只保存环境变量名，凭据由进程环境提供。参考配置见[三服务配置样例](../examples/evaluator_providers.json)。
+## 复现与产物
 
 ```bash
 python3 -m agent_benchmark.providers --manifest runs/agent-benchmark-v1/judge-matched-final/manifest.json --config-file examples/evaluator_providers.json --output runs/provider-comparison --workers 2 --repeats 1 --timeout 180
-python3 -m agent_benchmark.provider_report --run runs/provider-comparison --output runs/provider-comparison/figures
+python3 -m agent_benchmark.provider_report --run runs/provider-comparison --output runs/provider-comparison/figures --prices examples/official_model_prices.json
 ```
 
-该命令会真实调用三项服务；需先按[Agent评测指南](AGENT_BENCHMARK.md)生成冻结轨迹与manifest。请求、响应、HTTP状态、服务端请求标识、原始usage及档位回显分别保存；隐藏推理正文不用于评测或公开展示。
+使用独立 `DEEPSEEK_API_KEY`、`MODELGO_API_KEY`、`HIGHLAND_API_KEY`、`KIMI_API_KEY`。凭据仅在本机进程加载，Kimi凭据不覆盖推荐端配置。
+
+- [逐例答案、用量与延迟](assets/provider-comparison/case-results.json)
+- [汇总与费率](assets/provider-comparison/summary.json)
+- [共同case成本](assets/provider-comparison/paired-costs.json)
+- [各自有计量case成本](assets/provider-comparison/costs.json)
+- [CSV对照](assets/provider-comparison/comparison.csv)
+
+原始响应与官方价页面快照保留在本机忽略目录，公开产物不含凭据。模型与思考元数据只是接口观测，不是底层权重身份的独立证明。程序参考不是人工语义金标；24条轨迹来自8个任务且有关联，每case只评1次，不证明重复稳定性。

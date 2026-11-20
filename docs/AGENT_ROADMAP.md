@@ -68,7 +68,7 @@
 
 ## 下一步
 
-追加完成：三服务对同24条冻结轨迹执行72次同期交错评测。原DeepSeek为关闭思考；新增Sol请求Ultra但24次均回显xhigh，已单独记录，未声称实际Ultra。详见[模型对照](MODEL_PROVIDER_COMPARISON.md)。
+追加完成：四模型对同24条冻结轨迹执行96次交错评测；图表显示DeepSeek关闭思考、Sol xhigh、Kimi思考开启，并按官方价格计算共同case成本。详见[模型与成本对照](MODEL_PROVIDER_COMPARISON.md)。
 
 - [ ] 完成6对开发输出的人工偏好标注与分歧核验。
 - [ ] 扩充成功与错误恢复轨迹，增加能完整覆盖长任务的训练样本。

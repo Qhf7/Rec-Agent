@@ -24,5 +24,14 @@
     "protocol": "responses",
     "reasoning_effort": "ultra",
     "max_output_tokens": 8192
+  },
+  {
+    "name": "kimi_k31_thinking",
+    "base_url": "https://www.suanyouyou.com/v1",
+    "api_key_env": "KIMI_API_KEY",
+    "model": "kimi-k3.1-pro-zbs",
+    "protocol": "chat_completions",
+    "reasoning_effort": "max",
+    "max_output_tokens": 8192
   }
 ]

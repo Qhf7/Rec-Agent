@@ -128,6 +128,17 @@ def usage_of(envelope: dict) -> dict:
         result["cached_tokens"] = _nonnegative(prompt_details.get("cached_tokens", source.get("prompt_cache_hit_tokens")))
     if isinstance(output_details, dict):
         result["reasoning_tokens"] = _nonnegative(output_details.get("reasoning_tokens", source.get("reasoning_tokens")))
+    if isinstance(prompt_details, dict):
+        # Preserve explicit cache-write zeros and tier counters for pricing.
+        # Missing counters remain missing rather than being inferred from reads.
+        result["input_tokens_details"] = {k: v for k, v in prompt_details.items()
+            if k in {"cached_tokens", "cache_write_tokens", "cache_write_5m_tokens", "cache_write_1h_tokens",
+                     "cache_write_30m_tokens", "cache_write_12h_tokens"} and _nonnegative(v) is not None}
+    for field in ("cache_creation_input_tokens", "cache_read_input_tokens", "cache_write_tokens"):
+        if _nonnegative(source.get(field)) is not None:
+            result[field] = source[field]
+    if isinstance(source.get("cache_creation"), dict):
+        result["cache_creation"] = {k: v for k, v in source["cache_creation"].items() if _nonnegative(v) is not None}
     customer_usage = envelope.get("customer_usage", source.get("customer_usage"))
     if isinstance(customer_usage, dict):
         result["customer_usage"] = _redact_response(customer_usage)

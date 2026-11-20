@@ -1,6 +1,6 @@
 # Agent 评测、工具决策与训练结果
 
-新增第三方Sol推理服务的同期三方对照见[模型与思考强度对比](MODEL_PROVIDER_COMPARISON.md)。本页保留首轮结果；原DeepSeek基线明确关闭思考，不继承桌面Max档。
+四模型同期对照及官方价成本见[模型与成本对比](MODEL_PROVIDER_COMPARISON.md)。本页保留Agent执行实验；评审模型展示使用实际观测的思考设置。
 
 ## 实验范围
 
