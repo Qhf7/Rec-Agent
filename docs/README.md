@@ -13,5 +13,7 @@ Rec-Agent 将商品推荐与 Jev 审核连接为一个可视化工作流。按�
 | 配置 Jev API | [接口配置](../jev_api_config.example.md) |
 | 了解数据字段与反馈记录 | [数据契约](../data/README.md) |
 | 参与开发 | [贡献指南](../CONTRIBUTING.md) |
+| 复现Agent评测与本地训练 | [Agent评测指南](AGENT_BENCHMARK.md) |
+| 查看能力建设状态 | [任务清单与进度](AGENT_ROADMAP.md) |
 
 [返回项目首页](../README.md)
