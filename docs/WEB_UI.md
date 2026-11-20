@@ -47,6 +47,26 @@ python3 ui_server.py
 
 使用 DeepSeek 独立额度时，再设置 `DEEPSEEK_API_KEY`；Jev 仍使用 `MODELGO_API_KEY`。页面可查看模型与配置状态，密钥只保留在服务端环境中。
 
+### 复用桌面 Harness 提供商
+
+推荐端支持 OpenAI Chat Completions 兼容服务。将 `DEEPSEEK_BASE_URL`、`DEEPSEEK_MODEL` 和 `DEEPSEEK_API_KEY` 设置为桌面 Harness 中同一提供商的配置。例如：
+
+```bash
+export DEEPSEEK_BASE_URL="https://www.suanyouyou.com/v1"
+export DEEPSEEK_MODEL="deepseek-v4.1-flash-1017"
+```
+
+基础地址使用 `/v1`，后端自动追加 `/chat/completions`。密钥通过环境变量提供。也可复制 [`.env.example`](../.env.example) 为本机 `.env`，填写凭据并取消所需配置前的注释，然后在 macOS / Linux 终端加载并启动：
+
+```bash
+set -a
+source .env
+set +a
+python3 ui_server.py
+```
+
+`.env` 已加入 Git 忽略规则。更新配置后重启服务；独立 Jev 阶段继续使用 ModelGo SystemOne 接口。
+
 ## 结果说明
 
 商品卡同时展示商品属性、曝光理由与审核结果。Jev 回答风险分型和吸引力两题：风险为 `compliant` 且吸引力严格大于 50 时，处置为 `expose`；其他情况为 `rewrite`。详见[审核协议](JEV_QUESTIONS.md)。
