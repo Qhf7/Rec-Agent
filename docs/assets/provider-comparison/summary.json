@@ -1,0 +1,244 @@
+{
+  "schema_version": "agent-provider-comparison-v1",
+  "case_count": 24,
+  "workers": 2,
+  "repeats": 1,
+  "source_manifest_sha256": "1d54810bffa6f949bea935a2fbdce8a8230330a06aae8252d44356ab3d611a84",
+  "reference_type": "programmatic_contract_checks_not_human_gold",
+  "evaluators": {
+    "deepseek_no_thinking": {
+      "config": {
+        "name": "deepseek_no_thinking",
+        "base_url": "https://www.suanyouyou.com/v1",
+        "api_key_env": "DEEPSEEK_API_KEY",
+        "model": "deepseek-v4.1-flash-1017",
+        "protocol": "chat_completions",
+        "reasoning_effort": null,
+        "max_output_tokens": 500,
+        "disable_thinking": true,
+        "temperature": 0,
+        "completion_token_field": null
+      },
+      "requests": 24,
+      "valid_answers": 22,
+      "answer_success_rate": 0.9166666666666666,
+      "transport_failures": 2,
+      "parse_failures": 0,
+      "mean_latency_seconds": 3.3885131666666664,
+      "p95_latency_seconds": 4.75377385,
+      "agreement_all_attempts": {
+        "task_completed": 0.625,
+        "tool_parameters": 0.9166666666666666,
+        "fact_coverage": 0.875
+      },
+      "agreement_valid_only": {
+        "task_completed": 0.6818181818181818,
+        "tool_parameters": 1.0,
+        "fact_coverage": 0.9545454545454546
+      },
+      "returned_models": [
+        "deepseek-v4-1-flash-261017"
+      ],
+      "prompt_tokens": {
+        "reported": 22,
+        "sum": 116002,
+        "mean_reported": 5272.818181818182
+      },
+      "completion_tokens": {
+        "reported": 22,
+        "sum": 1056,
+        "mean_reported": 48.0
+      },
+      "total_tokens": {
+        "reported": 22,
+        "sum": 117058,
+        "mean_reported": 5320.818181818182
+      },
+      "cached_tokens": {
+        "reported": 22,
+        "sum": 108800,
+        "mean_reported": 4945.454545454545
+      },
+      "reasoning_tokens": {
+        "reported": 22,
+        "sum": 0,
+        "mean_reported": 0.0
+      },
+      "estimated_usage_requests": 0,
+      "usage_measurement_sources": [],
+      "returned_reasoning_efforts": [],
+      "reasoning_effort_mismatches": 0,
+      "native_or_unmarked_total_tokens": {
+        "requests": 22,
+        "sum": 117058
+      },
+      "total_tokens_sources": {
+        "reported": 22,
+        "derived_input_plus_output": 0,
+        "unknown": 2
+      },
+      "complete_repeat_cases": null,
+      "repeat_unanimous": null
+    },
+    "jev": {
+      "config": {
+        "name": "jev",
+        "base_url": "https://api.modelgo.ai/v1",
+        "api_key_env": "MODELGO_API_KEY",
+        "model": "jev-1.14.0",
+        "protocol": "systemone",
+        "reasoning_effort": null,
+        "max_output_tokens": 8192,
+        "disable_thinking": false,
+        "temperature": null,
+        "completion_token_field": null
+      },
+      "requests": 24,
+      "valid_answers": 24,
+      "answer_success_rate": 1.0,
+      "transport_failures": 0,
+      "parse_failures": 0,
+      "mean_latency_seconds": 0.6996324166666666,
+      "p95_latency_seconds": 1.0573185,
+      "agreement_all_attempts": {
+        "task_completed": 0.875,
+        "tool_parameters": 0.9166666666666666,
+        "fact_coverage": 1.0
+      },
+      "agreement_valid_only": {
+        "task_completed": 0.875,
+        "tool_parameters": 0.9166666666666666,
+        "fact_coverage": 1.0
+      },
+      "returned_models": [
+        "jev-1.14.0"
+      ],
+      "prompt_tokens": {
+        "reported": 24,
+        "sum": 175582,
+        "mean_reported": 7315.916666666667
+      },
+      "completion_tokens": {
+        "reported": 24,
+        "sum": 2448,
+        "mean_reported": 102.0
+      },
+      "total_tokens": {
+        "reported": 24,
+        "sum": 178030,
+        "mean_reported": 7417.916666666667
+      },
+      "cached_tokens": {
+        "reported": 0,
+        "sum": null,
+        "mean_reported": null
+      },
+      "reasoning_tokens": {
+        "reported": 0,
+        "sum": null,
+        "mean_reported": null
+      },
+      "estimated_usage_requests": 0,
+      "usage_measurement_sources": [],
+      "returned_reasoning_efforts": [],
+      "reasoning_effort_mismatches": 0,
+      "native_or_unmarked_total_tokens": {
+        "requests": 24,
+        "sum": 178030
+      },
+      "total_tokens_sources": {
+        "reported": 0,
+        "derived_input_plus_output": 24,
+        "unknown": 0
+      },
+      "complete_repeat_cases": null,
+      "repeat_unanimous": null
+    },
+    "highland_sol_requested_ultra": {
+      "config": {
+        "name": "highland_sol_requested_ultra",
+        "base_url": "https://www.highland-api.com/v1",
+        "api_key_env": "HIGHLAND_API_KEY",
+        "model": "gpt-6.1-sol",
+        "protocol": "responses",
+        "reasoning_effort": "ultra",
+        "max_output_tokens": 8192,
+        "disable_thinking": false,
+        "temperature": null,
+        "completion_token_field": null
+      },
+      "requests": 24,
+      "valid_answers": 24,
+      "answer_success_rate": 1.0,
+      "transport_failures": 0,
+      "parse_failures": 0,
+      "mean_latency_seconds": 10.640057708333334,
+      "p95_latency_seconds": 14.532314199999998,
+      "agreement_all_attempts": {
+        "task_completed": 1.0,
+        "tool_parameters": 1.0,
+        "fact_coverage": 1.0
+      },
+      "agreement_valid_only": {
+        "task_completed": 1.0,
+        "tool_parameters": 1.0,
+        "fact_coverage": 1.0
+      },
+      "returned_models": [
+        "gpt-6.1-sol"
+      ],
+      "prompt_tokens": {
+        "reported": 24,
+        "sum": 123411,
+        "mean_reported": 5142.125
+      },
+      "completion_tokens": {
+        "reported": 24,
+        "sum": 5410,
+        "mean_reported": 225.41666666666666
+      },
+      "total_tokens": {
+        "reported": 24,
+        "sum": 128821,
+        "mean_reported": 5367.541666666667
+      },
+      "cached_tokens": {
+        "reported": 24,
+        "sum": 0,
+        "mean_reported": 0.0
+      },
+      "reasoning_tokens": {
+        "reported": 24,
+        "sum": 4304,
+        "mean_reported": 179.33333333333334
+      },
+      "estimated_usage_requests": 24,
+      "usage_measurement_sources": [
+        "client_request",
+        "fixed_deduction"
+      ],
+      "returned_reasoning_efforts": [
+        "xhigh"
+      ],
+      "reasoning_effort_mismatches": 24,
+      "native_or_unmarked_total_tokens": {
+        "requests": 0,
+        "sum": null
+      },
+      "total_tokens_sources": {
+        "reported": 24,
+        "derived_input_plus_output": 0,
+        "unknown": 0
+      },
+      "complete_repeat_cases": null,
+      "repeat_unanimous": null
+    }
+  },
+  "measurement_notes": [
+    "Same frozen 24 trajectories and questions; only evaluator/provider configuration differs.",
+    "All attempted requests remain in agreement and latency denominators.",
+    "Token means use reported usage; estimated usage is explicitly flagged.",
+    "Requested Ultra and returned effort are separate; no backend identity attestation.",
+    "Programmatic structural checks are not independent human semantic quality labels."
+  ]
+}

@@ -1,0 +1,28 @@
+[
+  {
+    "name": "deepseek_no_thinking",
+    "base_url": "https://www.suanyouyou.com/v1",
+    "api_key_env": "DEEPSEEK_API_KEY",
+    "model": "deepseek-v4.1-flash-1017",
+    "protocol": "chat_completions",
+    "disable_thinking": true,
+    "max_output_tokens": 500,
+    "temperature": 0
+  },
+  {
+    "name": "jev",
+    "base_url": "https://api.modelgo.ai/v1",
+    "api_key_env": "MODELGO_API_KEY",
+    "model": "jev-1.14.0",
+    "protocol": "systemone"
+  },
+  {
+    "name": "highland_sol_requested_ultra",
+    "base_url": "https://www.highland-api.com/v1",
+    "api_key_env": "HIGHLAND_API_KEY",
+    "model": "gpt-6.1-sol",
+    "protocol": "responses",
+    "reasoning_effort": "ultra",
+    "max_output_tokens": 8192
+  }
+]

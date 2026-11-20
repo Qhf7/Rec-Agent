@@ -1,0 +1,2313 @@
+[
+  {
+    "case_id": "adaptive_holdout_001",
+    "evaluator": "deepseek_no_thinking",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 3.042189,
+    "usage": {
+      "prompt_tokens": 7841,
+      "completion_tokens": 48,
+      "total_tokens": 7889,
+      "cached_tokens": 7808,
+      "reasoning_tokens": 0,
+      "total_tokens_source": "reported",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "08d1755017a8c697e96995dbe6c86bf49144fe07b51a1ca4d85c57143ebc66ac"
+  },
+  {
+    "case_id": "adaptive_holdout_001",
+    "evaluator": "highland_sol_requested_ultra",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 11.895524,
+    "usage": {
+      "prompt_tokens": 7940,
+      "completion_tokens": 238,
+      "total_tokens": 8178,
+      "cached_tokens": 0,
+      "reasoning_tokens": 193,
+      "total_tokens_source": "reported",
+      "customer_usage": {
+        "source": "client_request",
+        "version": "bps-customer-input-v2",
+        "estimated": true,
+        "cache_policy": "proportional_v1",
+        "cache_minimum_input_tokens": 1024
+      },
+      "estimated": true,
+      "measurement_source": "client_request"
+    },
+    "requested_reasoning_effort": "ultra",
+    "returned_reasoning_effort": "xhigh",
+    "input_sha256": "08d1755017a8c697e96995dbe6c86bf49144fe07b51a1ca4d85c57143ebc66ac"
+  },
+  {
+    "case_id": "adaptive_holdout_001",
+    "evaluator": "jev",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 0.564799,
+    "usage": {
+      "prompt_tokens": 10567,
+      "completion_tokens": 102,
+      "total_tokens": 10669,
+      "cached_tokens": null,
+      "reasoning_tokens": null,
+      "total_tokens_source": "derived_input_plus_output",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "08d1755017a8c697e96995dbe6c86bf49144fe07b51a1ca4d85c57143ebc66ac"
+  },
+  {
+    "case_id": "adaptive_holdout_002",
+    "evaluator": "deepseek_no_thinking",
+    "status": "ok",
+    "reference": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "latency_seconds": 3.439478,
+    "usage": {
+      "prompt_tokens": 5916,
+      "completion_tokens": 48,
+      "total_tokens": 5964,
+      "cached_tokens": 0,
+      "reasoning_tokens": 0,
+      "total_tokens_source": "reported",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "8ff9e2cd8803e371c46c23276333708cf2f731292adc02f3d74b823b116157aa"
+  },
+  {
+    "case_id": "adaptive_holdout_002",
+    "evaluator": "highland_sol_requested_ultra",
+    "status": "ok",
+    "reference": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "latency_seconds": 8.996028,
+    "usage": {
+      "prompt_tokens": 5865,
+      "completion_tokens": 191,
+      "total_tokens": 6056,
+      "cached_tokens": 0,
+      "reasoning_tokens": 146,
+      "total_tokens_source": "reported",
+      "customer_usage": {
+        "source": "client_request",
+        "version": "bps-customer-input-v2",
+        "estimated": true,
+        "cache_policy": "proportional_v1",
+        "cache_minimum_input_tokens": 1024
+      },
+      "estimated": true,
+      "measurement_source": "client_request"
+    },
+    "requested_reasoning_effort": "ultra",
+    "returned_reasoning_effort": "xhigh",
+    "input_sha256": "8ff9e2cd8803e371c46c23276333708cf2f731292adc02f3d74b823b116157aa"
+  },
+  {
+    "case_id": "adaptive_holdout_002",
+    "evaluator": "jev",
+    "status": "ok",
+    "reference": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "has_invalid",
+      "fact_coverage": "partial"
+    },
+    "latency_seconds": 0.545592,
+    "usage": {
+      "prompt_tokens": 8127,
+      "completion_tokens": 102,
+      "total_tokens": 8229,
+      "cached_tokens": null,
+      "reasoning_tokens": null,
+      "total_tokens_source": "derived_input_plus_output",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "8ff9e2cd8803e371c46c23276333708cf2f731292adc02f3d74b823b116157aa"
+  },
+  {
+    "case_id": "adaptive_holdout_003",
+    "evaluator": "deepseek_no_thinking",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 3.136046,
+    "usage": {
+      "prompt_tokens": 1728,
+      "completion_tokens": 48,
+      "total_tokens": 1776,
+      "cached_tokens": 1664,
+      "reasoning_tokens": 0,
+      "total_tokens_source": "reported",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "499edc8e5b0e48e29f1fd03b5394b7a2f8aa6f6a9020da1eaf55a8e83a812ef5"
+  },
+  {
+    "case_id": "adaptive_holdout_003",
+    "evaluator": "highland_sol_requested_ultra",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 8.40997,
+    "usage": {
+      "prompt_tokens": 1711,
+      "completion_tokens": 122,
+      "total_tokens": 1833,
+      "cached_tokens": 0,
+      "reasoning_tokens": 77,
+      "total_tokens_source": "reported",
+      "customer_usage": {
+        "source": "client_request",
+        "version": "bps-customer-input-v2",
+        "estimated": true,
+        "cache_policy": "proportional_v1",
+        "cache_minimum_input_tokens": 1024
+      },
+      "estimated": true,
+      "measurement_source": "client_request"
+    },
+    "requested_reasoning_effort": "ultra",
+    "returned_reasoning_effort": "xhigh",
+    "input_sha256": "499edc8e5b0e48e29f1fd03b5394b7a2f8aa6f6a9020da1eaf55a8e83a812ef5"
+  },
+  {
+    "case_id": "adaptive_holdout_003",
+    "evaluator": "jev",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 1.047739,
+    "usage": {
+      "prompt_tokens": 3270,
+      "completion_tokens": 102,
+      "total_tokens": 3372,
+      "cached_tokens": null,
+      "reasoning_tokens": null,
+      "total_tokens_source": "derived_input_plus_output",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "499edc8e5b0e48e29f1fd03b5394b7a2f8aa6f6a9020da1eaf55a8e83a812ef5"
+  },
+  {
+    "case_id": "adaptive_holdout_004",
+    "evaluator": "deepseek_no_thinking",
+    "status": "ok",
+    "reference": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "latency_seconds": 3.673016,
+    "usage": {
+      "prompt_tokens": 6731,
+      "completion_tokens": 48,
+      "total_tokens": 6779,
+      "cached_tokens": 6656,
+      "reasoning_tokens": 0,
+      "total_tokens_source": "reported",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "fd6cb50634611966976a1762914c6ca9f5e489c6879068d433a09c03d5cec8bc"
+  },
+  {
+    "case_id": "adaptive_holdout_004",
+    "evaluator": "highland_sol_requested_ultra",
+    "status": "ok",
+    "reference": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "latency_seconds": 12.341483,
+    "usage": {
+      "prompt_tokens": 6761,
+      "completion_tokens": 176,
+      "total_tokens": 6937,
+      "cached_tokens": 0,
+      "reasoning_tokens": 131,
+      "total_tokens_source": "reported",
+      "customer_usage": {
+        "source": "client_request",
+        "version": "bps-customer-input-v2",
+        "estimated": true,
+        "cache_policy": "proportional_v1",
+        "cache_minimum_input_tokens": 1024
+      },
+      "estimated": true,
+      "measurement_source": "client_request"
+    },
+    "requested_reasoning_effort": "ultra",
+    "returned_reasoning_effort": "xhigh",
+    "input_sha256": "fd6cb50634611966976a1762914c6ca9f5e489c6879068d433a09c03d5cec8bc"
+  },
+  {
+    "case_id": "adaptive_holdout_004",
+    "evaluator": "jev",
+    "status": "ok",
+    "reference": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "has_invalid",
+      "fact_coverage": "partial"
+    },
+    "latency_seconds": 0.524336,
+    "usage": {
+      "prompt_tokens": 9217,
+      "completion_tokens": 102,
+      "total_tokens": 9319,
+      "cached_tokens": null,
+      "reasoning_tokens": null,
+      "total_tokens_source": "derived_input_plus_output",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "fd6cb50634611966976a1762914c6ca9f5e489c6879068d433a09c03d5cec8bc"
+  },
+  {
+    "case_id": "adaptive_holdout_005",
+    "evaluator": "deepseek_no_thinking",
+    "status": "ok",
+    "reference": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "latency_seconds": 4.75345,
+    "usage": {
+      "prompt_tokens": 6820,
+      "completion_tokens": 48,
+      "total_tokens": 6868,
+      "cached_tokens": 6784,
+      "reasoning_tokens": 0,
+      "total_tokens_source": "reported",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "b81006719b8791122f8fc7931463bd11743d978410737522d128366bb6e3e2e7"
+  },
+  {
+    "case_id": "adaptive_holdout_005",
+    "evaluator": "highland_sol_requested_ultra",
+    "status": "ok",
+    "reference": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "latency_seconds": 8.313873,
+    "usage": {
+      "prompt_tokens": 6729,
+      "completion_tokens": 140,
+      "total_tokens": 6869,
+      "cached_tokens": 0,
+      "reasoning_tokens": 95,
+      "total_tokens_source": "reported",
+      "customer_usage": {
+        "source": "client_request",
+        "version": "bps-customer-input-v2",
+        "estimated": true,
+        "cache_policy": "proportional_v1",
+        "cache_minimum_input_tokens": 1024
+      },
+      "estimated": true,
+      "measurement_source": "client_request"
+    },
+    "requested_reasoning_effort": "ultra",
+    "returned_reasoning_effort": "xhigh",
+    "input_sha256": "b81006719b8791122f8fc7931463bd11743d978410737522d128366bb6e3e2e7"
+  },
+  {
+    "case_id": "adaptive_holdout_005",
+    "evaluator": "jev",
+    "status": "ok",
+    "reference": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "latency_seconds": 1.059009,
+    "usage": {
+      "prompt_tokens": 9137,
+      "completion_tokens": 102,
+      "total_tokens": 9239,
+      "cached_tokens": null,
+      "reasoning_tokens": null,
+      "total_tokens_source": "derived_input_plus_output",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "b81006719b8791122f8fc7931463bd11743d978410737522d128366bb6e3e2e7"
+  },
+  {
+    "case_id": "adaptive_holdout_006",
+    "evaluator": "deepseek_no_thinking",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 4.753831,
+    "usage": {
+      "prompt_tokens": 6736,
+      "completion_tokens": 48,
+      "total_tokens": 6784,
+      "cached_tokens": 6656,
+      "reasoning_tokens": 0,
+      "total_tokens_source": "reported",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "dd2e42d4c9e627f733d800c47b722bcba311b44781f1274b23ba4a3579fe083b"
+  },
+  {
+    "case_id": "adaptive_holdout_006",
+    "evaluator": "highland_sol_requested_ultra",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 10.693547,
+    "usage": {
+      "prompt_tokens": 6771,
+      "completion_tokens": 289,
+      "total_tokens": 7060,
+      "cached_tokens": 0,
+      "reasoning_tokens": 238,
+      "total_tokens_source": "reported",
+      "customer_usage": {
+        "source": "client_request",
+        "version": "bps-customer-input-v2",
+        "estimated": true,
+        "cache_policy": "proportional_v1",
+        "cache_minimum_input_tokens": 1024
+      },
+      "estimated": true,
+      "measurement_source": "client_request"
+    },
+    "requested_reasoning_effort": "ultra",
+    "returned_reasoning_effort": "xhigh",
+    "input_sha256": "dd2e42d4c9e627f733d800c47b722bcba311b44781f1274b23ba4a3579fe083b"
+  },
+  {
+    "case_id": "adaptive_holdout_006",
+    "evaluator": "jev",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 0.574951,
+    "usage": {
+      "prompt_tokens": 9148,
+      "completion_tokens": 102,
+      "total_tokens": 9250,
+      "cached_tokens": null,
+      "reasoning_tokens": null,
+      "total_tokens_source": "derived_input_plus_output",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "dd2e42d4c9e627f733d800c47b722bcba311b44781f1274b23ba4a3579fe083b"
+  },
+  {
+    "case_id": "adaptive_holdout_007",
+    "evaluator": "deepseek_no_thinking",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 2.871963,
+    "usage": {
+      "prompt_tokens": 7088,
+      "completion_tokens": 48,
+      "total_tokens": 7136,
+      "cached_tokens": 7040,
+      "reasoning_tokens": 0,
+      "total_tokens_source": "reported",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "a394044a760a7a4a113a8bde42e9feabd223f38beb9ba5281d75c05924c0afa8"
+  },
+  {
+    "case_id": "adaptive_holdout_007",
+    "evaluator": "highland_sol_requested_ultra",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 10.284584,
+    "usage": {
+      "prompt_tokens": 7198,
+      "completion_tokens": 306,
+      "total_tokens": 7504,
+      "cached_tokens": 0,
+      "reasoning_tokens": 261,
+      "total_tokens_source": "reported",
+      "customer_usage": {
+        "source": "client_request",
+        "version": "bps-customer-input-v2",
+        "estimated": true,
+        "cache_policy": "proportional_v1",
+        "cache_minimum_input_tokens": 1024
+      },
+      "estimated": true,
+      "measurement_source": "client_request"
+    },
+    "requested_reasoning_effort": "ultra",
+    "returned_reasoning_effort": "xhigh",
+    "input_sha256": "a394044a760a7a4a113a8bde42e9feabd223f38beb9ba5281d75c05924c0afa8"
+  },
+  {
+    "case_id": "adaptive_holdout_007",
+    "evaluator": "jev",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 0.668751,
+    "usage": {
+      "prompt_tokens": 9771,
+      "completion_tokens": 102,
+      "total_tokens": 9873,
+      "cached_tokens": null,
+      "reasoning_tokens": null,
+      "total_tokens_source": "derived_input_plus_output",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "a394044a760a7a4a113a8bde42e9feabd223f38beb9ba5281d75c05924c0afa8"
+  },
+  {
+    "case_id": "adaptive_holdout_008",
+    "evaluator": "deepseek_no_thinking",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 4.928979,
+    "usage": {
+      "prompt_tokens": 6842,
+      "completion_tokens": 48,
+      "total_tokens": 6890,
+      "cached_tokens": 6784,
+      "reasoning_tokens": 0,
+      "total_tokens_source": "reported",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "6e365c8bba7b5de9c1901fe369d24164c79c33c46c7c0ac9acf9122b9ef3243c"
+  },
+  {
+    "case_id": "adaptive_holdout_008",
+    "evaluator": "highland_sol_requested_ultra",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 11.689951,
+    "usage": {
+      "prompt_tokens": 6943,
+      "completion_tokens": 349,
+      "total_tokens": 7292,
+      "cached_tokens": 0,
+      "reasoning_tokens": 298,
+      "total_tokens_source": "reported",
+      "customer_usage": {
+        "source": "client_request",
+        "version": "bps-customer-input-v2",
+        "estimated": true,
+        "cache_policy": "proportional_v1",
+        "cache_minimum_input_tokens": 1024
+      },
+      "estimated": true,
+      "measurement_source": "client_request"
+    },
+    "requested_reasoning_effort": "ultra",
+    "returned_reasoning_effort": "xhigh",
+    "input_sha256": "6e365c8bba7b5de9c1901fe369d24164c79c33c46c7c0ac9acf9122b9ef3243c"
+  },
+  {
+    "case_id": "adaptive_holdout_008",
+    "evaluator": "jev",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 0.506148,
+    "usage": {
+      "prompt_tokens": 9311,
+      "completion_tokens": 102,
+      "total_tokens": 9413,
+      "cached_tokens": null,
+      "reasoning_tokens": null,
+      "total_tokens_source": "derived_input_plus_output",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "6e365c8bba7b5de9c1901fe369d24164c79c33c46c7c0ac9acf9122b9ef3243c"
+  },
+  {
+    "case_id": "budgeted_holdout_001",
+    "evaluator": "deepseek_no_thinking",
+    "status": "error",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": null,
+    "latency_seconds": 3.11668,
+    "usage": {
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "total_tokens": null,
+      "cached_tokens": null,
+      "reasoning_tokens": null,
+      "total_tokens_source": "unknown",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "371d850d8323e8e06e9324857402e4d28ff76fac102c7deb9a030233401158f1"
+  },
+  {
+    "case_id": "budgeted_holdout_001",
+    "evaluator": "highland_sol_requested_ultra",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 9.66221,
+    "usage": {
+      "prompt_tokens": 3331,
+      "completion_tokens": 236,
+      "total_tokens": 3567,
+      "cached_tokens": 0,
+      "reasoning_tokens": 191,
+      "total_tokens_source": "reported",
+      "customer_usage": {
+        "source": "client_request",
+        "version": "bps-customer-input-v2",
+        "estimated": true,
+        "cache_policy": "proportional_v1",
+        "cache_minimum_input_tokens": 1024
+      },
+      "estimated": true,
+      "measurement_source": "client_request"
+    },
+    "requested_reasoning_effort": "ultra",
+    "returned_reasoning_effort": "xhigh",
+    "input_sha256": "371d850d8323e8e06e9324857402e4d28ff76fac102c7deb9a030233401158f1"
+  },
+  {
+    "case_id": "budgeted_holdout_001",
+    "evaluator": "jev",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 0.669658,
+    "usage": {
+      "prompt_tokens": 5178,
+      "completion_tokens": 102,
+      "total_tokens": 5280,
+      "cached_tokens": null,
+      "reasoning_tokens": null,
+      "total_tokens_source": "derived_input_plus_output",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "371d850d8323e8e06e9324857402e4d28ff76fac102c7deb9a030233401158f1"
+  },
+  {
+    "case_id": "budgeted_holdout_002",
+    "evaluator": "deepseek_no_thinking",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 3.71246,
+    "usage": {
+      "prompt_tokens": 3594,
+      "completion_tokens": 48,
+      "total_tokens": 3642,
+      "cached_tokens": 3584,
+      "reasoning_tokens": 0,
+      "total_tokens_source": "reported",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "490b2c177e4075405cf77c962b7616b628e95a80674c56ecbaea4d2ea0fb7631"
+  },
+  {
+    "case_id": "budgeted_holdout_002",
+    "evaluator": "highland_sol_requested_ultra",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 10.323503,
+    "usage": {
+      "prompt_tokens": 3621,
+      "completion_tokens": 305,
+      "total_tokens": 3926,
+      "cached_tokens": 0,
+      "reasoning_tokens": 258,
+      "total_tokens_source": "reported",
+      "customer_usage": {
+        "source": "client_request",
+        "version": "bps-customer-input-v2",
+        "estimated": true,
+        "cache_policy": "proportional_v1",
+        "cache_minimum_input_tokens": 1024
+      },
+      "estimated": true,
+      "measurement_source": "client_request"
+    },
+    "requested_reasoning_effort": "ultra",
+    "returned_reasoning_effort": "xhigh",
+    "input_sha256": "490b2c177e4075405cf77c962b7616b628e95a80674c56ecbaea4d2ea0fb7631"
+  },
+  {
+    "case_id": "budgeted_holdout_002",
+    "evaluator": "jev",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 0.522366,
+    "usage": {
+      "prompt_tokens": 5462,
+      "completion_tokens": 102,
+      "total_tokens": 5564,
+      "cached_tokens": null,
+      "reasoning_tokens": null,
+      "total_tokens_source": "derived_input_plus_output",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "490b2c177e4075405cf77c962b7616b628e95a80674c56ecbaea4d2ea0fb7631"
+  },
+  {
+    "case_id": "budgeted_holdout_003",
+    "evaluator": "deepseek_no_thinking",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 2.454608,
+    "usage": {
+      "prompt_tokens": 1724,
+      "completion_tokens": 48,
+      "total_tokens": 1772,
+      "cached_tokens": 1664,
+      "reasoning_tokens": 0,
+      "total_tokens_source": "reported",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "f959273b3b98dbf3e65e70feab0b4d3635946b38c07b7d2ce93c15e1f4bf4dc8"
+  },
+  {
+    "case_id": "budgeted_holdout_003",
+    "evaluator": "highland_sol_requested_ultra",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 8.543465,
+    "usage": {
+      "prompt_tokens": 1708,
+      "completion_tokens": 129,
+      "total_tokens": 1837,
+      "cached_tokens": 0,
+      "reasoning_tokens": 84,
+      "total_tokens_source": "reported",
+      "customer_usage": {
+        "source": "client_request",
+        "version": "bps-customer-input-v2",
+        "estimated": true,
+        "cache_policy": "proportional_v1",
+        "cache_minimum_input_tokens": 1024
+      },
+      "estimated": true,
+      "measurement_source": "client_request"
+    },
+    "requested_reasoning_effort": "ultra",
+    "returned_reasoning_effort": "xhigh",
+    "input_sha256": "f959273b3b98dbf3e65e70feab0b4d3635946b38c07b7d2ce93c15e1f4bf4dc8"
+  },
+  {
+    "case_id": "budgeted_holdout_003",
+    "evaluator": "jev",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 1.202209,
+    "usage": {
+      "prompt_tokens": 3267,
+      "completion_tokens": 102,
+      "total_tokens": 3369,
+      "cached_tokens": null,
+      "reasoning_tokens": null,
+      "total_tokens_source": "derived_input_plus_output",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "f959273b3b98dbf3e65e70feab0b4d3635946b38c07b7d2ce93c15e1f4bf4dc8"
+  },
+  {
+    "case_id": "budgeted_holdout_004",
+    "evaluator": "deepseek_no_thinking",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 3.529921,
+    "usage": {
+      "prompt_tokens": 3925,
+      "completion_tokens": 48,
+      "total_tokens": 3973,
+      "cached_tokens": 3840,
+      "reasoning_tokens": 0,
+      "total_tokens_source": "reported",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "d2ec93d9da1e2bb87856d18b76e50d3b81bab0d802bcf5b274e2d99061779a2f"
+  },
+  {
+    "case_id": "budgeted_holdout_004",
+    "evaluator": "highland_sol_requested_ultra",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 12.800379,
+    "usage": {
+      "prompt_tokens": 3937,
+      "completion_tokens": 249,
+      "total_tokens": 4186,
+      "cached_tokens": 0,
+      "reasoning_tokens": 204,
+      "total_tokens_source": "reported",
+      "customer_usage": {
+        "source": "client_request",
+        "version": "bps-customer-input-v2",
+        "estimated": true,
+        "cache_policy": "proportional_v1",
+        "cache_minimum_input_tokens": 1024
+      },
+      "estimated": true,
+      "measurement_source": "client_request"
+    },
+    "requested_reasoning_effort": "ultra",
+    "returned_reasoning_effort": "xhigh",
+    "input_sha256": "d2ec93d9da1e2bb87856d18b76e50d3b81bab0d802bcf5b274e2d99061779a2f"
+  },
+  {
+    "case_id": "budgeted_holdout_004",
+    "evaluator": "jev",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 0.961606,
+    "usage": {
+      "prompt_tokens": 5888,
+      "completion_tokens": 102,
+      "total_tokens": 5990,
+      "cached_tokens": null,
+      "reasoning_tokens": null,
+      "total_tokens_source": "derived_input_plus_output",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "d2ec93d9da1e2bb87856d18b76e50d3b81bab0d802bcf5b274e2d99061779a2f"
+  },
+  {
+    "case_id": "budgeted_holdout_005",
+    "evaluator": "deepseek_no_thinking",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 2.670845,
+    "usage": {
+      "prompt_tokens": 3399,
+      "completion_tokens": 48,
+      "total_tokens": 3447,
+      "cached_tokens": 3328,
+      "reasoning_tokens": 0,
+      "total_tokens_source": "reported",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "b718ab117ed83e980bfeb06cc5861ddb0c24126656ea9c6e04f0e9c75911c367"
+  },
+  {
+    "case_id": "budgeted_holdout_005",
+    "evaluator": "highland_sol_requested_ultra",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 10.449898,
+    "usage": {
+      "prompt_tokens": 3385,
+      "completion_tokens": 265,
+      "total_tokens": 3650,
+      "cached_tokens": 0,
+      "reasoning_tokens": 220,
+      "total_tokens_source": "reported",
+      "customer_usage": {
+        "source": "client_request",
+        "version": "bps-customer-input-v2",
+        "estimated": true,
+        "cache_policy": "proportional_v1",
+        "cache_minimum_input_tokens": 1024
+      },
+      "estimated": true,
+      "measurement_source": "client_request"
+    },
+    "requested_reasoning_effort": "ultra",
+    "returned_reasoning_effort": "xhigh",
+    "input_sha256": "b718ab117ed83e980bfeb06cc5861ddb0c24126656ea9c6e04f0e9c75911c367"
+  },
+  {
+    "case_id": "budgeted_holdout_005",
+    "evaluator": "jev",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 0.732018,
+    "usage": {
+      "prompt_tokens": 5223,
+      "completion_tokens": 102,
+      "total_tokens": 5325,
+      "cached_tokens": null,
+      "reasoning_tokens": null,
+      "total_tokens_source": "derived_input_plus_output",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "b718ab117ed83e980bfeb06cc5861ddb0c24126656ea9c6e04f0e9c75911c367"
+  },
+  {
+    "case_id": "budgeted_holdout_006",
+    "evaluator": "deepseek_no_thinking",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 2.727857,
+    "usage": {
+      "prompt_tokens": 3807,
+      "completion_tokens": 48,
+      "total_tokens": 3855,
+      "cached_tokens": 3712,
+      "reasoning_tokens": 0,
+      "total_tokens_source": "reported",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "554479862091f5d88eec57de777bccdcb61c2e574ee4010bf3db8db3850a537c"
+  },
+  {
+    "case_id": "budgeted_holdout_006",
+    "evaluator": "highland_sol_requested_ultra",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 8.626288,
+    "usage": {
+      "prompt_tokens": 3877,
+      "completion_tokens": 262,
+      "total_tokens": 4139,
+      "cached_tokens": 0,
+      "reasoning_tokens": 217,
+      "total_tokens_source": "reported",
+      "customer_usage": {
+        "source": "client_request",
+        "version": "bps-customer-input-v2",
+        "estimated": true,
+        "cache_policy": "proportional_v1",
+        "cache_minimum_input_tokens": 1024
+      },
+      "estimated": true,
+      "measurement_source": "client_request"
+    },
+    "requested_reasoning_effort": "ultra",
+    "returned_reasoning_effort": "xhigh",
+    "input_sha256": "554479862091f5d88eec57de777bccdcb61c2e574ee4010bf3db8db3850a537c"
+  },
+  {
+    "case_id": "budgeted_holdout_006",
+    "evaluator": "jev",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 0.899669,
+    "usage": {
+      "prompt_tokens": 5760,
+      "completion_tokens": 102,
+      "total_tokens": 5862,
+      "cached_tokens": null,
+      "reasoning_tokens": null,
+      "total_tokens_source": "derived_input_plus_output",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "554479862091f5d88eec57de777bccdcb61c2e574ee4010bf3db8db3850a537c"
+  },
+  {
+    "case_id": "budgeted_holdout_007",
+    "evaluator": "deepseek_no_thinking",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 2.520626,
+    "usage": {
+      "prompt_tokens": 4594,
+      "completion_tokens": 48,
+      "total_tokens": 4642,
+      "cached_tokens": 4480,
+      "reasoning_tokens": 0,
+      "total_tokens_source": "reported",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "49bf1070ab1aa6461780c84dab4d1161ac7cca489e9c401bd4fa462d7d5068a4"
+  },
+  {
+    "case_id": "budgeted_holdout_007",
+    "evaluator": "highland_sol_requested_ultra",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 8.54663,
+    "usage": {
+      "prompt_tokens": 4703,
+      "completion_tokens": 234,
+      "total_tokens": 4937,
+      "cached_tokens": 0,
+      "reasoning_tokens": 189,
+      "total_tokens_source": "reported",
+      "customer_usage": {
+        "source": "client_request",
+        "version": "bps-customer-input-v2",
+        "estimated": true,
+        "cache_policy": "proportional_v1",
+        "cache_minimum_input_tokens": 1024
+      },
+      "estimated": true,
+      "measurement_source": "client_request"
+    },
+    "requested_reasoning_effort": "ultra",
+    "returned_reasoning_effort": "xhigh",
+    "input_sha256": "49bf1070ab1aa6461780c84dab4d1161ac7cca489e9c401bd4fa462d7d5068a4"
+  },
+  {
+    "case_id": "budgeted_holdout_007",
+    "evaluator": "jev",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 0.787543,
+    "usage": {
+      "prompt_tokens": 6768,
+      "completion_tokens": 102,
+      "total_tokens": 6870,
+      "cached_tokens": null,
+      "reasoning_tokens": null,
+      "total_tokens_source": "derived_input_plus_output",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "49bf1070ab1aa6461780c84dab4d1161ac7cca489e9c401bd4fa462d7d5068a4"
+  },
+  {
+    "case_id": "budgeted_holdout_008",
+    "evaluator": "deepseek_no_thinking",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 4.111524,
+    "usage": {
+      "prompt_tokens": 3398,
+      "completion_tokens": 48,
+      "total_tokens": 3446,
+      "cached_tokens": 3328,
+      "reasoning_tokens": 0,
+      "total_tokens_source": "reported",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "b1a07973139c3fc68db7fd13c79fbca1ee289e93e2ec972aee0ff9fae61bc43e"
+  },
+  {
+    "case_id": "budgeted_holdout_008",
+    "evaluator": "highland_sol_requested_ultra",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 13.181478,
+    "usage": {
+      "prompt_tokens": 3466,
+      "completion_tokens": 497,
+      "total_tokens": 3963,
+      "cached_tokens": 0,
+      "reasoning_tokens": 446,
+      "total_tokens_source": "reported",
+      "customer_usage": {
+        "source": "client_request",
+        "version": "bps-customer-input-v2",
+        "estimated": true,
+        "cache_policy": "proportional_v1",
+        "cache_minimum_input_tokens": 1024
+      },
+      "estimated": true,
+      "measurement_source": "client_request"
+    },
+    "requested_reasoning_effort": "ultra",
+    "returned_reasoning_effort": "xhigh",
+    "input_sha256": "b1a07973139c3fc68db7fd13c79fbca1ee289e93e2ec972aee0ff9fae61bc43e"
+  },
+  {
+    "case_id": "budgeted_holdout_008",
+    "evaluator": "jev",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 0.596209,
+    "usage": {
+      "prompt_tokens": 5262,
+      "completion_tokens": 102,
+      "total_tokens": 5364,
+      "cached_tokens": null,
+      "reasoning_tokens": null,
+      "total_tokens_source": "derived_input_plus_output",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "b1a07973139c3fc68db7fd13c79fbca1ee289e93e2ec972aee0ff9fae61bc43e"
+  },
+  {
+    "case_id": "fixed_holdout_001",
+    "evaluator": "deepseek_no_thinking",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 3.142648,
+    "usage": {
+      "prompt_tokens": 8066,
+      "completion_tokens": 48,
+      "total_tokens": 8114,
+      "cached_tokens": 8064,
+      "reasoning_tokens": 0,
+      "total_tokens_source": "reported",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "dc1dddf039dc41ec7dee35fb8e936c951b4bc252a4f631d7f181e95f829fe661"
+  },
+  {
+    "case_id": "fixed_holdout_001",
+    "evaluator": "highland_sol_requested_ultra",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 9.684159,
+    "usage": {
+      "prompt_tokens": 8058,
+      "completion_tokens": 248,
+      "total_tokens": 8306,
+      "cached_tokens": 0,
+      "reasoning_tokens": 203,
+      "total_tokens_source": "reported",
+      "customer_usage": {
+        "fixed_deduction_tokens": 22417,
+        "local_guidance_credit_tokens": 100,
+        "local_guidance_credit_version": "bps-search-format-v2",
+        "source": "fixed_deduction",
+        "version": "bps-customer-fixed-deduction-v1",
+        "estimated": true,
+        "cache_policy": "cache_read_first_v1",
+        "cache_minimum_input_tokens": 1024
+      },
+      "estimated": true,
+      "measurement_source": "fixed_deduction"
+    },
+    "requested_reasoning_effort": "ultra",
+    "returned_reasoning_effort": "xhigh",
+    "input_sha256": "dc1dddf039dc41ec7dee35fb8e936c951b4bc252a4f631d7f181e95f829fe661"
+  },
+  {
+    "case_id": "fixed_holdout_001",
+    "evaluator": "jev",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 0.512841,
+    "usage": {
+      "prompt_tokens": 10805,
+      "completion_tokens": 102,
+      "total_tokens": 10907,
+      "cached_tokens": null,
+      "reasoning_tokens": null,
+      "total_tokens_source": "derived_input_plus_output",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "dc1dddf039dc41ec7dee35fb8e936c951b4bc252a4f631d7f181e95f829fe661"
+  },
+  {
+    "case_id": "fixed_holdout_002",
+    "evaluator": "deepseek_no_thinking",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 3.730367,
+    "usage": {
+      "prompt_tokens": 6072,
+      "completion_tokens": 48,
+      "total_tokens": 6120,
+      "cached_tokens": 6016,
+      "reasoning_tokens": 0,
+      "total_tokens_source": "reported",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "cddfef6959bc2ebb77dfec463b426de63519426810aa376e5e656e3c788312c4"
+  },
+  {
+    "case_id": "fixed_holdout_002",
+    "evaluator": "highland_sol_requested_ultra",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 11.332006,
+    "usage": {
+      "prompt_tokens": 6049,
+      "completion_tokens": 244,
+      "total_tokens": 6293,
+      "cached_tokens": 0,
+      "reasoning_tokens": 199,
+      "total_tokens_source": "reported",
+      "customer_usage": {
+        "source": "client_request",
+        "version": "bps-customer-input-v2",
+        "estimated": true,
+        "cache_policy": "proportional_v1",
+        "cache_minimum_input_tokens": 1024
+      },
+      "estimated": true,
+      "measurement_source": "client_request"
+    },
+    "requested_reasoning_effort": "ultra",
+    "returned_reasoning_effort": "xhigh",
+    "input_sha256": "cddfef6959bc2ebb77dfec463b426de63519426810aa376e5e656e3c788312c4"
+  },
+  {
+    "case_id": "fixed_holdout_002",
+    "evaluator": "jev",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 0.790336,
+    "usage": {
+      "prompt_tokens": 8328,
+      "completion_tokens": 102,
+      "total_tokens": 8430,
+      "cached_tokens": null,
+      "reasoning_tokens": null,
+      "total_tokens_source": "derived_input_plus_output",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "cddfef6959bc2ebb77dfec463b426de63519426810aa376e5e656e3c788312c4"
+  },
+  {
+    "case_id": "fixed_holdout_003",
+    "evaluator": "deepseek_no_thinking",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "latency_seconds": 2.566532,
+    "usage": {
+      "prompt_tokens": 1487,
+      "completion_tokens": 48,
+      "total_tokens": 1535,
+      "cached_tokens": 1408,
+      "reasoning_tokens": 0,
+      "total_tokens_source": "reported",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "7bf0b3d556e597e34e453e856441a1d8c0d42fd388f4f493b8be5e8097a9876d"
+  },
+  {
+    "case_id": "fixed_holdout_003",
+    "evaluator": "highland_sol_requested_ultra",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 7.786653,
+    "usage": {
+      "prompt_tokens": 1493,
+      "completion_tokens": 101,
+      "total_tokens": 1594,
+      "cached_tokens": 0,
+      "reasoning_tokens": 56,
+      "total_tokens_source": "reported",
+      "customer_usage": {
+        "source": "client_request",
+        "version": "bps-customer-input-v2",
+        "estimated": true,
+        "cache_policy": "proportional_v1",
+        "cache_minimum_input_tokens": 1024
+      },
+      "estimated": true,
+      "measurement_source": "client_request"
+    },
+    "requested_reasoning_effort": "ultra",
+    "returned_reasoning_effort": "xhigh",
+    "input_sha256": "7bf0b3d556e597e34e453e856441a1d8c0d42fd388f4f493b8be5e8097a9876d"
+  },
+  {
+    "case_id": "fixed_holdout_003",
+    "evaluator": "jev",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 0.687801,
+    "usage": {
+      "prompt_tokens": 3015,
+      "completion_tokens": 102,
+      "total_tokens": 3117,
+      "cached_tokens": null,
+      "reasoning_tokens": null,
+      "total_tokens_source": "derived_input_plus_output",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "7bf0b3d556e597e34e453e856441a1d8c0d42fd388f4f493b8be5e8097a9876d"
+  },
+  {
+    "case_id": "fixed_holdout_004",
+    "evaluator": "deepseek_no_thinking",
+    "status": "ok",
+    "reference": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "latency_seconds": 3.433039,
+    "usage": {
+      "prompt_tokens": 4819,
+      "completion_tokens": 48,
+      "total_tokens": 4867,
+      "cached_tokens": 4736,
+      "reasoning_tokens": 0,
+      "total_tokens_source": "reported",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "e322ac7a320bdadae671ac8fe84bcd32e6e1733844a3300c6735beba47c14c07"
+  },
+  {
+    "case_id": "fixed_holdout_004",
+    "evaluator": "highland_sol_requested_ultra",
+    "status": "ok",
+    "reference": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "latency_seconds": 14.644738,
+    "usage": {
+      "prompt_tokens": 4733,
+      "completion_tokens": 111,
+      "total_tokens": 4844,
+      "cached_tokens": 0,
+      "reasoning_tokens": 66,
+      "total_tokens_source": "reported",
+      "customer_usage": {
+        "fixed_deduction_tokens": 22417,
+        "local_guidance_credit_tokens": 100,
+        "local_guidance_credit_version": "bps-search-format-v2",
+        "source": "fixed_deduction",
+        "version": "bps-customer-fixed-deduction-v1",
+        "estimated": true,
+        "cache_policy": "cache_read_first_v1",
+        "cache_minimum_input_tokens": 1024
+      },
+      "estimated": true,
+      "measurement_source": "fixed_deduction"
+    },
+    "requested_reasoning_effort": "ultra",
+    "returned_reasoning_effort": "xhigh",
+    "input_sha256": "e322ac7a320bdadae671ac8fe84bcd32e6e1733844a3300c6735beba47c14c07"
+  },
+  {
+    "case_id": "fixed_holdout_004",
+    "evaluator": "jev",
+    "status": "ok",
+    "reference": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "latency_seconds": 0.525713,
+    "usage": {
+      "prompt_tokens": 7043,
+      "completion_tokens": 102,
+      "total_tokens": 7145,
+      "cached_tokens": null,
+      "reasoning_tokens": null,
+      "total_tokens_source": "derived_input_plus_output",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "e322ac7a320bdadae671ac8fe84bcd32e6e1733844a3300c6735beba47c14c07"
+  },
+  {
+    "case_id": "fixed_holdout_005",
+    "evaluator": "deepseek_no_thinking",
+    "status": "error",
+    "reference": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "choices": null,
+    "latency_seconds": 3.142719,
+    "usage": {
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "total_tokens": null,
+      "cached_tokens": null,
+      "reasoning_tokens": null,
+      "total_tokens_source": "unknown",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "d0827505833eb32ba88481d43a223be4e845e355ee76bc33cfb6e5d89127856f"
+  },
+  {
+    "case_id": "fixed_holdout_005",
+    "evaluator": "highland_sol_requested_ultra",
+    "status": "ok",
+    "reference": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "latency_seconds": 15.356383,
+    "usage": {
+      "prompt_tokens": 3848,
+      "completion_tokens": 117,
+      "total_tokens": 3965,
+      "cached_tokens": 0,
+      "reasoning_tokens": 72,
+      "total_tokens_source": "reported",
+      "customer_usage": {
+        "fixed_deduction_tokens": 22417,
+        "local_guidance_credit_tokens": 100,
+        "local_guidance_credit_version": "bps-search-format-v2",
+        "source": "fixed_deduction",
+        "version": "bps-customer-fixed-deduction-v1",
+        "estimated": true,
+        "cache_policy": "cache_read_first_v1",
+        "cache_minimum_input_tokens": 1024
+      },
+      "estimated": true,
+      "measurement_source": "fixed_deduction"
+    },
+    "requested_reasoning_effort": "ultra",
+    "returned_reasoning_effort": "xhigh",
+    "input_sha256": "d0827505833eb32ba88481d43a223be4e845e355ee76bc33cfb6e5d89127856f"
+  },
+  {
+    "case_id": "fixed_holdout_005",
+    "evaluator": "jev",
+    "status": "ok",
+    "reference": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "latency_seconds": 0.617896,
+    "usage": {
+      "prompt_tokens": 5914,
+      "completion_tokens": 102,
+      "total_tokens": 6016,
+      "cached_tokens": null,
+      "reasoning_tokens": null,
+      "total_tokens_source": "derived_input_plus_output",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "d0827505833eb32ba88481d43a223be4e845e355ee76bc33cfb6e5d89127856f"
+  },
+  {
+    "case_id": "fixed_holdout_006",
+    "evaluator": "deepseek_no_thinking",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 3.986256,
+    "usage": {
+      "prompt_tokens": 8450,
+      "completion_tokens": 48,
+      "total_tokens": 8498,
+      "cached_tokens": 8448,
+      "reasoning_tokens": 0,
+      "total_tokens_source": "reported",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "8e97db1148d80a82288a31ce550edc4ab670366c5ad3a7bc26f4eb482f23ceeb"
+  },
+  {
+    "case_id": "fixed_holdout_006",
+    "evaluator": "highland_sol_requested_ultra",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 13.895246,
+    "usage": {
+      "prompt_tokens": 8433,
+      "completion_tokens": 376,
+      "total_tokens": 8809,
+      "cached_tokens": 0,
+      "reasoning_tokens": 325,
+      "total_tokens_source": "reported",
+      "customer_usage": {
+        "fixed_deduction_tokens": 22417,
+        "local_guidance_credit_tokens": 100,
+        "local_guidance_credit_version": "bps-search-format-v2",
+        "source": "fixed_deduction",
+        "version": "bps-customer-fixed-deduction-v1",
+        "estimated": true,
+        "cache_policy": "cache_read_first_v1",
+        "cache_minimum_input_tokens": 1024
+      },
+      "estimated": true,
+      "measurement_source": "fixed_deduction"
+    },
+    "requested_reasoning_effort": "ultra",
+    "returned_reasoning_effort": "xhigh",
+    "input_sha256": "8e97db1148d80a82288a31ce550edc4ab670366c5ad3a7bc26f4eb482f23ceeb"
+  },
+  {
+    "case_id": "fixed_holdout_006",
+    "evaluator": "jev",
+    "status": "ok",
+    "reference": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "choices": {
+      "task_completed": "yes",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "full"
+    },
+    "latency_seconds": 0.591253,
+    "usage": {
+      "prompt_tokens": 11303,
+      "completion_tokens": 102,
+      "total_tokens": 11405,
+      "cached_tokens": null,
+      "reasoning_tokens": null,
+      "total_tokens_source": "derived_input_plus_output",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "8e97db1148d80a82288a31ce550edc4ab670366c5ad3a7bc26f4eb482f23ceeb"
+  },
+  {
+    "case_id": "fixed_holdout_007",
+    "evaluator": "deepseek_no_thinking",
+    "status": "ok",
+    "reference": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "latency_seconds": 3.140384,
+    "usage": {
+      "prompt_tokens": 7932,
+      "completion_tokens": 48,
+      "total_tokens": 7980,
+      "cached_tokens": 7808,
+      "reasoning_tokens": 0,
+      "total_tokens_source": "reported",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "b241f16f76f5cf1ce67f5e6cb1f5bed550170b6358991b7c00b3caddb18ec074"
+  },
+  {
+    "case_id": "fixed_holdout_007",
+    "evaluator": "highland_sol_requested_ultra",
+    "status": "ok",
+    "reference": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "latency_seconds": 9.933071,
+    "usage": {
+      "prompt_tokens": 7856,
+      "completion_tokens": 121,
+      "total_tokens": 7977,
+      "cached_tokens": 0,
+      "reasoning_tokens": 76,
+      "total_tokens_source": "reported",
+      "customer_usage": {
+        "fixed_deduction_tokens": 22417,
+        "local_guidance_credit_tokens": 100,
+        "local_guidance_credit_version": "bps-search-format-v2",
+        "source": "fixed_deduction",
+        "version": "bps-customer-fixed-deduction-v1",
+        "estimated": true,
+        "cache_policy": "cache_read_first_v1",
+        "cache_minimum_input_tokens": 1024
+      },
+      "estimated": true,
+      "measurement_source": "fixed_deduction"
+    },
+    "requested_reasoning_effort": "ultra",
+    "returned_reasoning_effort": "xhigh",
+    "input_sha256": "b241f16f76f5cf1ce67f5e6cb1f5bed550170b6358991b7c00b3caddb18ec074"
+  },
+  {
+    "case_id": "fixed_holdout_007",
+    "evaluator": "jev",
+    "status": "ok",
+    "reference": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "latency_seconds": 0.648187,
+    "usage": {
+      "prompt_tokens": 10705,
+      "completion_tokens": 102,
+      "total_tokens": 10807,
+      "cached_tokens": null,
+      "reasoning_tokens": null,
+      "total_tokens_source": "derived_input_plus_output",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "b241f16f76f5cf1ce67f5e6cb1f5bed550170b6358991b7c00b3caddb18ec074"
+  },
+  {
+    "case_id": "fixed_holdout_008",
+    "evaluator": "deepseek_no_thinking",
+    "status": "ok",
+    "reference": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "latency_seconds": 2.738898,
+    "usage": {
+      "prompt_tokens": 5033,
+      "completion_tokens": 48,
+      "total_tokens": 5081,
+      "cached_tokens": 4992,
+      "reasoning_tokens": 0,
+      "total_tokens_source": "reported",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "078807e5b1577dbf20668fc7dc60963165929ccc4dc3de35279ce643f6227205"
+  },
+  {
+    "case_id": "fixed_holdout_008",
+    "evaluator": "highland_sol_requested_ultra",
+    "status": "ok",
+    "reference": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "latency_seconds": 7.970318,
+    "usage": {
+      "prompt_tokens": 4995,
+      "completion_tokens": 104,
+      "total_tokens": 5099,
+      "cached_tokens": 0,
+      "reasoning_tokens": 59,
+      "total_tokens_source": "reported",
+      "customer_usage": {
+        "source": "client_request",
+        "version": "bps-customer-input-v2",
+        "estimated": true,
+        "cache_policy": "proportional_v1",
+        "cache_minimum_input_tokens": 1024
+      },
+      "estimated": true,
+      "measurement_source": "client_request"
+    },
+    "requested_reasoning_effort": "ultra",
+    "returned_reasoning_effort": "xhigh",
+    "input_sha256": "078807e5b1577dbf20668fc7dc60963165929ccc4dc3de35279ce643f6227205"
+  },
+  {
+    "case_id": "fixed_holdout_008",
+    "evaluator": "jev",
+    "status": "ok",
+    "reference": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "choices": {
+      "task_completed": "no",
+      "tool_parameters": "all_valid",
+      "fact_coverage": "partial"
+    },
+    "latency_seconds": 0.554548,
+    "usage": {
+      "prompt_tokens": 7113,
+      "completion_tokens": 102,
+      "total_tokens": 7215,
+      "cached_tokens": null,
+      "reasoning_tokens": null,
+      "total_tokens_source": "derived_input_plus_output",
+      "customer_usage": null,
+      "estimated": null,
+      "measurement_source": null
+    },
+    "requested_reasoning_effort": null,
+    "returned_reasoning_effort": null,
+    "input_sha256": "078807e5b1577dbf20668fc7dc60963165929ccc4dc3de35279ce643f6227205"
+  }
+]

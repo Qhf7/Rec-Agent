@@ -1,0 +1,4 @@
+﻿evaluator,requested_model,requested_reasoning,returned_reasoning,requests,valid_answers,task_agreement,parameter_agreement,coverage_agreement,mean_input_tokens,mean_output_tokens,mean_total_tokens,mean_reasoning_tokens,estimated_usage_requests,p95_seconds,transport_failures,parse_failures
+deepseek_no_thinking,deepseek-v4.1-flash-1017,,,24,22,0.625,0.9166666666666666,0.875,5272.818181818182,48.0,5320.818181818182,0.0,0,4.75377385,2,0
+jev,jev-1.14.0,,,24,24,0.875,0.9166666666666666,1.0,7315.916666666667,102.0,7417.916666666667,,0,1.0573185,0,0
+highland_sol_requested_ultra,gpt-6.1-sol,ultra,xhigh,24,24,1.0,1.0,1.0,5142.125,225.41666666666666,5367.541666666667,179.33333333333334,24,14.532314199999998,0,0

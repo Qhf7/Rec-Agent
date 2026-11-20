@@ -27,6 +27,8 @@ python3 -m agent_benchmark.experiment run --output runs/agent-benchmark-v1/match
 
 ## 评审器对照
 
+跨服务、Responses推理模型和档位回显处理见[三方评测与配置](MODEL_PROVIDER_COMPARISON.md)。
+
 ```bash
 python3 -m agent_benchmark.judges --output runs/judge-controls --limit 12 --repeats 2 --workers 2
 ```
