@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="148" height="42" viewBox="0 0 148 42" role="img" aria-label="在线体验">
+  <defs>
+    <linearGradient id="button" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8974fc"/>
+      <stop offset="1" stop-color="#6450da"/>
+    </linearGradient>
+  </defs>
+  <rect width="148" height="42" rx="12" fill="url(#button)"/>
+  <text x="74" y="26.5" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans CJK SC', sans-serif" font-size="15" font-weight="600" fill="white">在线体验</text>
+</svg>

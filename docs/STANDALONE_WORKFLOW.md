@@ -1,190 +1,102 @@
-# 推荐生成与独立 Jev 判断工作流
+# 推荐与 Jev 独立工作流
 
-DeepSeek Harness/Rec-Agent 生成推荐商品和曝光理由。独立 Python 工作流读取推荐 JSON，构建事实包，调用 Jev 回答风险分类和吸引力两题，再按固定规则生成处置。
+推荐 Agent 生成商品及曝光理由，独立 Python 工作流读取推荐 JSON、构建 Fact Bundle，并调用 Jev 生成审核结果。
 
 ```mermaid
 flowchart LR
-    A[输入用户 ID] --> B[DeepSeek Harness / Rec-Agent]
-    B --> C[导出推荐 JSON]
-    C --> D[独立程序构建 Fact Bundle]
-    D --> E[独立 Jev 两题判断]
-    E --> P[合规与吸引力汇总规则]
-    P --> F[推荐与 Jev 判断组合 JSON]
+    A[用户 ID] --> B[Rec-Agent / Harness]
+    B --> C[推荐 JSON]
+    C --> D[Fact Bundle]
+    D --> E[Jev 风险与吸引力判断]
+    E --> F[商品、理由与审核结果]
 ```
 
-`risk_type=compliant` 时合规状态为 Y，且吸引力严格大于 50 才输出 `expose`；其他情况统一为 `rewrite`，不会自动重新生成文案。真实展示和点击采集属于后续业务接入。
+## 准备推荐结果
 
-## 1. 导出 Harness 推荐
+从桌面 Harness 导出最终 JSON，保存为 UTF-8 文件。也可使用仓库提供的 [`examples/harness_recommendations.json`](../examples/harness_recommendations.json)。
 
-将Harness最终答案保存为UTF-8严格JSON，例如 `harness-result.json`：
-
-```json
-{
-  "user_id": "u_0001",
-  "recommendations": [
-    {
-      "item_id": "i_0001",
-      "exposure_reason": "折叠收纳，换季衣物随手收",
-      "generated_reason": "折叠收纳，换季衣物随手收",
-      "evidence_fields": [
-        "items.category_l3",
-        "items.functions"
-      ],
-      "context_summary": "使用商品类目与折叠收纳功能"
-    }
-  ],
-  "agent_version": "rec-agent-v2"
-}
-```
-
-- 有候选时，`user_id`须为 `data/raw/users.csv` 中存在的 `u_####`，`item_id`须为 `data/raw/items.csv` 中存在的 `i_####`。未知用户返回空推荐列表时，工作流正常结束，Jev调用为0，即使指定 `--live` 也无需密钥。
-- `exposure_reason`与兼容字段 `generated_reason`至少提供一个；同时存在时须完全相同。
-- `reason_id`可省略，程序据用户、商品与理由生成稳定ID；提供时格式为 `r_` 加字母、数字、下划线或连字符，同批不得重复。
-- `evidence_fields`指向实际发送给Jev的事实；`context_summary`在本地候选中保留。
-- 输入须是完整严格JSON，不接受过程文字、代码围栏、重复键、`NaN`或`Infinity`。整段对话可先用 `scripts/strict_json_output.py` 提取最终JSON。
-- Harness推荐只包含生成结果，审核结论由独立Jev阶段生成。
-
-`--input-format auto`自动识别Harness导出对象或逐行候选；也可明确指定 `harness` / `jsonl`。候选JSONL使用 `rec-candidate-v2` 和 `canonical-2026-06-15-v1`，旧 `item_####` 数据先经独立迁移脚本核对身份。
-
-## 2. 准备事实与请求
-
-```bash
-python3 scripts/run_recommendation_workflow.py \
-  --input harness-result.json \
-  --output-dir runs/recommendation-prepare-001
-```
-
-默认读取本地规范数据，生成候选、事实包、请求预览和组合结果；网络调用为0，组合结果的 `audit_status` 为 `prepared`、`jev_audit` 为null。
-
-披露参数按实际展示配置填写：
-
-| 参数 | 意义 |
+| 字段 | 要求 |
 | --- | --- |
-| `--ai-disclosure unknown` | 默认值；展示披露配置未确认，记录 `ai_disclosure_unknown` 注记 |
-| `--ai-disclosure visible` | 已确认展示包含所需AI披露 |
-| `--ai-disclosure missing` | 已确认展示缺少所需AI披露 |
+| `user_id` | 规范数据中存在的 `u_####` 用户 ID |
+| `recommendations` | 推荐数组；未知用户可返回空数组 |
+| `item_id` | 规范数据中存在的 `i_####` 商品 ID |
+| `exposure_reason` / `generated_reason` | 至少提供一个；同时存在时内容相同 |
+| `evidence_fields` | 支撑文案的事实字段路径 |
+| `context_summary` | 推荐依据摘要 |
 
-商品事实 `verification_state`仅反映来源与覆盖；披露status独立为visible/missing/unknown。这些信息交给Jev判断并保留在结果中。模型自行声明的披露值不作为实际页面配置证明。
+输入必须是完整的严格 JSON。工作流默认自动识别 Harness JSON 与候选 JSONL，也可使用 `--input-format harness` 或 `--input-format jsonl` 指定格式。用户与商品事实按 ID 从 `data/raw/` 查询。
 
-## 3. 显式调用独立 Jev
+## 准备请求
+
+在项目根目录运行：
 
 ```bash
-export MODELGO_API_KEY="<your-api-key>"
+python3 scripts/run_recommendation_workflow.py \
+  --input examples/harness_recommendations.json \
+  --output-dir runs/recommendation-prepare
+```
+
+默认生成候选、事实包、请求预览和组合结果，不调用模型。每次运行请使用新的输出目录。
+
+## 调用 Jev
+
+在终端配置 `MODELGO_API_KEY` 后，添加 `--live`：
+
+```bash
 python3 scripts/run_recommendation_workflow.py \
   --input harness-result.json \
-  --output-dir runs/recommendation-live-001 \
+  --output-dir runs/recommendation-live \
   --ai-disclosure unknown \
   --live
 ```
 
-每条候选对应一次请求，仅含 `risk_type` 六选一和 `attractiveness_score` 1–100 分评分。风险为 `compliant` 时合规为 Y，其他为 N；只有 Y 且分数严格大于 50 才 `expose`，其余 `rewrite`。不再用披露配置、事实覆盖或置信度作独立本地门禁。[题目标准](JEV_QUESTIONS.md)
+`--ai-disclosure` 应与实际展示配置一致：
 
-默认协议 `jev-questions-v4-two`，规则 `jev-two-policy-v1`。SystemOne 最多允许 10 个评分等级。当前索引 `0…9` 对应 `1、12、23、34、45、56、67、78、89、100`；业务分为 `1 + 11 × 索引`，有概率时使用归一化后的期望索引。这是等级概率换算的 1–100 分，不是原生 100 档逐整数评分。历史五题、九题按原版本回放，旧答卷不作为当前两题结果。
-
-密钥未配置会在发出请求前报错。响应格式、身份或模型版本错误单独记录；有失败项时命令退出码为1，不将接口或解析错误包装为成功审核结论。
-
-## 4. 查看组合结果
-
-`workflow_results.json`使用两空格缩进，一份文件关联推荐和Jev判断：
-
-```json
-{
-  "schema_version": "recommendation-jev-workflow-v1",
-  "mode": "live",
-  "decision_source": "jev_answers_policy",
-  "recommendations": [
-    {
-      "reason_id": "r_example",
-      "user_id": "u_0001",
-      "item_id": "i_0001",
-      "title": "规范商品标题",
-      "exposure_reason": "折叠收纳，换季衣物随手收",
-      "generated_reason": "折叠收纳，换季衣物随手收",
-      "evidence_fields": ["items.category_l3", "items.functions"],
-      "context_summary": "使用商品类目与折叠收纳功能",
-      "audit_status": "completed",
-      "jev_audit": {
-        "decision": "expose",
-        "decision_source": "jev_answers_policy",
-        "compliance": "Y",
-        "risk_type": "compliant",
-        "attractiveness_score": 72.4,
-        "decision_reasons": ["compliant_and_attractiveness_above_50"]
-      }
-    }
-  ],
-  "errors": []
-}
-```
-
-示例省略了 `jev_audit`其余字段；实际文件保存完整结论、逐题选择和置信度、风险分类、吸引力、处置依据、事实引用及配置注记。`title`来自规范商品数据，原推荐理由保持不变。
-
-| 状态 | `audit_status` | `jev_audit` |
-| --- | --- | --- |
-| 已准备请求 | prepared | null |
-| 模型成功返回有效结果 | completed | 完整Jev结果 |
-| 请求或解析失败 | error | null；原因见errors |
-
-当前有效处置为 `expose` 或 `rewrite`，两者的 `audit_status` 都是 `completed`。
-
-## 5. 独立追溯产物
-
-| 文件 | 内容 |
+| 取值 | 含义 |
 | --- | --- |
-| `workflow_results.json` | 推荐商品、曝光理由及对应Jev判断的组合结果 |
-| `candidates.jsonl` | 规范候选、理由、证据路径及版本 |
-| `fact_bundles.jsonl` | 冻结商品/场景事实、规则线索和披露状态 |
-| `jev_requests.jsonl` | 按理由保存的请求预览 |
-| `jev_responses.jsonl` | HTTP成功响应的原始正文，保留逐题选择、置信度和概率 |
-| `jev_decisions.jsonl` | 解析后的 Jev 答卷及处置 |
-| `jev_errors.jsonl` | 有审核失败时保存错误类型和信息 |
-| `workflow_report.json` | 模式、数量、版本、调用次数与产物路径 |
+| `unknown` | 默认值；披露配置未确认 |
+| `visible` | 已确认展示包含 AI 披露 |
+| `missing` | 已确认展示缺少 AI 披露 |
 
-输出目录包含同名产物时拒绝覆盖，每次运行使用新目录。响应在解析前落盘；无效JSON或协议错误保留原文并记录错误，不生成成功结论。HTTP失败、仅准备请求、没有候选，或自定义适配器未提供原始正文时，不生成响应正文记录。
+每条推荐对应一次 Jev 请求，使用 `jev-questions-v4-two` 协议。风险为 `compliant` 时合规状态为 `Y`；仅合规 `Y` 且吸引力严格大于 50 时输出 `expose`，其余为 `rewrite`。详细题目、选项与评分标准见[审核协议](JEV_QUESTIONS.md)。
 
-`evidence_source: workflow_fact_snapshot`表示引用来自本地事实快照，不是Jev生成的逐句解释。`confidence` 保留全部问题最低置信度用于诊断。两题协议的 `decision_confidence` 为 `null`，`escalated` 兼容字段固定为 `false`。
+未知用户的空推荐正常结束，无需调用 Jev。接口或解析失败单独记录为错误，命令存在失败项时退出码为 `1`。
 
-## 6. 事实与版本边界
+## 查看结果
 
-规范场景日期为2026-06-15。新导入Harness结果时，程序按此版本查询数据，写入 `snapshot_at: 2026-06-15T12:00:00+08:00`，与命令执行当天不同。
+`workflow_results.json` 将推荐与对应审核结论关联，使用两空格缩进，便于查看和集成。
 
-新推荐的商品、用户场景和促销事实按ID从 `data/raw/`读取，记录 `local_csv_lookup`。Harness输出中的自由文本或历史统计不直接成为Jev事实。
+| 字段 | 内容 |
+| --- | --- |
+| `exposure_reason` | 推荐 Agent 生成的曝光理由 |
+| `audit_status` | `prepared`、`completed` 或 `error` |
+| `jev_audit.risk_type` | 六类风险之一 |
+| `jev_audit.attractiveness_score` | 1–100 吸引力评分 |
+| `jev_audit.compliance` | 合规状态 `Y` / `N` |
+| `jev_audit.decision` | 最终处置 `expose` / `rewrite` |
+| `jev_audit.decision_reasons` | 处置依据 |
 
-已有候选JSONL先校验快照与版本，漂移时报错；部分快照继续保留缺字段、原始时间和原查询轨迹。例如2026-06-12的候选按原时间回放，空轨迹仍为空。
+`prepared` 表示已准备请求，`jev_audit` 为 `null`；`completed` 表示模型已返回有效结论；`error` 的具体原因记录在错误列表中。`rewrite` 是审核结论，工作流不会自动改写文案。
 
-Jev请求使用独立字段白名单。CTR、曝光点击、搜索词、购物车和反馈供Rec-Agent使用，不进入Jev输入。模型答卷和固定汇总规则共同决定处置。
+### 输出文件
 
-## 7. 测试与历史回放
+| 文件 | 用途 |
+| --- | --- |
+| `workflow_results.json` | 商品、曝光理由与审核结论 |
+| `candidates.jsonl` | 规范候选与版本信息 |
+| `fact_bundles.jsonl` | 商品、场景与披露事实快照 |
+| `jev_requests.jsonl` | 模型请求预览 |
+| `jev_responses.jsonl` | 已收到的原始响应 |
+| `jev_decisions.jsonl` | 结构化审核结果 |
+| `jev_errors.jsonl` | 审核失败信息（有失败时生成） |
+| `workflow_report.json` | 数量、版本、调用次数与文件路径 |
 
-当前两题使用上面的工作流命令准备或真实调用，检查请求中恰好只有风险和吸引力。以下脚本保留历史评测，不代表当前两题请求。
+## 数据契约
 
-```bash
-# 准备历史五题评估请求
-python3 scripts/run_jev_five_question_evaluation.py \
-  --output-dir runs/jev-five-prepare
+候选使用 `rec-candidate-v2`，规范数据版本为 `canonical-2026-06-15-v1`，场景日期为 `2026-06-15`。工作流校验身份与版本，并保留事实来源。
 
-# 终端配置模型凭据后运行同一套评估
-python3 scripts/run_jev_five_question_evaluation.py \
-  --output-dir runs/jev-five-live --live
-```
+历史曝光点击、CTR、搜索、购物车和订单用于推荐排序；Jev 接收独立白名单内的审核事实。导出结果中的自由画像文本不替代规范数据。详见[数据说明](../data/README.md)与[审核输入说明](JEV_JUDGMENT_PROTOCOL.md)。
 
-历史九题的 Q2 对照和冻结响应仍可按原协议运行。
+---
 
-```bash
-# 默认40条×2版本×2重复，仅准备请求，网络调用0次
-python3 scripts/run_jev_review_comparison.py \
-  --output-dir runs/q2-comparison-prepare
-
-# 显式运行160次新旧Q2对照
-python3 scripts/run_jev_review_comparison.py \
-  --output-dir runs/q2-comparison-live --live
-
-# 解析冻结响应，输出模型处置，网络调用0次
-python3 scripts/replay_jev_model_decisions.py \
-  --comparison-dir runs/q2-comparison-live \
-  --output-dir runs/jev-model-replay-001
-```
-
-A/B固定商品、文案、事实、模型及其他八题，仅改变Q2。可加 `--include-original-six --disclosure-controls 3`运行原六条回归和披露控制，总计172次；原六条参数依赖此前保存的本地桌面端推荐文件。
-
-[人工标注模板](JEV_EVALUATION_LABELING.md)可用于独立离线模型评估，当前回放无需人工标签。详细结果见 [历史九题验证报告](TEST_REPORT_JEV_MODEL_WORKFLOW_2026-11-18.md)。历史调用和旧结果保留在各次运行目录，回放不声称重新调用了模型。
+[返回项目首页](../README.md) · [可视化工作台](WEB_UI.md) · [桌面 Harness 配置](../harness-main-workspace.md)

@@ -1,157 +1,66 @@
-# Rec-Agent Agent Preset
+# Rec-Agent Preset
 
-可复用的电商推荐 Agent 预设：根据 `user_id` 或直接传入的 `user_context`，查询当前工作区的用户、商品、促销与场景数据，输出用户信息、1–3 个商品及其可直接展示给用户的曝光理由。大模型从商品关键信息提炼卖点，结合适配的通用场景创作自然、轻快的广告文案。输出严格 JSON，交给下游独立的 Jev 审核链路。
+面向电商推荐的 DeepSeek Harness Agent 预设。输入用户 ID，查询画像、行为、推荐反馈和商品数据，输出 1–3 个商品及曝光理由，供独立 Jev 工作流审核。
 
-## 安装信息
+## 安装
 
-| 项 | 值 |
-|---|---|
+在支持本地插件 bundle 的 DeepSeek Harness 中，使用插件管理器的 `install_bundle` 安装本目录。
+
+| 项目 | 值 |
+| --- | --- |
 | Bundle 包名 | `@local/dsh-rec-agent-preset` |
 | Preset ID | `rec-agent` |
-| 选择器显示名 | `Rec-Agent` |
-| Loader 行 ID | `preset-rec-agent` |
-| 顺序 | `5` |
-| 来源 | 当前工作区 `rec-agent-preset/`（profile 以 `link:` 安装） |
+| 显示名称 | `Rec-Agent` |
+| Loader ID | `preset-rec-agent` |
 
-安装后 `preset-rec-agent` 在 Host Loader 中为 `active`，会出现在 Web 的 Agent 预设选择器中（新建任务的选择器与 Settings 的预设列表；若页面未刷新，刷新一次即可）。
-
-## 组成
-
-- `persona`：Rec-Agent 的角色、输入契约、数据查询优先级、选品规则、事实边界、职责边界、工作步骤与输出 Schema。
-- `strict-output`：原生 `llm/stream` 输出边界，缓冲工具步骤并隐藏前置文字；最终整段通过严格 JSON、Schema、20 字符与参数表达校验后，以两空格缩进输出。校验失败时使用同一提供商和模型修复，最多两次；仍不通过则本轮报错。
-- `time-context`：当前日期与时段，用于活跃时段、季节和促销有效期判断。
-- `tool-fs`：只读文件工具（read），关闭 write/edit/apply_patch/readImage。
-- `tool-fs-search`：glob/grep，用于定位数据文件。
-- `tool-bash`（macOS/Linux）或 `tool-pwsh`（Windows）：只读查询数据（python3/sqlite3/grep/awk），关闭后台任务。
-- `compaction`：基础压缩与工具结果裁剪，避免大 CSV 读入撑爆上下文。
+将仓库根目录设为工作区，并按[工作区配置说明](../harness-main-workspace.md)连接 MCP 数据服务。安装后在 Agent 选择器中选择 **Rec-Agent**，新建会话即可使用。更新预设后重新安装 bundle，并新建会话以加载配置。
 
 ## 输入
 
-支持两种方式，二者同时提供时 `user_context` 的字段优先（`user_id` 除外）：
-
-```json
-{"user_id": "u_0007"}
-```
-
 ```json
 {
-  "user_context": {
-    "user_id": "u_0007",
-    "city": "杭州",
-    "active_hours": "22:00-02:00",
-    "recent_cart_item_ids": ["i_0031"],
-    "preferred_categories": ["家居日用", "母婴亲子"]
-  }
+  "user_id": "u_0007"
 }
 ```
 
-以上为 Rec-Agent 的生成输入能力。当前独立 Python 工作流只接收规范 `u_####` 用户 ID，并按 ID 从 `data/raw` 重建审核事实；导出 JSON 中的 `user_profile` 和运行时 `user_context` 覆盖值不作为审核事实。`anonymous` 或自定义画像推荐不能直接通过该规范数据工作流。
+也支持传入 `user_context` 对象，用于自定义画像与场景。当前规范数据审核工作流按 `u_####` 用户 ID 重建事实；如需接入自定义画像，应同时扩展审核数据契约。
 
-## 数据与工具优先级
+## 输出
 
-1. 若已配置 MCP 工具，优先使用 `get_user_profile`、`get_user_behavior`、`get_user_recommendation_history`、`get_session_context`、`search_items`、`get_item`、`get_promo`（实际名称可能带 `mcp__<server>__` 前缀）。
-2. 否则查询工作区文件：
-   - `data/raw/users.csv`
-   - `data/raw/items.csv`
-   - `data/raw/promo_rules.json`
-   - `data/raw/city_climate.json`
-   - `data/raw/history_reason_stats.csv`（冷启动时的类目 × 理由钩子弱先验）
-   - 字段说明：`data/README.md`
-3. 原始文件不可用时才使用 `data/mock.db`。
+最终回答为两空格缩进的严格 JSON 对象：
 
-文件回退读取 CSV 时，使用 `open(path, encoding="utf-8-sig", newline="")` 与 `csv.DictReader`，以处理 UTF-8 BOM。`search_items.query` 按空格拆词并要求所有词都匹配（AND）；要查找多个备选主题，应分开查询，或只传 `category_l1` 检索类目。空结果时先简化查询，不能据此认定整个 MCP 数据源不可用。
+| 字段 | 内容 |
+| --- | --- |
+| `user_id` | 用户 ID |
+| `user_profile` | 用户画像摘要 |
+| `recommendations` | 按优先级排序的推荐列表 |
+| `recommendations[].item_id` | 规范商品 ID |
+| `recommendations[].title` | 商品完整标题 |
+| `recommendations[].exposure_reason` | 商品卡展示的曝光理由 |
+| `recommendations[].generated_reason` | 与曝光理由相同的兼容字段 |
+| `recommendations[].evidence_fields` | 支撑文案的事实字段路径 |
+| `recommendations[].context_summary` | 推荐依据摘要 |
+| `agent_version` | `rec-agent-v2` |
 
-如果已配置 `get_user_recommendation_history`，在画像和行为查询后调用它读取用户最近 30 天的 Jev 通过后曝光反馈。使用 `recent_clicked_item_ids` 和 `category_stats.smoothed_ctr` 做弱偏好，使用 `recent_ignored_item_ids` 降权、`recent_shown_item_ids` 去重。历史只用于软排序、去重和探索位分配，不写入用户可见理由，也不提供给 Jev。`history_status=cold_start` 是正常的首轮状态，应继续依赖画像、购物车、搜索词、场景和商品事实完成推荐。
+用户不存在或没有可推荐商品时，`recommendations` 为空数组，并通过顶层 `context_summary` 说明原因。预设包含输出校验与修复机制；无效结果会报错。
 
-## 输出（严格 JSON，无 Markdown）
+## 数据访问
 
-```json
-{
-  "user_id": "string",
-  "user_profile": {
-    "city": "string",
-    "city_tier": "string",
-    "climate_zone": "string",
-    "age": 0,
-    "gender": "string",
-    "life_stage": "string",
-    "preferred_categories": ["string"],
-    "tags": ["string"],
-    "active_hours": "string",
-    "price_sensitivity": "string"
-  },
-  "recommendations": [
-    {
-      "item_id": "string",
-      "title": "string",
-      "exposure_reason": "string",
-      "generated_reason": "string",
-      "evidence_fields": ["string"],
-      "context_summary": "string"
-    }
-  ],
-  "agent_version": "rec-agent-v2"
-}
-```
+优先使用只读 MCP 工具查询画像、行为、推荐历史、会话场景、商品与促销。未连接 MCP 时，读取工作区 `data/raw/`；原始文件不可用时可使用 `data/mock.db`。
 
-- `recommendations` 默认 1–3 条，按推荐优先级排序；`title` 直接取商品 `title`。
-- `exposure_reason`：唯一的用户可见广告文案，聚焦商品功能、材质或有事实支撑的使用特点，保持单行；建议 8–18 个字符，全部 Unicode 字符不超过 20 个（含标点、字母和 emoji，以码点计数）。由大模型直接创作完整短句，不截断长句。可以有轻快语气、感叹号，最多 1 个 emoji。不能出现内部字段、证据路径或「你搜过/购物车里的」等行为追踪措辞。
-- 由大模型围绕真实卖点自由创作，内部比较 2–3 个不同开头的候选后选择最终文案；不把城市、身份、规格机械拼成一句，不要求每条都用同一套开头或结尾。只输出最终文案，不新增草稿、比较结果或生成过程字段。
-- 画像与反馈用于选品和选择通用场景。可以写「带娃日常」「居家清洁」，不能据此断言「带娃家里纸消耗快」「你家纸消耗翻倍」或虚构第一人称使用经历。第二人称邀请可以使用，但不能夹带个人状态断言。
-- `exposure_reason` 不写价格、优惠、折扣、满减、赠品或门槛；这类信息只供内部审核。
-- 曝光文案不写数量、尺寸、容量、包装件数、型号、数值或技术参数，包括「24包」「34cm」「三层」「二十四包」等中英文形式；不出现阿拉伯数字及参数缩写。允许「一抹」「三餐」等自然措辞。商品完整 `title` 保留原始数据，用于识别商品。
-- `generated_reason`：必须与 `exposure_reason` 完全相同，作为旧版 Jev 管线的兼容字段。
-- `evidence_fields`：只填写直接支撑曝光文案、在实际事实快照中存在非空值的字段路径，至少 2 个、最多 6 个，且至少 1 个商品字段。用户场景仅允许 `users.city`、`users.city_tier`、`users.climate_zone`、`users.life_stage`、`users.tags`、`users.active_hours`，或这些字段对应的 `user_context.` 路径；年龄、性别、偏好类目、购物车、搜索词、订单和曝光点击反馈只用于选品，不进入审核证据。
-- 商品证据使用 `items.` 前缀，字段仅允许 `item_id`、`title`、`brand`、`category_l1`、`category_l2`、`category_l3`、`functions`、`material`、`spec`、`suit_audience`、`suit_season`、`efficacy_claims_allowed`、`qualifications`、`price_cents`、`original_price_cents`、`promo_tags`、`promo_rule_ids`、`stock`、`regulated_category`、`sensitive_category`、`ad_law_notes`。气候证据仅允许 `city_climate.city_tier`、`city_climate.climate_zone`、`city_climate.monsoon_months`、`city_climate.notes`；日期基准使用 `time-context`。
-- 逐字段回指文案：没有直接使用的商品或场景字段，以及只用于选品的标签，不要填入。白名单限定可传输范围，不代表可以把价格、行为追踪措辞等写进用户可见文案。
-- 最终回答只返回格式化 JSON：对象属性和数组元素使用换行与 2 个空格缩进，JSON 前后不添加英文过程说明、Markdown 或解释文字。
-- 最终回答只能有一个 JSON 根对象；工具回显、过程进度、多个并列对象、未加引号的键、JSON5 写法和省略号都不属于最终 JSON。
-- 调用工具前和工具调用之间不发送自然语言状态消息；工具轨迹只在 Harness 轨迹面板查看。
-- 格式化检查是硬约束：第一行只有 `{`、最后一行只有 `}`，禁止返回单行压缩 JSON。
-- `context_summary`：每条约 60 字以内的推荐依据总结。
+历史反馈用于软排序、去重与探索。无历史反馈的用户依靠画像、行为、场景和商品信息完成首轮推荐。反馈不作为商品事实传给 Jev。
 
-### 广告文案的生成方式
+## 审核交接
 
-1. 查询商品详情后，提炼 1–2 个有用卖点及来源字段，例如原生木浆、不粘或计步。
-2. 根据画像和兴趣选择相容的通用使用场景，用动作、日常用途、情绪感受或轻快邀请构思 2–3 个不同开头的候选。
-3. 按自然广告语气、事实支撑、场景适配和句式多样性择优，检查长度及来源后填写最终 JSON。`generated_reason` 与选中的 `exposure_reason` 一致。
+预设负责推荐生成，审核由 Harness 外的独立工作流完成。保存最终 JSON 后，按[独立工作流说明](../docs/STANDALONE_WORKFLOW.md)运行 Jev，或使用[可视化工作台](../docs/WEB_UI.md)查看完整链路。
 
-例如，`i_0006` 的 `material=原生木浆`、`functions=清洁|吸水`、`category_l3=抽纸` 可以支持「原生木浆抽纸，清洁随手抽」。这些字段没有说明柔软、不掉屑、湿水不破或宝宝适用，因此不能增加这些承诺。轻快语气可以由模型创作，客观卖点必须能回指查询结果。
+### 预设文件
 
-其余示例及对应商品来源写在预设中，只用于展示语气；实际生成仍须针对当前商品重新创作。仅修改预设文件不会改变已启动 Session 的指令，验证时按下文重装并新建 Session。
+| 文件 | 作用 |
+| --- | --- |
+| `cordis.patch.yml` | 角色、数据访问及输出配置 |
+| `strict-output.js` | 严格 JSON 输出校验 |
 
-### 原生输出校验
+---
 
-`strict-output.js` 通过 Harness 官方 `llm/stream` 扩展点处理当前 Rec-Agent 会话。工具调用原样保留，工具步骤的前置自然语言不发布为回答。最终结果必须是一个完整 JSON 对象，拒绝 Markdown、前后说明、多个根值、重复键、非有限数字及字段类型错误；文案还要满足 20 字符和无参数要求。通过后统一输出两空格缩进 JSON。
-
-校验失败会请求当前提供商和模型修复，最多两次；修复调用不开放工具。持续失败时本轮报错，不发布无效结果。Jev 审核仍由外部独立工作流执行。
-
-### 空结果约定
-
-当用户不存在、商品字段不足或找不到有事实支撑的推荐时：
-
-```json
-{
-  "user_id": "u_9999",
-  "recommendations": [],
-  "context_summary": "users.csv 中无 u_9999，未生成推荐",
-  "agent_version": "rec-agent-v2"
-}
-```
-
-空结果时，固定 Schema 中只有 `recommendations` 内部才有 `context_summary`；为满足“说明原因”的要求，此处允许在**顶层**增加这一个 `context_summary` 字段。非空结果必须严格使用固定 Schema，不得出现顶层 `context_summary`。
-
-## 职责边界
-
-- 只负责选品和生成理由，不做曝光合规判决；不输出 `decision`、`risk_type`、`judge_score`、`escalated` 等字段。
-- 不读取 `compliance_lexicon.txt` 或标签文件，避免生成端自我审查。
-- 理由只能引用商品/用户/促销/场景的真实字段；不编造功能、功效、资质、优惠、销量或物流承诺。
-- 生成结果本身就是 Jev 审核链路的候选输入，Agent 不声称结果已合规。
-
-## 修改与重装
-
-编辑 `cordis.patch.yml` 后，用 `plugin_manager` 的 `install_bundle` 重新安装本目录；profile 使用 `link:` 指向本目录，重装可让 Loader 重新读取最新声明。已存在的 Session 保留其启动时的插件修订，验证修改请新建 Session。
-
-## 独立审核交接
-
-Rec-Agent 不调用 Jev，也不通过终端启动审核脚本。生成完成后导出最终 JSON，由 Harness 外的 `scripts/run_recommendation_workflow.py` 接收。默认只准备事实与请求，显式 `--live` 才调用 Jev。该工作流也接受离线 canonical JSONL，无需启动 DeepSeek Harness。详见 [独立工作流](../docs/STANDALONE_WORKFLOW.md)。
+[返回项目首页](../README.md) · [数据说明](../data/README.md)

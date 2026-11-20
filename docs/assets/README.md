@@ -1,11 +1,12 @@
-# 架构图资料说明
+# 视觉资源
 
-主 [README](../../README.md) 当前展示已纳入版本管理的 `rec_agent_core_framework_1080p.png`。
+| 资源 | 用途 |
+| --- | --- |
+| [rec_agent_core_framework_1080p.png](rec_agent_core_framework_1080p.png) | 项目首页模型框架图 |
+| [demo-button.svg](demo-button.svg) | 在线体验按钮 |
+| [web-ui-desktop.png](web-ui-desktop.png) | 桌面工作台预览 |
+| [web-ui-mobile.png](web-ui-mobile.png) | 手机工作台预览 |
+| [rec_agent_logo_1080p.png](rec_agent_logo_1080p.png) | Rec-Agent 标识 |
+| [typesafe-ai-official-logo.svg](typesafe-ai-official-logo.svg) | Type Safe AI 官方标识 |
 
-`rec_agent_pipeline_1080p.svg`、`rec_agent_pipeline_1080p.png` 和 `rec_agent_core_framework_1080p.svg` 保留为历史设计资料，部分内容包含早期问题编号或处置路由。当前实现与契约以以下文件为准：
-
-- [Rec-Agent 预设](../../rec-agent-preset/cordis.patch.yml)
-- [发送给 Jev 的问题清单](../JEV_QUESTIONS.md)
-- [独立工作流说明](../STANDALONE_WORKFLOW.md)
-
-`human_review` 仅为 Jev 模型给出的处置结论；当前项目没有接入人工复核服务。
+运行方式与审核协议见[项目首页](../../README.md)及[独立工作流文档](../STANDALONE_WORKFLOW.md)。

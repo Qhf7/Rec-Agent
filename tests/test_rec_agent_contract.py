@@ -58,10 +58,9 @@ def test_ad_copy_examples_use_canonical_facts_and_fit_length_contract():
         assert re.search(r"[0-9０-９]|(?:一|二|三|四|五|六|七|八|九|十|两|百)+(?:(?:包|层|抽|厘米|毫升|克|公斤|键|粒|片))", reason) is None
         assert "\n" not in reason
 
-    for text in (patch_text, (ROOT / "rec-agent-preset/README.md").read_text(encoding="utf-8")):
-        assert "8–18" in text and "不超过 20 个" in text
-        assert "数量、尺寸、容量" in text
-        assert "一抹" in text and "三餐" in text
+    assert "8–18" in patch_text and "不超过 20 个" in patch_text
+    assert "数量、尺寸、容量" in patch_text
+    assert "一抹" in patch_text and "三餐" in patch_text
 
 
 def test_profile_links_to_main_workspace_preset():

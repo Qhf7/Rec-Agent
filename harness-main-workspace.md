@@ -1,82 +1,70 @@
-# Rec-Agent 主工作区配置
+# DeepSeek Harness 工作区配置
 
-当前统一工作区：
+桌面 Harness 使用 Rec-Agent 预设生成推荐 JSON；MCP 提供只读数据查询。Jev 审核由独立工作流执行。
 
-`/Users/qiaohongfei/Desktop/实习/Jev曝光审核`
+## 连接工作区
 
-## Harness preset
+1. 将克隆的仓库根目录设为 Harness 工作区。
+2. 使用插件管理器安装 [`rec-agent-preset/`](rec-agent-preset/) bundle。
+3. 配置 MCP 数据服务：将 [`rec-agent-mcp/cordis.patch.yml`](rec-agent-mcp/cordis.patch.yml) 中的 `args` 改为本机 `mcp_server.py` 的绝对路径，`cwd` 改为仓库根目录，再安装该 bundle。
+4. 在 Agent 选择器中选择 **Rec-Agent**，新建会话。
 
-- Bundle：`rec-agent-preset/`
-- MCP bundle：`rec-agent-mcp/`
-- Preset ID：`rec-agent`
-- 显示名：`Rec-Agent`
-- 输出字段：`exposure_reason`（用户可见）、`generated_reason`（兼容别名）、`evidence_fields`、`context_summary`
-
-## MCP 启动
-
-在主工作区运行：
+MCP 使用 stdio 传输。手动启动命令为：
 
 ```bash
 python3 mcp_server.py
 ```
 
-默认使用 stdio transport。工具包括：
+运行前安装依赖：
 
-- `get_user_profile`
-- `get_user_behavior`
-- `get_user_recommendation_history`
-- `get_session_context`
-- `search_items`
-- `get_item`
-- `get_promo`
+```bash
+python3 -m pip install -r requirements-mcp.txt
+```
 
-Harness 中对应的工具名为：`mcp__rec-agent-data__get_user_profile`、
-`mcp__rec-agent-data__get_user_behavior`、`mcp__rec-agent-data__get_user_recommendation_history`、
-`mcp__rec-agent-data__get_session_context`、
-`mcp__rec-agent-data__search_items`、`mcp__rec-agent-data__get_item`、
-`mcp__rec-agent-data__get_promo`。
+## 数据工具
 
-这些工具只读 `data/raw/` 和 `data/recommendation_feedback_history.csv`，不修改数据，也不调用 Jev。`data/raw/` 是唯一 canonical 数据源，商品 ID 使用 `i_####`；推荐历史只提供给 Rec-Agent 做候选排序参考，不会进入 Jev 审核输入。
+| 工具 | 数据 |
+| --- | --- |
+| `get_user_profile` | 用户画像 |
+| `get_user_behavior` | 行为与兴趣 |
+| `get_user_recommendation_history` | 历史推荐曝光与点击反馈 |
+| `get_session_context` | 场景与时间 |
+| `search_items` | 商品检索 |
+| `get_item` | 商品详情 |
+| `get_promo` | 促销规则 |
 
-离线候选、Fact Bundle 和 Jev 请求使用同一 `canonical-2026-06-15-v1` 数据版本。Jev 请求使用 `jev-questions-v1` 七步协议：候选身份、事实支持、表达风险、商业准确性、场景相关性、安全门禁和最终处置。Jev 只接收当前候选事实、促销快照、最小场景摘要、证据和版本，不接收点击历史、CTR、订单、退款、投诉、购物车、搜索词或排序分。
+Harness 中的工具名可能带 `mcp__rec-agent-data__` 前缀。规范数据位于 `data/raw/`，商品 ID 为 `i_####`；反馈位于 `data/recommendation_feedback_history.csv`。详见[数据说明](data/README.md)。
 
-事件级参考数据位于 `data/recommendation_feedback_history.csv`：每行是一条已通过 Jev 并实际展示的推荐事件，包含 `event_time`、`exposure_reason`、`clicked`、`click_time`、`position`、`traffic_source`、`device_type` 和 `session_id`。它是合成冷启动演示数据，接入真实链路后应由展示服务按同一字段追加真实反馈。
+## 生成推荐
 
-## 测试输入
+输入：
 
 ```json
-{"user_id":"u_0007"}
+{
+  "user_id": "u_0007"
+}
 ```
 
-用户卡片只展示 `exposure_reason`；`evidence_fields` 和 `context_summary` 留给 Jev 审核与审计。
-最终回答必须是一个严格 JSON 根对象；工具回显和轨迹可以在 Harness 的工具面板中查看，但不要把它们与最终 JSON 拼接。前后不附加英文过程说明；如果界面仍显示旧的压缩 JSON 或 `rec-agent-v1`，请完全重启 Harness 并新建会话。
+最终回答包含用户画像、商品与曝光理由，格式为严格 JSON。输出字段见[预设文档](rec-agent-preset/README.md)。工具查询轨迹可在 Harness 轨迹面板查看。
 
-每次修改 `rec-agent-preset/cordis.patch.yml` 后，需要完全退出并重新打开 DeepSeek Harness，再新建会话验证。旧会话会保留历史响应；如果输出中的 `agent_version` 仍是 `rec-agent-v1`，说明看到的是旧结果。本次文案策略版本为 `rec-agent-v2`。
+## 查看与导出
 
-## 独立结果查看器
+复制最终回答并保存为 `harness-result.json`，交给[独立工作流](docs/STANDALONE_WORKFLOW.md)审核。也可打开 [`rec-agent-viewer.html`](rec-agent-viewer.html)，粘贴内容查看商品卡片和格式化 JSON。
 
-Harness 的消息区域可能压缩 JSON 空白。可打开主工作区中的 [rec-agent-viewer.html](</Users/qiaohongfei/Desktop/实习/Jev曝光审核/rec-agent-viewer.html>)，把 Harness 整段输出粘贴进去，点击“格式化结果”。查看器会保留原始输入，并在右侧独立生成 2 个空格缩进、逐项换行的结果；“复制格式化结果”可以直接复制可读版本，同时下方展示用户画像和推荐卡片。
-
-命令行也可以格式化结果：
+已有文本文件可通过命令行提取并格式化 JSON：
 
 ```bash
-pbpaste | python3 scripts/format_rec_agent_output.py
+python3 scripts/strict_json_output.py < harness-output.txt > harness-result.json
 ```
 
-如果只需要缩进后的 JSON：
+macOS 可从剪贴板读取：
 
 ```bash
-pbpaste | python3 scripts/format_rec_agent_output.py --json-only
+pbpaste | python3 scripts/strict_json_output.py > harness-result.json
 ```
 
-如果要把 Harness 的整段消息直接转换成一个严格 JSON 文档（自动跳过工具预览、进度文字和前面的非 JSON 内容）：
+应复制完整最终回答；工具结果预览可能省略字段，不适合作为导出文件。
 
-```bash
-pbpaste | python3 scripts/strict_json_output.py
-```
+---
 
-请从对话区最终回答旁的“复制”按钮复制内容；不要从“轨迹”面板的工具结果卡片复制，因为工具卡片是便于阅读的对象预览，可能包含未加引号的键或 `…`，不属于完整 JSON。
-
-## 独立工作流交接
-
-推荐生成完成后导出严格 JSON，在 Harness 外运行 `scripts/run_recommendation_workflow.py --input <导出文件> --output-dir <新目录>`。默认只生成候选、事实包和请求预览；显式 `--live` 才由工作流调用 Jev。Rec-Agent/MCP 不自动调用审核模型，也不启动审核脚本。详见 `docs/STANDALONE_WORKFLOW.md`。
+[返回项目首页](README.md) · [可视化工作台](docs/WEB_UI.md) · [独立工作流](docs/STANDALONE_WORKFLOW.md)
