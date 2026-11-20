@@ -1,5 +1,217 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="616" height="616" viewBox="0 0 616 616" role="img" aria-labelledby="logoTitle logoDesc">
-  <title id="logoTitle">Logo Mark</title>
-  <desc id="logoDesc">Graphic mark only; no wordmark.</desc>
-  <image href="rec_agent_logo_1080p.png" width="616" height="616" preserveAspectRatio="xMidYMid meet"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080" role="img" aria-label="Rec-Agent Logo (Light Theme)">
+  <defs>
+    <!-- Background Gradient (Crisp Off-White) -->
+    <radialGradient id="bgLight" cx="50%" cy="42%" r="65%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="70%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#f1f5f9"/>
+    </radialGradient>
+
+    <!-- Shield / Rim Gradient -->
+    <linearGradient id="rimGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="40%" stop-color="#2563eb"/>
+      <stop offset="80%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+
+    <linearGradient id="shieldSurface" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
+    </linearGradient>
+
+    <!-- Emblem Facet Gradients -->
+    <linearGradient id="facetBackbone" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="60%" stop-color="#1d4ed8"/>
+      <stop offset="100%" stop-color="#1e40af"/>
+    </linearGradient>
+
+    <linearGradient id="facetLoopOuter" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f2fe"/>
+      <stop offset="50%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+
+    <linearGradient id="facetLeg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="50%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+
+    <linearGradient id="sparkleCore" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="50%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="50%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </linearGradient>
+
+    <!-- Refined Shadows -->
+    <filter id="lightDrop" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="28" flood-color="#0f172a" flood-opacity="0.08"/>
+    </filter>
+
+    <filter id="ambientCoreGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="1080" height="1080" fill="url(#bgLight)"/>
+
+  <!-- Subtle Blueprint Tech Pattern -->
+  <g opacity="0.3" stroke="#e2e8f0" stroke-width="1.2">
+    <line x1="140" y1="0" x2="140" y2="1080"/>
+    <line x1="280" y1="0" x2="280" y2="1080"/>
+    <line x1="420" y1="0" x2="420" y2="1080"/>
+    <line x1="540" y1="0" x2="540" y2="1080" stroke-width="2" stroke="#cbd5e1"/>
+    <line x1="660" y1="0" x2="660" y2="1080"/>
+    <line x1="800" y1="0" x2="800" y2="1080"/>
+    <line x1="940" y1="0" x2="940" y2="1080"/>
+
+    <line x1="0" y1="140" x2="1080" y2="140"/>
+    <line x1="0" y1="280" x2="1080" y2="280"/>
+    <line x1="0" y1="420" x2="1080" y2="420"/>
+    <line x1="0" y1="540" x2="1080" y2="540" stroke-width="2" stroke="#cbd5e1"/>
+    <line x1="0" y1="660" x2="1080" y2="660"/>
+    <line x1="0" y1="800" x2="1080" y2="800"/>
+    <line x1="0" y1="940" x2="1080" y2="940"/>
+  </g>
+
+  <!-- ==================== MAIN SQUIRCLE EMBLEM CONTAINER ==================== -->
+  <g filter="url(#lightDrop)">
+    <!-- Outer Precision Rim -->
+    <rect x="250" y="150" width="580" height="580" rx="145" fill="none" stroke="url(#rimGrad)" stroke-width="4.5"/>
+    <!-- Card Surface -->
+    <rect x="258" y="158" width="564" height="564" rx="137" fill="url(#shieldSurface)" stroke="#f1f5f9" stroke-width="1.5"/>
+  </g>
+
+  <!-- Orbital Context Nodes -->
+  <g opacity="0.85">
+    <path d="M 390 320 C 370 260, 470 210, 560 210" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="8,6" opacity="0.6"/>
+    <path d="M 690 350 C 730 400, 740 500, 690 580" fill="none" stroke="#818cf8" stroke-width="2.5" stroke-dasharray="8,6" opacity="0.6"/>
+    
+    <circle cx="390" cy="320" r="7" fill="#0284c7"/>
+    <text x="345" y="310" font-family="'SF Mono', Menlo, monospace" font-size="13" font-weight="700" fill="#0284c7" letter-spacing="1">USER</text>
+
+    <circle cx="690" cy="350" r="7" fill="#6366f1"/>
+    <text x="708" y="345" font-family="'SF Mono', Menlo, monospace" font-size="13" font-weight="700" fill="#4f46e5" letter-spacing="1">SCENE</text>
+
+    <circle cx="690" cy="580" r="7" fill="#10b981"/>
+    <text x="708" y="585" font-family="'SF Mono', Menlo, monospace" font-size="13" font-weight="700" fill="#059669" letter-spacing="1">ITEM</text>
+  </g>
+
+  <!-- The Master 'R' Geometry -->
+  <g filter="url(#lightDrop)">
+    <!-- 1. The Vertical Backbone: Data Foundation -->
+    <path d="M 400 280 
+             L 456 280 
+             C 462 280, 466 284, 466 290 
+             L 466 590 
+             C 466 596, 462 600, 456 600 
+             L 400 600 
+             C 394 600, 390 596, 390 590 
+             L 390 290 
+             C 390 284, 394 280, 400 280 Z" 
+          fill="url(#facetBackbone)" 
+          stroke="#0284c7" 
+          stroke-width="1.8"/>
+
+    <!-- Pillar Segment Highlights -->
+    <line x1="404" y1="330" x2="424" y2="330" stroke="#bae6fd" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="404" y1="370" x2="444" y2="370" stroke="#bae6fd" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="404" y1="410" x2="430" y2="410" stroke="#bae6fd" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="404" y1="450" x2="448" y2="450" stroke="#bae6fd" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="404" y1="490" x2="430" y2="490" stroke="#bae6fd" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="404" y1="530" x2="446" y2="530" stroke="#bae6fd" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- 2. The Upper Loop: Recommendation Aperture -->
+    <path d="M 466 280 
+             L 570 280 
+             C 636 280, 686 322, 686 388 
+             C 686 454, 636 496, 570 496 
+             L 466 496 Z" 
+          fill="url(#facetLoopOuter)" 
+          stroke="#3b82f6" 
+          stroke-width="1.8"/>
+
+    <!-- Inner Hollow of Loop -->
+    <path d="M 466 338 
+             L 560 338 
+             C 594 338, 624 358, 624 388 
+             C 624 418, 594 438, 560 438 
+             L 466 438 Z" 
+          fill="#ffffff" 
+          stroke="#e2e8f0" 
+          stroke-width="1.5"/>
+
+    <!-- 3. Generative Sparkle Inside Loop -->
+    <g transform="translate(545, 388) scale(0.95)">
+      <path d="M 0 -48 
+               C 2 -16, 16 -2, 48 0 
+               C 16 2, 2 16, 0 48 
+               C -2 16, -16 2, -48 0 
+               C -16 -2, -2 -16, 0 -48 Z" 
+            fill="url(#sparkleCore)"/>
+      <circle cx="0" cy="0" r="10" fill="#ffffff" stroke="#0284c7" stroke-width="2"/>
+    </g>
+
+    <!-- 4. The Recommendation Dynamic Leg -->
+    <path d="M 522 476 
+             L 600 476 
+             C 610 476, 620 482, 626 490 
+             L 688 584 
+             C 694 594, 688 604, 676 604 
+             L 616 604 
+             C 606 604, 596 598, 590 590 
+             L 534 502 
+             C 528 494, 524 484, 522 476 Z" 
+          fill="url(#facetLeg)" 
+          stroke="#10b981" 
+          stroke-width="1.8"/>
+
+    <circle cx="678" cy="596" r="6" fill="#0284c7"/>
+  </g>
+
+  <!-- ==================== TYPOGRAPHY & BRANDING ==================== -->
+  <g transform="translate(540, 805)" text-anchor="middle">
+    <!-- Brand Title -->
+    <text font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC', sans-serif" 
+          font-size="82" 
+          font-weight="900" 
+          letter-spacing="-1">
+      <tspan fill="#0f172a">Rec-</tspan>
+      <tspan fill="url(#textGrad)">Agent</tspan>
+    </text>
+
+    <!-- High-Tech Subtitle -->
+    <text y="58" 
+          font-family="'SF Mono', Menlo, Monaco, 'Courier New', monospace" 
+          font-size="20" 
+          font-weight="700" 
+          fill="#64748b" 
+          letter-spacing="5.5">
+      GENERATIVE RECOMMENDATION INTELLIGENCE
+    </text>
+
+    <!-- Architectural Badge -->
+    <g transform="translate(0, 100)">
+      <rect x="-190" y="-18" width="380" height="36" rx="18" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.2"/>
+      <circle cx="-162" cy="0" r="5" fill="#10b981"/>
+      <text x="10" y="6" 
+            font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', sans-serif" 
+            font-size="14" 
+            font-weight="700" 
+            fill="#334155" 
+            letter-spacing="1.2">
+        CONTEXT-AWARE · AUDITABLE AIGR
+      </text>
+    </g>
+  </g>
 </svg>

@@ -8,11 +8,11 @@
 | Model | `jev-1.14.0` |
 | Authorization | `Bearer $MODELGO_API_KEY` |
 | Content-Type | `application/json` |
-| 默认协议 | `jev-questions-v3-five-r1` |
+| 默认协议 | `jev-questions-v4-two` |
 
 请求通过 `model`、`state`、`questions` 发送。`state` 包含候选理由、商品与促销事实、最小场景、气候和时间、覆盖与规则线索、AI 披露、来源和版本。用户标识字段、推荐行为和离线评测标签留在本地。[输入字段清单](docs/JEV_JUDGMENT_PROTOCOL.md)
 
-每条推荐对应一次请求。Jev 回答事实支持、表达风险、场景相关性、主要风险四道单选，以及一道吸引力评分。工作流用 0–5 六档的概率期望等级乘 20 得到 0–100 分，无分布时直接将标量乘 20。最终只有 `compliance=Y` 且吸引力严格大于 50 才会曝光。合规文案得 50 分时归为改写。已知硬风险和证据缺失按规则分别处置。历史九题可用 `--question-version jev-questions-v2` 显式选择。[题目与处置标准](docs/JEV_QUESTIONS.md)
+每条推荐一次请求，只含 `risk_type` 六选一和 `attractiveness_score` 1–100 分评分。风险为 `compliant` 时合规为 Y，其他为 N；规则 `jev-two-policy-v1` 仅在 Y 且分数严格大于 50 时 `expose`，其他为 `rewrite`。披露由模型风险题判断，工作流不再依据披露配置、事实覆盖或置信度额外改判。SystemOne 接口最多允许 10 个评分等级。当前索引 `0…9` 对应业务锚点 `1、12、23、34、45、56、67、78、89、100`；无概率时使用 `1 + 11 × 原始索引`，有概率时使用 `1 + 11 × 归一化期望索引`。这是等级概率换算的 1–100 分，不是原生 100 档逐整数评分。[题目与规则](docs/JEV_QUESTIONS.md)
 
 ## 使用示例
 

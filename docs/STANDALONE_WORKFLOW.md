@@ -1,18 +1,18 @@
 # 推荐生成与独立 Jev 判断工作流
 
-DeepSeek Harness/Rec-Agent 生成推荐商品和曝光理由。独立 Python 工作流读取推荐 JSON，构建事实包，调用 Jev 回答五题，再按固定规则生成处置。
+DeepSeek Harness/Rec-Agent 生成推荐商品和曝光理由。独立 Python 工作流读取推荐 JSON，构建事实包，调用 Jev 回答风险分类和吸引力两题，再按固定规则生成处置。
 
 ```mermaid
 flowchart LR
     A[输入用户 ID] --> B[DeepSeek Harness / Rec-Agent]
     B --> C[导出推荐 JSON]
     C --> D[独立程序构建 Fact Bundle]
-    D --> E[独立 Jev 五题判断]
+    D --> E[独立 Jev 两题判断]
     E --> P[合规与吸引力汇总规则]
     P --> F[推荐与 Jev 判断组合 JSON]
 ```
 
-`human_review` 表示关键资料需核验，流程在保存处置后结束。`rewrite`同样是处置结论，不会自动重新生成文案。真实页面展示和点击事件采集属于后续业务接入。
+`risk_type=compliant` 时合规状态为 Y，且吸引力严格大于 50 才输出 `expose`；其他情况统一为 `rewrite`，不会自动重新生成文案。真实展示和点击采集属于后续业务接入。
 
 ## 1. 导出 Harness 推荐
 
@@ -77,11 +77,11 @@ python3 scripts/run_recommendation_workflow.py \
   --live
 ```
 
-每条候选对应一次 Jev 请求，模型并行判断事实、表达、场景和主要风险，并为文案评估吸引力。工作流从四道单选计算合规状态，只有合规且吸引力严格大于 50 分才输出 `expose`。详细条件见 [五题标准](JEV_QUESTIONS.md)。
+每条候选对应一次请求，仅含 `risk_type` 六选一和 `attractiveness_score` 1–100 分评分。风险为 `compliant` 时合规为 Y，其他为 N；只有 Y 且分数严格大于 50 才 `expose`，其余 `rewrite`。不再用披露配置、事实覆盖或置信度作独立本地门禁。[题目标准](JEV_QUESTIONS.md)
 
-默认协议为 `jev-questions-v3-five-r1`。首轮五题 `jev-questions-v3-five` 保留用于原请求回放；历史九题可通过 `--question-version jev-questions-v2` 显式运行，处置仍取 Q7。其余历史版本用于旧请求复现。
+默认协议 `jev-questions-v4-two`，规则 `jev-two-policy-v1`。SystemOne 最多允许 10 个评分等级。当前索引 `0…9` 对应 `1、12、23、34、45、56、67、78、89、100`；业务分为 `1 + 11 × 索引`，有概率时使用归一化后的期望索引。这是等级概率换算的 1–100 分，不是原生 100 档逐整数评分。历史五题、九题按原版本回放，旧答卷不作为当前两题结果。
 
-密钥未配置会在发出请求前报错。响应格式、身份或模型版本错误单独记录；有失败项时命令退出码为1，不将接口或解析错误包装为模型的 `human_review`结论。
+密钥未配置会在发出请求前报错。响应格式、身份或模型版本错误单独记录；有失败项时命令退出码为1，不将接口或解析错误包装为成功审核结论。
 
 ## 4. 查看组合结果
 
@@ -107,6 +107,7 @@ python3 scripts/run_recommendation_workflow.py \
         "decision": "expose",
         "decision_source": "jev_answers_policy",
         "compliance": "Y",
+        "risk_type": "compliant",
         "attractiveness_score": 72.4,
         "decision_reasons": ["compliant_and_attractiveness_above_50"]
       }
@@ -124,7 +125,7 @@ python3 scripts/run_recommendation_workflow.py \
 | 模型成功返回有效结果 | completed | 完整Jev结果 |
 | 请求或解析失败 | error | null；原因见errors |
 
-`human_review`结论对应的状态仍是 `completed`，表示程序已得到有效结果。
+当前有效处置为 `expose` 或 `rewrite`，两者的 `audit_status` 都是 `completed`。
 
 ## 5. 独立追溯产物
 
@@ -141,7 +142,7 @@ python3 scripts/run_recommendation_workflow.py \
 
 输出目录包含同名产物时拒绝覆盖，每次运行使用新目录。响应在解析前落盘；无效JSON或协议错误保留原文并记录错误，不生成成功结论。HTTP失败、仅准备请求、没有候选，或自定义适配器未提供原始正文时，不生成响应正文记录。
 
-`evidence_source: workflow_fact_snapshot`表示引用来自本地事实快照，不是Jev生成的逐句解释。`confidence` 保留全部问题最低置信度用于诊断。五题协议的 `decision_confidence` 为 `null`。`escalated`是兼容标记，表示decision是否为human_review，不触发额外工作流。
+`evidence_source: workflow_fact_snapshot`表示引用来自本地事实快照，不是Jev生成的逐句解释。`confidence` 保留全部问题最低置信度用于诊断。两题协议的 `decision_confidence` 为 `null`，`escalated` 兼容字段固定为 `false`。
 
 ## 6. 事实与版本边界
 
@@ -153,10 +154,12 @@ python3 scripts/run_recommendation_workflow.py \
 
 Jev请求使用独立字段白名单。CTR、曝光点击、搜索词、购物车和反馈供Rec-Agent使用，不进入Jev输入。模型答卷和固定汇总规则共同决定处置。
 
-## 7. 测试与回放
+## 7. 测试与历史回放
+
+当前两题使用上面的工作流命令准备或真实调用，检查请求中恰好只有风险和吸引力。以下脚本保留历史评测，不代表当前两题请求。
 
 ```bash
-# 准备五题评估请求
+# 准备历史五题评估请求
 python3 scripts/run_jev_five_question_evaluation.py \
   --output-dir runs/jev-five-prepare
 

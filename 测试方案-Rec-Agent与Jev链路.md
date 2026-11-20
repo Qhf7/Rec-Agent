@@ -51,7 +51,7 @@ pytest tests/test_mcp_server.py -q
 - 每个 `item_id` 都存在于商品表且库存大于 0；
 - 存在 `exposure_reason`、`generated_reason`、`evidence_fields`、`context_summary`；
 - `exposure_reason == generated_reason`；
-- `exposure_reason` 是一句面向用户的中文文案，汉字不超过 24 个；
+- `exposure_reason` 是一句面向用户的中文文案，Unicode 字符不超过 20 个（含标点、字母和 emoji），不写数量或规格参数；
 - 文案不能出现 `users.city`、`items.functions`、`evidence_fields` 等内部字段路径。
 
 ### R2：未知用户空结果
@@ -130,14 +130,15 @@ score_name
 
 断言：事实包保留两个字段，且二者相同；词表命中和 Jev 文本解析使用 `exposure_reason`。
 
-### J2：规则路由
+### J2：两题处置规则
 
 | 场景 | 预期处置 |
 |---|---|
-| 事实完整、属性支撑充分 | `expose` |
-| 绝对化表达但可以机械改写 | `rewrite` |
-| 商品关键字段缺失或工具冲突 | `human_review` |
-| 未支持的医疗/功效宣称 | `block` |
+| `risk_type=compliant` 且 1–100 分吸引力严格大于 50 | `expose` |
+| `risk_type=compliant` 但吸引力不超过 50 | `rewrite` |
+| 其余五个风险类别，任意合法吸引力分 | `rewrite` |
+
+默认 `jev-questions-v4-two` 仅含六选一风险题和一题吸引力评分，合规与最终处置是汇总字段。接口评分使用十档等级 `0…9`，业务分为 `1 + 11 × 等级期望`。披露配置交给模型在风险题判断；当前不以置信度、事实覆盖或披露状态额外改判。[详细契约](docs/JEV_QUESTIONS_INPUT_DECISION_GUIDE.md)
 
 ### J3：Dry-run 安全
 
@@ -148,7 +149,7 @@ python3 run_jev_batch.py \
   --report /tmp/jev-dry-run-report.json
 ```
 
-`run_jev_batch.py` 默认是 dry-run；只有显式增加 `--send` 才会请求 Jev endpoint。断言：不发起网络请求，结果包含 `jev-questions-v1` 七个逻辑问题加风险类别/严重度，共九个标量问题的请求、canonical `item_id` 和可追溯的 `reason_id`。
+`run_jev_batch.py` 默认是 dry-run；只有显式增加 `--send` 才会请求 Jev endpoint。断言：不发起网络请求，请求使用当前 `jev-questions-v4-two` 的两题定义、canonical `item_id` 和可追溯的 `reason_id`。
 
 Jev 输入必须只包含当前候选的商品事实、有效促销快照、最小场景摘要、证据和版本信息；点击历史、CTR、订单、退款、投诉、购物车、搜索词和排序信号必须被排除。
 

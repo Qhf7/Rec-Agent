@@ -4,8 +4,24 @@
 
 [![Agent](https://img.shields.io/badge/Agent-Rec--Agent-2563eb)](rec-agent-preset/)
 [![Review](https://img.shields.io/badge/Review-Jev%20Judgment-7c3aed)](jev_adapter.py)
-[![Tests](https://img.shields.io/badge/tests-410%20passed-16a34a)](tests/)
+[![Tests](https://img.shields.io/badge/tests-520%20passed-16a34a)](tests/)
 [![Data](https://img.shields.io/badge/mock%20data-200%20users%20%2B%20200%20items-0891b2)](data/raw/)
+
+## 可视化工作台
+
+**[在线体验 → qhf7.github.io/Rec-Agent](https://qhf7.github.io/Rec-Agent/)**
+
+公开站点无需安装，输入 `u_0001`、`u_0199` 或 `u_0007` 即可查看真实历史推荐、Jev 判断、可视化图表和 JSON 导出。GitHub Pages 托管交互演示；实时模型调用使用以下本地后端。
+
+```bash
+python3 ui_server.py
+```
+
+打开 [http://127.0.0.1:8787](http://127.0.0.1:8787)，输入用户 ID，即可查看商品、曝光理由、独立 Jev 判断与评分图表。支持实时模型调用、真实历史结果演示、审核详情、运行记录和 JSON 导出，并适配手机屏幕。[启动与模型配置](docs/WEB_UI.md)。
+
+网页使用独立 Web Harness 编排推荐，再调用 Jev；桌面 DeepSeek Harness 预设仍可单独使用。演示模式不调用模型，实时模式需要服务端模型凭据。
+
+[界面预览](docs/assets/web-ui-desktop.png) · [手机预览](docs/assets/web-ui-mobile.png) · [工作台测试记录](docs/TEST_REPORT_WEB_UI_2026-11-20.md)
 
 推荐生成与审核通过独立 Python 工作流衔接；DeepSeek Harness 只生成推荐 JSON，独立工作流显式运行 Jev 审核。[运行说明](docs/STANDALONE_WORKFLOW.md)。
 
@@ -13,17 +29,33 @@
 
 [桌面 Harness 严格 JSON 与 20 字符真实测试记录](docs/TEST_REPORT_STRICT_JSON_2026-11-19.md)。
 
-[五题协议验证](docs/TEST_REPORT_JEV_FIVE_2026-11-19.md)记录新协议的测试、请求预览和真实调用条件。[九题工作流验证](docs/TEST_REPORT_JEV_MODEL_WORKFLOW_2026-11-18.md)保留历史真实响应回放。
+[历史五题验证](docs/TEST_REPORT_JEV_FIVE_2026-11-19.md)和[九题工作流验证](docs/TEST_REPORT_JEV_MODEL_WORKFLOW_2026-11-18.md)保留各版本的真实测试记录。
 
-[Harness → Jev 最新全链路实测](docs/TEST_REPORT_HARNESS_JEV_2026-11-20.md)：新建 Rec-Agent 会话生成 3 条推荐，独立工作流实时调用 Jev 评分并汇总处置；记录了低置信度边界案例。
+[Harness → Jev 五题全链路实测](docs/TEST_REPORT_HARNESS_JEV_2026-11-20.md)：新建 Rec-Agent 会话生成 3 条推荐，独立工作流实时调用当时的 Jev 协议；记录了低置信度边界案例。
 
-Rec-Agent 根据画像、行为和场景选择商品并生成曝光理由。独立工作流调用 Jev 评估文案，再根据答卷生成 `expose / rewrite / human_review / block` 四档处置结论。
+[当前 Jev 的问题、选项、输入信息与最终处置](docs/JEV_QUESTIONS_INPUT_DECISION_GUIDE.md)说明两题如何回答、历史点击的使用边界和处置规则。
+
+[当前两题协议实测](docs/TEST_REPORT_JEV_TWO_2026-11-20.md)：26/26 个扩展请求成功解析，覆盖六类风险、披露状态和重复调用；保存评分映射与逐条结果。
+
+[两题工作流多轮完整测试](docs/TEST_REPORT_JEV_MULTIROUND_2026-11-20.md)：三个新桌面会话生成 9 条推荐并各审核三次，另测冻结对照，共 66 次真实 Jev 调用；提供逐条表格、三组图像及边界问题分析。
+
+Rec-Agent 根据画像、行为和场景选择商品并生成曝光理由。独立工作流调用 Jev 回答风险分型和吸引力两题，汇总为 `expose` 或 `rewrite`。
 
 ## 一眼看懂项目链路
 
-![Rec-Agent 与 Jev 推荐与合规判决模型框架](docs/assets/rec_agent_core_framework_1080p.png)
+```mermaid
+flowchart LR
+    U[用户 ID] --> H[DeepSeek Harness / Rec-Agent]
+    C[画像、行为与历史曝光点击] --> H
+    H --> R[推荐商品与曝光理由 JSON]
+    R --> F[独立工作流：规范商品与精简场景事实]
+    F --> J[Jev：风险六选一 + 吸引力评分]
+    J --> D{合规 Y 且吸引力大于 50}
+    D -->|是| E[expose]
+    D -->|否| W[rewrite]
+```
 
-模型框架图（1920 × 1080），展示多源上下文、Rec-Agent、事实与规则、Jev 判决及四档处置。当前功能边界与运行方式见[独立工作流说明](docs/STANDALONE_WORKFLOW.md)，验证范围见[工作流验证报告](docs/TEST_REPORT_JEV_MODEL_WORKFLOW_2026-11-18.md)。
+当前功能边界与运行方式见[独立工作流说明](docs/STANDALONE_WORKFLOW.md)。
 
 ## 当前实现
 
@@ -38,6 +70,7 @@ Rec-Agent 根据画像、行为和场景选择商品并生成曝光理由。独�
 | **Fact Bundle** | 将候选结果转换为可审核、可追溯的事实包 | [`fact_bundle.py`](fact_bundle.py) |
 | **Jev Adapter** | 构建请求预览或显式调用 `jev-1.14.0` | [`jev_adapter.py`](jev_adapter.py) |
 | **结果查看器** | 从 Harness 整段输出中提取 JSON，展示缩进 JSON 和推荐卡片 | [`rec-agent-viewer.html`](rec-agent-viewer.html) |
+| **可视化工作台** | 输入用户 ID，串联推荐与 Jev，展示评分、处置、轨迹和导出 | [`ui_server.py`](ui_server.py) / [`web/`](web/) |
 | **测试矩阵** | 覆盖 MCP、Agent、Fact Bundle、Jev 和批处理链路 | [`测试方案-Rec-Agent与Jev链路.md`](测试方案-Rec-Agent与Jev链路.md) |
 
 ## Rec-Agent 输出示例
@@ -87,25 +120,25 @@ Rec-Agent 根据画像、行为和场景选择商品并生成曝光理由。独�
 
 ## Jev 判决协议
 
-独立工作流从 Jev 的五题答卷得到以下结果。
+独立工作流从 Jev 的两题答卷得到以下结果。
 
 | 字段 | 说明 |
 | --- | --- |
-| `decision` | 根据五题汇总的 `expose`、`rewrite`、`human_review`、`block` |
-| `compliance` | 事实有依据、表达无风险、场景相关、主要风险为合规，且没有确认缺少的必需披露时为 `Y` |
-| `risk_type` | Jev 选择的主要风险，包括客观主张冲突及关键证据缺失 |
+| `decision` | 合规且吸引力 > 50 时 `expose`，否则 `rewrite` |
+| `compliance` | 风险选项为 `compliant` 时 `Y`，其他五类为 `N` |
+| `risk_type` | `compliant`、`absolute_claim`、`efficacy_or_medical_claim`、`price_misleading`、`missing_ai_disclosure`、`off_topic` 六选一 |
 | `evidence` | 输入事实引用；通过 `evidence_source` 标明来自模型选择或工作流事实快照 |
-| `attractiveness_score` | 0–100 分，衡量卖点、广告语气和使用画面 |
+| `attractiveness_score` | 1–100 分，由 10 档有序评分及其概率换算，衡量卖点、广告语气和使用画面 |
 | `decision_source` | `jev_answers_policy`，表示独立工作流按 Jev 答卷汇总 |
 | `decision_reasons` | 触发当前处置的选项和门槛 |
-| `escalated` | 兼容字段，表示结论是否为 `human_review` |
+| `escalated` | 兼容字段，当前两题协议固定为 `false` |
 | `model_version` | 判决模型版本 |
 
-[输入字段说明](docs/JEV_JUDGMENT_PROTOCOL.md)和[题目及评分标准](docs/JEV_QUESTIONS.md)记录 `jev-questions-v3-five-r1` 使用的事实与问题。
+[输入字段说明](docs/JEV_JUDGMENT_PROTOCOL.md)和[题目及评分标准](docs/JEV_QUESTIONS.md)记录 `jev-questions-v4-two` 使用的事实与问题。
 
-每条候选发一次请求，Jev 并行回答事实、表达、场景和风险类别四道单选，以及一道吸引力评分。独立工作流仅在 `compliance=Y` 且吸引力严格大于 50 时输出 `expose`。`human_review` 作为关键事实无法核验时的结果标签，流程在保存处置后结束。
+每条候选发一次请求，Jev 独立回答一道风险选择题和一道评分题。`compliance` 和 `decision` 由工作流汇总，不增加模型题目。处置只使用模型的风险选项与吸引力分；置信度、披露配置和字段覆盖不作为额外本地门禁。
 
-Q2 区分客观事实、一般场景、行动建议、主观表达和具体个人状态。披露状态独立记录。显式选择历史九题协议时沿用其原始 Q7 处置，便于复现 [v2 对照结果](docs/TEST_REPORT_JEV_V2_2026-11-18.md)。
+当前风险范围限于六类，不输出独立的通用事实支持结论。披露缺失由模型在风险题判断。显式选择历史五题或九题版本时仍按对应协议回放，以便复现[历史结果](docs/TEST_REPORT_JEV_FIVE_2026-11-19.md)。
 
 ## 数据
 
@@ -164,7 +197,7 @@ python3 scripts/run_recommendation_workflow.py \
 
 默认生成候选、事实包、请求预览、组合结果和报告，调用次数为 0。实际导出时替换 `--input` 文件，并使用新的输出目录。根据实际展示配置设置 `--ai-disclosure visible`、`missing` 或默认 `unknown`，披露状态独立保留。追加 `--live` 并设置 `MODELGO_API_KEY` 即调用 Jev，`workflow_results.json` 将每条推荐与对应模型判断放在同一份缩进 JSON 中。
 
-Jev 输出四档处置；展示、点击采集和真实反馈写入由后续业务流程实现，本脚本不生成这些事件。
+两题协议输出曝光或需改写标签；展示、点击采集和真实反馈写入由后续业务流程实现，本脚本不生成这些事件。
 
 ## 结果查看器
 
@@ -209,7 +242,7 @@ pbpaste | python3 scripts/strict_json_output.py
 ## 验证状态
 
 ```text
-pytest -q                 410 passed
+pytest -q                 520 passed
 scripts/validate_data.py  PASS: all hard checks passed
 ```
 

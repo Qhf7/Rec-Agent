@@ -1,6 +1,6 @@
 # Jev 判断问题与输入契约
 
-DeepSeek Harness 生成推荐商品和曝光理由。独立 Python 工作流导入推荐 JSON，从规范数据构建事实包，调用 Jev 回答五题，再按模型答卷和固定规则保存处置。默认协议为 `jev-questions-v3-five-r1`，一条候选对应一次请求。题目包括事实支持、表达风险、场景相关性、主要风险分类四道单选，以及一道文案吸引力评分。[问题清单](JEV_QUESTIONS.md)
+DeepSeek Harness 生成推荐商品和曝光理由。独立 Python 工作流导入推荐 JSON，从规范数据构建事实包，调用 Jev 回答风险分型与吸引力两题，再按答卷和固定规则保存处置。默认协议为 `jev-questions-v4-two`，一条候选对应一次请求。仅含 `risk_type` 六选一和 `attractiveness_score` 1–100 分评分。[问题清单](JEV_QUESTIONS.md)
 
 ## 请求结构
 
@@ -24,22 +24,15 @@ HTTP 请求正文包含 `model`、`state`、`questions`。`state` 是字符串�
 
 ## 汇总处置
 
-`compliance=Y` 要求事实 `supported`、表达 `clean`、场景 `relevant`、风险 `compliant`，且没有已确认缺少的必需披露。其它情况为 `N`。披露 `unknown` 单独记录为配置注记。
+风险选项严格为 `compliant`、`absolute_claim`、`efficacy_or_medical_claim`、`price_misleading`、`missing_ai_disclosure`、`off_topic`。模型只回答两题，合规和最终处置不增加提问。
 
-吸引力按 0–5 六档评分。收到概率分布时，先归一化再计算期望等级。只有标量时采用原始 0–5 分。工作流将等级乘以 20 得到 0–100 分，以未舍入分数比较门槛。
+规则 `jev-two-policy-v1` 规定：`risk_type=compliant` 时 `compliance=Y`，其余为 N；只有 **Y 且吸引力严格大于 50** 才输出 `expose`，其他情况为 `rewrite`。披露由 Jev 根据 `required=true`、`flag=false` 判断；工作流不再单独依据披露配置、事实覆盖状态或置信度改判。`unknown` 仅为配置待确认。
 
-| 顺序 | 触发条件 | 处置 |
-| --- | --- | --- |
-| 1 | 表达 `blocking` | `block` |
-| 2 | 事实或场景 `unverifiable`，或风险 `missing_evidence` | `human_review` |
-| 3 | 其它合规失败，或合规但吸引力不超过 50 | `rewrite` |
-| 4 | 合规且吸引力严格大于 50 | `expose` |
+SystemOne 最多允许 10 个评分等级，当前索引 `0…9` 对应业务锚点 `1、12、23、34、45、56、67、78、89、100`，业务分范围仍为 `1…100`。有概率时先归一化，再计算 `1 + 11 × 期望索引`；无概率时计算 `1 + 11 × 原始索引`。这是等级概率换算分数，不是原生 100 档逐整数评分。门槛使用未舍入业务分，风险与吸引力独立，分数不是点击率预测。
 
-`human_review` 是保存到结果的处置标签。`rewrite` 标记文案需要调整。流程在输出处置后结束。
+`workflow_results.json` 每条推荐包含 `jev_audit`，保存风险、合规状态、吸引力、处置、置信度、概率、处置依据及规则版本。`decision_source=jev_answers_policy`，`decision_question`、`decision_confidence` 为 `null`。`rewrite` 不自动启动生成器；接口或答卷错误单独保存，不伪造处置。
 
-`workflow_results.json` 按推荐条目保存 `jev_audit`。结果包含 `compliance`、`attractiveness_score`、`decision`、`decision_reasons`、`decision_inputs` 以及 `decision_source=jev_answers_policy` 和 `policy_version=jev-five-policy-v1`。五题的 `question_confidences` 和最低 `confidence` 用于诊断。处置来自汇总规则，因此 `decision_question` 与 `decision_confidence` 为 `null`。接口失败、响应缺题或协议不匹配会记录为运行错误。
-
-原始请求、事实包、模型响应和解析结果分别存档。默认事实引用标记为 `evidence_source=workflow_fact_snapshot`。模型给出有效路径时，结果记录该路径来源。[工作流产物](STANDALONE_WORKFLOW.md)
+分类范围限于六类，`compliant` 不代表已完成所有客观事实核验。原始请求、事实包、响应和解析结果分别存档。默认事实引用标记 `evidence_source=workflow_fact_snapshot`，不声称是模型自由生成的解释。[工作流产物](STANDALONE_WORKFLOW.md)
 
 ## 数据版本与历史回放
 
@@ -47,7 +40,7 @@ HTTP 请求正文包含 `model`、`state`、`questions`。`state` 是字符串�
 
 新导入的 Harness 推荐使用 2026 年 6 月 15 日模拟场景。已有 JSONL 回放保留原快照子集、原时间和查询记录。旧 `item_####` 通过迁移脚本核对数字后缀、标题和品牌后转换。[迁移脚本](../scripts/migrate_legacy_candidates.py)
 
-显式选择 `jev-questions-v3-five` 时，按首轮五题提示词回放。显式选择 `jev-questions-v2`、`jev-questions-v2-q2-legacy` 或 `jev-questions-v1` 时，沿用历史九题；其最终处置取 Jev Q7，严重度采用原 0–1 换算。冻结的历史响应可离线回放。[历史回放脚本](../scripts/replay_jev_model_decisions.py)
+显式选择 `jev-questions-v3-five` 或 `jev-questions-v3-five-r1` 时，按原五题版本及原评分规则回放；历史 `human_review`、`block` 标签不属于当前两题结果。显式选择 `jev-questions-v2`、`jev-questions-v2-q2-legacy` 或 `jev-questions-v1` 时，沿用历史九题；其最终处置取 Jev Q7，严重度采用原 0–1 换算。冻结的历史响应可离线回放。[历史回放脚本](../scripts/replay_jev_model_decisions.py)
 
 ## 预览与调用
 

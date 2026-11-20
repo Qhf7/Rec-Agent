@@ -316,7 +316,7 @@ def test_live_joins_recommendation_with_original_jev_decision(tmp_path, monkeypa
 
 
 @pytest.mark.parametrize("level, expected", [(2.5, "rewrite"), (3, "expose")])
-def test_default_workflow_decides_from_five_answers(tmp_path, monkeypatch, level, expected):
+def test_five_question_workflow_decides_from_frozen_answers(tmp_path, monkeypatch, level, expected):
     monkeypatch.setenv("MODELGO_API_KEY", "test-only-key")
     answers = {
         "q2_fact_support": {"choice": "supported", "confidence": 0.9},
@@ -326,7 +326,7 @@ def test_default_workflow_decides_from_five_answers(tmp_path, monkeypatch, level
         "attractiveness_score": {"score": level, "confidence": 0.9},
     }
     mock_http_response(monkeypatch, json.dumps({"model": "jev-1.14.0", "answers": answers}))
-    report = _run_workflow(write_input(tmp_path), tmp_path / "output", live=True)
+    report = _run_workflow(write_input(tmp_path), tmp_path / "output", live=True, question_version="jev-questions-v3-five-r1")
     assert (report["decision_count"], report["error_count"]) == (1, 0)
     request = read_jsonl(report["artifacts"]["jev_requests"])[0]["request"]
     assert set(request["questions"]) == set(answers)
@@ -336,6 +336,61 @@ def test_default_workflow_decides_from_five_answers(tmp_path, monkeypatch, level
     assert (audit["compliance"], audit["attractiveness_score"], audit["decision"]) == ("Y", level * 20, expected)
     assert audit["decision_question"] is None
     assert "judge_score" not in audit
+
+
+@pytest.mark.parametrize("risk_type,index,disclosure,expected_compliance,expected_decision", [
+    ("compliant", 0, "unknown", "Y", "rewrite"),
+    ("compliant", 49 / 11, "unknown", "Y", "rewrite"),
+    ("compliant", 49 / 11 + .0001, "unknown", "Y", "expose"),
+    ("compliant", 9, "missing", "Y", "expose"),
+    ("missing_ai_disclosure", 9, "missing", "N", "rewrite"),
+    ("efficacy_or_medical_claim", 9, "visible", "N", "rewrite"),
+])
+def test_default_two_question_workflow_uses_only_model_risk_and_score(
+    tmp_path, monkeypatch, risk_type, index, disclosure, expected_compliance, expected_decision,
+):
+    monkeypatch.setenv("MODELGO_API_KEY", "test-only-key")
+    answers = {
+        "risk_type": {"choice": risk_type, "confidence": 0.01},
+        "attractiveness_score": {"score": index, "confidence": 0.01},
+    }
+    mock_http_response(monkeypatch, json.dumps({"model": "jev-1.14.0", "answers": answers}))
+    report = _run_workflow(write_input(tmp_path), tmp_path / "two", live=True, ai_disclosure=disclosure)
+    assert (report["decision_count"], report["error_count"], report["network_calls"]) == (1, 0, 1)
+    assert report["question_schema_version"] == "jev-questions-v4-two"
+    assert report["policy_version"] == "jev-two-policy-v1"
+    request = read_jsonl(report["artifacts"]["jev_requests"])[0]["request"]
+    assert set(request["questions"]) == {"risk_type", "attractiveness_score"}
+    assert request["questions"] == json.loads(request["state"])["questions"]
+    result = json.loads(Path(report["artifacts"]["workflow_results"]).read_text())
+    audit = result["recommendations"][0]["jev_audit"]
+    assert (audit["compliance"], audit["attractiveness_score"], audit["decision"]) == (
+        expected_compliance, pytest.approx(index * 11 + 1), expected_decision,
+    )
+    assert audit["escalated"] is False
+    assert audit["decision_confidence"] is None
+    assert "required_ai_disclosure_missing" not in audit["decision_inputs"]
+    assert set(audit["question_choices"]) == {"risk_type"}
+    assert "fact_support_choice" not in audit
+    assert "judge_score" not in audit
+
+
+def test_two_question_workflow_rejects_five_question_response(tmp_path, monkeypatch):
+    monkeypatch.setenv("MODELGO_API_KEY", "test-only-key")
+    answers = {
+        "risk_type": {"choice": "compliant", "confidence": .9},
+        "attractiveness_score": {"score": 3, "confidence": .9},
+        "q2_fact_support": {"choice": "supported", "confidence": .9},
+        "q3_expression_risk": {"choice": "clean", "confidence": .9},
+        "q5_context_relevance": {"choice": "relevant", "confidence": .9},
+    }
+    mock_http_response(monkeypatch, json.dumps({"answers": answers}))
+    report = _run_workflow(write_input(tmp_path), tmp_path / "two", live=True)
+    assert report["error_count"] == 1
+    assert report["decision_count"] == 0
+    combined = json.loads(Path(report["artifacts"]["workflow_results"]).read_text())
+    assert combined["recommendations"][0]["jev_audit"] is None
+    assert combined["recommendations"][0]["audit_status"] == "error"
 
 
 def test_live_keeps_malformed_response_and_records_parse_error(tmp_path, monkeypatch):

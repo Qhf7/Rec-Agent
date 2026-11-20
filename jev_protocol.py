@@ -12,15 +12,19 @@ from jev_five_question import (
     FIVE_QUESTION_PREVIOUS_SCHEMA_VERSION, FIVE_QUESTION_SCHEMA_VERSION,
     build_five_question_questions, parse_five_question_answers,
 )
+from jev_two_question import (
+    TWO_QUESTION_SCHEMA_VERSION, build_two_question_questions, parse_two_question_answers,
+)
 
 
 LEGACY_JEV_QUESTION_SCHEMA_VERSION = "jev-questions-v1"
 V2_JEV_QUESTION_SCHEMA_VERSION = "jev-questions-v2"
-JEV_QUESTION_SCHEMA_VERSION = FIVE_QUESTION_SCHEMA_VERSION
+JEV_QUESTION_SCHEMA_VERSION = TWO_QUESTION_SCHEMA_VERSION
 Q2_LEGACY_QUESTION_SCHEMA_VERSION = "jev-questions-v2-q2-legacy"
 SUPPORTED_JEV_QUESTION_VERSIONS = frozenset({
     LEGACY_JEV_QUESTION_SCHEMA_VERSION,
     FIVE_QUESTION_PREVIOUS_SCHEMA_VERSION,
+    FIVE_QUESTION_SCHEMA_VERSION,
     JEV_QUESTION_SCHEMA_VERSION,
     V2_JEV_QUESTION_SCHEMA_VERSION,
     Q2_LEGACY_QUESTION_SCHEMA_VERSION,
@@ -164,8 +168,10 @@ def _question_version(version: str | None) -> str:
 
 
 def build_jev_questions(version: str | None = None) -> dict[str, dict[str, Any]]:
-    """Build versioned five-question output or a frozen nine-question rubric."""
+    """Build the current two-question protocol or frozen historical questions."""
     version = _question_version(version)
+    if version == TWO_QUESTION_SCHEMA_VERSION:
+        return build_two_question_questions()
     questions = _legacy_jev_questions()
     if version == LEGACY_JEV_QUESTION_SCHEMA_VERSION:
         return questions
@@ -497,6 +503,11 @@ def parse_jev_answers(payload: Mapping[str, Any], fact_bundle: Mapping[str, Any]
     answers = payload.get("answers") if isinstance(payload, Mapping) else None
     if not isinstance(answers, Mapping):
         raise ValueError("Jev response answers are required")
+    if expected_protocol == TWO_QUESTION_SCHEMA_VERSION or (expected_protocol is None and set(answers) == {"risk_type", "attractiveness_score"}):
+        return parse_two_question_answers(
+            answers, fact_bundle, build_jev_questions(TWO_QUESTION_SCHEMA_VERSION), _evidence_path_present,
+            protocol_version=TWO_QUESTION_SCHEMA_VERSION,
+        )
     if expected_protocol in {FIVE_QUESTION_PREVIOUS_SCHEMA_VERSION, FIVE_QUESTION_SCHEMA_VERSION} or "attractiveness_score" in answers:
         if expected_protocol not in (None, FIVE_QUESTION_PREVIOUS_SCHEMA_VERSION, FIVE_QUESTION_SCHEMA_VERSION):
             raise ValueError("response format does not match requested protocol")

@@ -42,12 +42,13 @@ def answers(level=3):
 
 
 def parse(value=None, **kwargs):
+    kwargs.setdefault("expected_protocol", FIVE_QUESTION_SCHEMA_VERSION)
     return parse_jev_answers({"answers": value if value is not None else answers()}, bundle(), **kwargs)
 
 
-def test_default_is_five_independent_questions_and_frozen_versions_stay_nine():
-    questions = build_jev_questions()
-    assert JEV_QUESTION_SCHEMA_VERSION == FIVE_QUESTION_SCHEMA_VERSION
+def test_frozen_five_independent_questions_and_older_versions_stay_nine():
+    questions = build_jev_questions(FIVE_QUESTION_SCHEMA_VERSION)
+    assert JEV_QUESTION_SCHEMA_VERSION != FIVE_QUESTION_SCHEMA_VERSION
     assert list(questions) == list(FIVE_QUESTION_KEYS)
     assert sum(q["type"] == "choice" for q in questions.values()) == 4
     assert questions["attractiveness_score"]["type"] == "score"
@@ -65,8 +66,8 @@ def test_default_is_five_independent_questions_and_frozen_versions_stay_nine():
     assert "unsupported_fact" not in build_jev_questions(V2_JEV_QUESTION_SCHEMA_VERSION)["risk_type"]["criteria"]
 
 
-def test_default_input_retains_fact_allowlist_and_excludes_behavior():
-    payload = build_jev_input(bundle())
+def test_five_question_input_retains_fact_allowlist_and_excludes_behavior():
+    payload = build_jev_input(bundle(), question_version=FIVE_QUESTION_SCHEMA_VERSION)
     assert payload["question_schema_version"] == FIVE_QUESTION_SCHEMA_VERSION
     assert len(payload["questions"]) == 5
     assert payload["facts"]["scene"] == {"city": "广州", "tags": ["家庭采购"]}
@@ -216,7 +217,7 @@ def test_transmitted_evidence_is_validated_for_each_question():
 
 
 def test_all_valid_choice_combinations_have_transparent_total_disposition():
-    questions = build_jev_questions()
+    questions = build_jev_questions(FIVE_QUESTION_SCHEMA_VERSION)
     for values in itertools.product(*(questions[key]["criteria"] for key in CHOICE_KEYS)):
         choices = dict(zip(CHOICE_KEYS, values))
         result = aggregate_five_question_answers(choices, 75)

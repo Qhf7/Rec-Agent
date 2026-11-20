@@ -36,3 +36,7 @@ rule_baseline_full_report.json
 
 # Local standalone workflow artifacts
 /runs/
+
+# Local browser validation artifacts
+/.playwright-cli/
+/output/

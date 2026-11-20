@@ -87,4 +87,4 @@ python3 scripts/run_recommendation_workflow.py \
   --output-dir runs/copy-review-prepare
 ```
 
-默认仅准备事实与请求。使用 `--live` 调用 Jev 后，独立工作流汇总五题答案，并在合规且吸引力严格大于 50 分时输出 `expose`。见 [题目及处置标准](JEV_QUESTIONS.md)。
+默认仅准备事实与请求。使用 `--live` 调用 Jev 后，独立工作流汇总风险六选一和吸引力评分两题，在 `risk_type=compliant` 且 1–100 分吸引力严格大于 50 时输出 `expose`，其余为 `rewrite`。见[题目及处置标准](JEV_QUESTIONS.md)。
